@@ -13,9 +13,8 @@ function resolveBaseURL(): string {
 
 // 创建 axios 实例（统一后端基础地址配置）
 const http: AxiosInstance = axios.create({
-  // 统一设置后端基础地址（同源优先，避免 Mixed Content）
-  baseURL: resolveBaseURL(),
-  timeout: 10000, // 10秒超时
+  baseURL: resolveBaseURL() || '',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,7 +27,9 @@ http.interceptors.request.use(
     console.log('Sending request:', config.method?.toUpperCase(), config.url)
 
     // 添加认证 token（如果存在）
-    const token = localStorage.getItem('token')
+    const token =
+      localStorage.getItem('telegram_auth_token') ||
+      localStorage.getItem('token')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
