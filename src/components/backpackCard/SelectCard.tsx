@@ -187,7 +187,7 @@ const SelectCard: React.FC<SelectCardProps> = ({
           className="w-full max-w-[361px] h-[37px] rounded-[14px] bg-[rgba(15,21,43,0.5)]  flex items-center justify-center gap-3"
           data-testid="select-category-tablist"
         >
-          {options.map(opt => {
+          {options?.map(opt => {
             const selected = opt.value === value
             return (
               <button

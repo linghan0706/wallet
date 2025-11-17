@@ -8,9 +8,9 @@ import SelectCard, {
   BackpackItem,
   BackpackCategory,
 } from '@/components/backpackCard/SelectCard'
-import NoseSection from '@/components/backpack_up/Nosesection'
+import NoseSection from '@/components/backpack_up/nosesection'
 import GiftProps from '@/components/backpack_up/GiftProps'
-import NoseSectionResult from '@/components/backpack_up/NosesectionResult'
+import NoseSectionResult from '@/components/backpack_up/nosesectionResult'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
 import backImage from '@/public/backImage.png'
 
@@ -146,7 +146,7 @@ export default function BackpackPage() {
         <SelectCard
           options={options}
           value={selectedCategory}
-          onChange={setSelectedCategory}
+          onChange={value => setSelectedCategory(value as BackpackCategory)}
           items={items}
           loading={loading}
           error={error}
