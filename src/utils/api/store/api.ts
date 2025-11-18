@@ -95,76 +95,51 @@ export type ExchangeRequest = {
 /**
  * 获取商店中心数据
  */
-export async function fetchStoreCenter(
-  token?: string
-): Promise<ApiSuccess<StoreCenterData>> {
-  const res = await http.get('/api/store/center', {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
-  // 先转成 unknown，再断言为 ApiSuccess<StoreCenterData>
-  return res.data as unknown as ApiSuccess<StoreCenterData>
+export async function fetchStoreCenter(): Promise<ApiSuccess<StoreCenterData>> {
+  const res = await http.get('/store/center')
+  return res as unknown as ApiSuccess<StoreCenterData>
 }
 
 /**
  * 获取商店订单列表
  */
-export async function fetchStoreOrders(
-  token?: string
-): Promise<ApiSuccess<StoreOrder[]>> {
-  const res = await http.get('/api/store/orders', {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
-  return res.data as unknown as ApiSuccess<StoreOrder[]>
+export async function fetchStoreOrders(): Promise<ApiSuccess<StoreOrder[]>> {
+  const res = await http.get('/store/orders')
+  return res as unknown as ApiSuccess<StoreOrder[]>
 }
 /**
  * 根据订单号查询商店订单
  */
 export async function fetchStoreOrderByNumber(
-  orderNumber: string,
-  token?: string
+  orderNumber: string
 ): Promise<ApiSuccess<StoreOrder>> {
-  const res = await http.get(
-    `/api/store/orders/${encodeURIComponent(orderNumber)}`,
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    }
-  )
-  return res.data as unknown as ApiSuccess<StoreOrder>
+  const res = await http.get(`/store/orders/${encodeURIComponent(orderNumber)}`)
+  return res as unknown as ApiSuccess<StoreOrder>
 }
 /**
  * 获取商店商品列表
  */
-export async function fetchStoreItems(
-  token?: string
-): Promise<ApiSuccess<StoreItemEntry[]>> {
-  const res = await http.get('/api/store/items', {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
-  return res.data as unknown as ApiSuccess<StoreItemEntry[]>
+export async function fetchStoreItems(): Promise<ApiSuccess<StoreItemEntry[]>> {
+  const res = await http.get('/store/items')
+  return res as unknown as ApiSuccess<StoreItemEntry[]>
 }
 
 /**
  * 提交商店购买订单
  */
 export async function submitStorePurchase(
-  payload: PurchaseSubmitRequest,
-  token?: string
+  payload: PurchaseSubmitRequest
 ): Promise<ApiSuccess<StoreOrder>> {
-  const res = await http.post('/api/store/purchase/submit', payload, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
-  return res.data as unknown as ApiSuccess<StoreOrder>
+  const res = await http.post('/store/purchase/submit', payload)
+  return res as unknown as ApiSuccess<StoreOrder>
 }
 
 /**
  * 资产兑换
  */
 export async function submitStoreExchange(
-  payload: ExchangeRequest,
-  token?: string
+  payload: ExchangeRequest
 ): Promise<ApiSuccess<AssetRedemption>> {
-  const res = await http.post('/api/store/exchange', payload, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  })
-  return res.data as unknown as ApiSuccess<AssetRedemption>
+  const res = await http.post('/store/exchange', payload)
+  return res as unknown as ApiSuccess<AssetRedemption>
 }

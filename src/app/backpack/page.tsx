@@ -3,14 +3,13 @@
 import { useEffect, useState } from 'react'
 import MotionDiv from '@/components/motion/MotionDiv'
 import StageProgressCard from '@/components/backpackCard/StageProgressCard'
-// import NoseSection from '@/components/backpack_up/nosesection'
 import SelectCard, {
   BackpackItem,
   BackpackCategory,
 } from '@/components/backpackCard/SelectCard'
-import NoseSection from '@/components/backpack_up/nosesection'
+import NoseSection from '@/components/backpack_up/Nosesection'
 import GiftProps from '@/components/backpack_up/GiftProps'
-import NoseSectionResult from '@/components/backpack_up/nosesectionResult'
+import NoseSectionResult from '@/components/backpack_up/NosesectionResult'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
 import backImage from '@/public/backImage.png'
 

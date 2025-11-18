@@ -1,4 +1,4 @@
-import { httpUtils } from './http'
+import http, { httpUtils } from './http'
 import { getFormattedInitData } from '../telegramWebApp/telegrambot'
 
 // 定义 Telegram 登录相关的类型
@@ -37,7 +37,9 @@ export interface TelegramLoginEmptyResponse extends BaseApiResponse {
 }
 
 // 统一的登录响应类型
-export type TelegramLoginResponse = TelegramLoginSuccessResponse | TelegramLoginEmptyResponse
+export type TelegramLoginResponse =
+  | TelegramLoginSuccessResponse
+  | TelegramLoginEmptyResponse
 
 // 错误响应类型
 export interface LoginError extends BaseApiResponse {
@@ -49,38 +51,41 @@ export interface LoginError extends BaseApiResponse {
 const STORAGE_KEYS = {
   TOKEN: 'telegram_auth_token',
   USER: 'telegram_user_info',
-  LOGIN_TIME: 'telegram_login_time'
+  LOGIN_TIME: 'telegram_login_time',
 } as const
 // 导出格式化数据
-export const initData=getFormattedInitData();
+export const initData = getFormattedInitData()
 /**
  * Telegram Web App 登录函数
  * 使用 getFormattedInitData 返回的数据进行登录
  */
-export async function telegramLogin(): Promise<TelegramLoginResponse | LoginError> {
+export async function telegramLogin(): Promise<
+  TelegramLoginResponse | LoginError
+> {
   try {
     // 1. 获取格式化后的 Telegram initData
     const initDataResult = getFormattedInitData()
-    
+
     if (!initDataResult || !initDataResult.initData) {
       return {
         success: false,
-        message: '无法获取 Telegram initData。请确保在 Telegram Web App 环境中运行。',
-        timestamp: Date.now()
+        message:
+          '无法获取 Telegram initData。请确保在 Telegram Web App 环境中运行。',
+        timestamp: Date.now(),
       }
     }
 
     // 2. 准备请求数据
     const requestData: TelegramLoginRequest = {
-      initData: initDataResult.initData
+      initData: initDataResult.initData,
     }
     console.log('Sending Telegram login request...')
-    console.log('InitData:', initDataResult.initData)
 
-    // 3. 发送 POST 请求到后端
+    // 3. 发送登录请求（优先 header-only，401/缺少令牌时回退 JSON body）
     const response = await httpUtils.post<TelegramLoginResponse>(
-      '/api/auth/login',
-      requestData
+      '/auth/login',
+      requestData,
+      { headers: { 'X-Telegram-Init-Data': initDataResult.initData } }
     )
 
     // 4. 验证响应数据
@@ -92,17 +97,24 @@ export async function telegramLogin(): Promise<TelegramLoginResponse | LoginErro
       return {
         success: false,
         message: response.message || 'Login failed',
-        timestamp: response.timestamp || Date.now()
+        timestamp: response.timestamp || Date.now(),
       }
     }
 
     // 5. 检查是否是成功响应且包含用户数据
-    if ('data' in response && response.data && typeof response.data === 'object' && 'accessToken' in response.data) {
+    if (
+      'data' in response &&
+      response.data &&
+      typeof response.data === 'object' &&
+      'accessToken' in response.data
+    ) {
       const successResponse = response as TelegramLoginSuccessResponse
-      
+
       // 6. 验证必要字段
       if (!successResponse.data.accessToken || !successResponse.data.userId) {
-        throw new Error('Missing required fields in response (accessToken or userId)')
+        throw new Error(
+          'Missing required fields in response (accessToken or userId)'
+        )
       }
 
       // 7. 保存登录信息到本地存储
@@ -114,23 +126,22 @@ export async function telegramLogin(): Promise<TelegramLoginResponse | LoginErro
 
     // 8. 处理空数据的成功响应
     return response
-
   } catch (error) {
     console.error('Telegram login error:', error)
-    
+
     // 处理不同类型的错误
     if (error instanceof Error) {
       return {
         success: false,
         message: error.message,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
     }
-    
+
     return {
       success: false,
       message: 'An unexpected error occurred during login',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
   }
 }
@@ -142,24 +153,26 @@ function saveLoginInfo(loginResponse: TelegramLoginSuccessResponse): void {
   try {
     // 保存认证令牌
     localStorage.setItem(STORAGE_KEYS.TOKEN, loginResponse.data.accessToken)
-    
+
     // 保存用户信息
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify({
-      userId: loginResponse.data.userId,
-      telegramId: loginResponse.data.telegramId,
-      username: loginResponse.data.username,
-      avatarUrl: loginResponse.data.avatarUrl,
-      refreshToken: loginResponse.data.refreshToken,
-      expiresIn: loginResponse.data.expiresIn
-    }))
-    
+    localStorage.setItem(
+      STORAGE_KEYS.USER,
+      JSON.stringify({
+        userId: loginResponse.data.userId,
+        telegramId: loginResponse.data.telegramId,
+        username: loginResponse.data.username,
+        avatarUrl: loginResponse.data.avatarUrl,
+        refreshToken: loginResponse.data.refreshToken,
+        expiresIn: loginResponse.data.expiresIn,
+      })
+    )
+
     // 保存登录时间
     localStorage.setItem(STORAGE_KEYS.LOGIN_TIME, Date.now().toString())
-    
+
     console.log('Login info saved to localStorage')
   } catch (error) {
     console.error('Failed to save login info to localStorage:', error)
-
   }
 }
 /**
@@ -181,10 +194,10 @@ export function getSavedLoginInfo(): {
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN)
     const userStr = localStorage.getItem(STORAGE_KEYS.USER)
     const loginTimeStr = localStorage.getItem(STORAGE_KEYS.LOGIN_TIME)
-    
+
     const user = userStr ? JSON.parse(userStr) : null
     const loginTime = loginTimeStr ? parseInt(loginTimeStr, 10) : null
-    
+
     return { token, user, loginTime }
   } catch (error) {
     console.error('Failed to get saved login info:', error)
@@ -197,20 +210,20 @@ export function getSavedLoginInfo(): {
  */
 export function isUserLoggedIn(): boolean {
   const { token, loginTime } = getSavedLoginInfo()
-  
+
   if (!token || !loginTime) {
     return false
   }
-  
+
   // 检查登录是否过期（例如：7天）
   const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
   const isExpired = Date.now() - loginTime > SEVEN_DAYS
-  
+
   if (isExpired) {
     clearLoginInfo()
     return false
   }
-  
+
   return true
 }
 
@@ -235,26 +248,26 @@ export async function telegramLogout(): Promise<BaseApiResponse> {
   try {
     // 清除本地存储
     clearLoginInfo()
-    
+
     // 可选：通知后端用户登出
     try {
-      await httpUtils.post('/api/auth/logout')
+      await httpUtils.post('/auth/logout')
     } catch (error) {
       console.warn('Failed to notify server about logout:', error)
       // 不影响本地登出流程
     }
-    
-    return { 
+
+    return {
       success: true,
       message: '登出成功',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
   } catch (error) {
     console.error('Logout error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '登出失败',
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
   }
 }
@@ -266,7 +279,7 @@ export const telegramApi = {
   getSavedLoginInfo,
   isUserLoggedIn,
   clearLoginInfo,
-};
+}
 
 // 导出所有 API
 const api = {
