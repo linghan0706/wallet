@@ -1,41 +1,42 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Web3ConfigProvider } from '@ant-design/web3'
+
 import dynamic from 'next/dynamic'
-import { TonWeb3ConfigProvider, CHAIN as TON_CHAIN } from '@ant-design/web3-ton'
+
 import {
   TonConnectUIProvider,
   CHAIN as TON_CHAIN_UI,
 } from '@tonconnect/ui-react'
-import WalletConnect from '@/components/WalletConnect'
-
-function useManifestUrl() {
-  const [url, setUrl] = useState<string | null>(null)
-  useEffect(() => {
-    const manifest = {
-      url: 'http://localhost',
-      name: 'Nova Explorer',
-      iconUrl: 'https://web3.antdigital.dev/favicon.png',
-    }
-    try {
-      const dataUrl =
-        'data:application/json;base64,' + btoa(JSON.stringify(manifest))
-      setUrl(dataUrl)
-    } catch {
-      setUrl(null)
-    }
-  }, [])
-  return url
-}
+import { tonConnectConfig } from '@/lib/ton-config'
 
 export default function WalletPage() {
-  const manifestUrl = useManifestUrl()
-  if (!manifestUrl) return null
+  const [manifestUrl, setManifestUrl] = useState(tonConnectConfig.manifestUrl)
 
-  const NoSSRWalletConnect = dynamic(() => Promise.resolve(WalletConnect), {
-    ssr: false,
-  })
+  useEffect(() => {
+    if (!tonConnectConfig.manifestUrl) return
+    if (isAbsoluteUrl(tonConnectConfig.manifestUrl)) return
+    if (typeof window === 'undefined') return
+
+    try {
+      const resolvedUrl = new URL(
+        tonConnectConfig.manifestUrl,
+        window.location.origin
+      ).toString()
+      setManifestUrl(resolvedUrl)
+    } catch (error) {
+      console.error('Failed to resolve TON manifest URL', error)
+    }
+  }, [])
+
+  if (!manifestUrl) {
+    return null
+  }
+
+  const NoSSRWalletConnect = dynamic(
+    () => import('@/components/WalletConnect'),
+    { ssr: false }
+  )
 
   return (
     <TonConnectUIProvider
@@ -43,17 +44,13 @@ export default function WalletPage() {
       chain={TON_CHAIN_UI.MAINNET}
       reconnect
     >
-      <TonWeb3ConfigProvider
-        manifestUrl={manifestUrl}
-        chain={TON_CHAIN.MAINNET}
-        reconnect
-      >
-        <Web3ConfigProvider>
-          <div className="min-h-screen w-full flex items-center justify-center p-4">
-            <NoSSRWalletConnect />
-          </div>
-        </Web3ConfigProvider>
-      </TonWeb3ConfigProvider>
+      <div className="min-h-screen w-full flex items-center justify-center p-4">
+        <NoSSRWalletConnect />
+      </div>
     </TonConnectUIProvider>
   )
+}
+
+function isAbsoluteUrl(url: string) {
+  return /^https?:\/\//i.test(url)
 }

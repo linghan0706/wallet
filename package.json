@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
@@ -14,7 +14,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "husky",
-    "analyze": "cross-env ANALYZE=true next build --turbopack",
+    "analyze": "cross-env ANALYZE=true next build",
+    "dev:turbopack": "next dev --turbopack",
+    "build:turbopack": "next build --turbopack",
     "lhci": "lhci autorun"
   },
   "dependencies": {
