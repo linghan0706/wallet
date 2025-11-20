@@ -8,6 +8,10 @@ export interface GetTasksMain {
   [property: string]: unknown
 }
 
+export type GetTaskDetail = Omit<GetTasksMain, 'data'> & {
+  data: Datum
+}
+
 export interface Datum {
   buttonEnabled: boolean
   buttonText: string
@@ -23,6 +27,14 @@ export interface Datum {
   totalRequirement: number | null
   userTaskProgressId: number
   weight: number
+  taskIconIsImage?: boolean
+  taskIconFallbackText?: string
+  primaryRewardIcon?: string
+  primaryRewardIconIsImage?: boolean
+  totalRewardAmount?: number
+  totalRewardDisplay?: string
+  showProgress?: boolean
+  progressPercent?: number
   [property: string]: unknown
 }
 
@@ -33,11 +45,12 @@ export interface RewardInfo {
   rewardAmount: number | null
   rewardIcon: string
   rewardType: string
+  rewardIconIsImage?: boolean
   [property: string]: unknown
 }
 
 export interface TaskRequirement {
-  invite_count: number
+  invite_count?: number
   url?: string
   [property: string]: unknown
 }
