@@ -94,59 +94,94 @@ declare global {
   interface Window {
     Telegram?: {
       WebApp: {
-        initData: string;
-        initDataUnsafe: Record<string, unknown>;
-        platform: string;
-        version: string;
-        colorScheme: 'light' | 'dark';
-        themeParams: TelegramThemeParams;
-        isExpanded: boolean;
-        viewportHeight: number;
-        viewportStableHeight: number;
-        ready(): void;
-        expand(): void;
-        close(): void;
-        showAlert(message: string): void;
-        showConfirm(message: string, callback: (confirmed: boolean) => void): void;
-        showPopup(params: {
-          title?: string;
-          message: string;
-          buttons?: Array<{
-            id?: string;
-            type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive';
-            text: string;
-          }>;
-        }, callback?: (buttonId: string) => void): void;
+        initData: string
+        initDataUnsafe: Record<string, unknown>
+        platform: string
+        version: string
+        colorScheme: 'light' | 'dark'
+        themeParams: TelegramThemeParams
+        isExpanded: boolean
+        viewportHeight: number
+        viewportStableHeight: number
+        ready(): void
+        expand(): void
+        close(): void
+        showAlert(message: string): void
+        showConfirm(
+          message: string,
+          callback: (confirmed: boolean) => void
+        ): void
+        showPopup(
+          params: {
+            title?: string
+            message: string
+            buttons?: Array<{
+              id?: string
+              type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive'
+              text: string
+            }>
+          },
+          callback?: (buttonId: string) => void
+        ): void
         MainButton: {
-          text: string;
-          color: string;
-          textColor: string;
-          isVisible: boolean;
-          isActive: boolean;
-          isProgressVisible: boolean;
-          setText(text: string): void;
-          onClick(callback: () => void): void;
-          offClick(callback: () => void): void;
-          show(): void;
-          hide(): void;
-          enable(): void;
-          disable(): void;
-          showProgress(leaveActive?: boolean): void;
-          hideProgress(): void;
-        };
+          text: string
+          color: string
+          textColor: string
+          isVisible: boolean
+          isActive: boolean
+          isProgressVisible: boolean
+          setText(text: string): void
+          onClick(callback: () => void): void
+          offClick(callback: () => void): void
+          show(): void
+          hide(): void
+          enable(): void
+          disable(): void
+          showProgress(leaveActive?: boolean): void
+          hideProgress(): void
+        }
         BackButton: {
-          isVisible: boolean;
-          onClick(callback: () => void): void;
-          offClick(callback: () => void): void;
-          show(): void;
-          hide(): void;
-        };
+          isVisible: boolean
+          onClick(callback: () => void): void
+          offClick(callback: () => void): void
+          show(): void
+          hide(): void
+        }
         HapticFeedback: {
-          impactOccurred(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'): void;
-          notificationOccurred(type: 'error' | 'success' | 'warning'): void;
-          selectionChanged(): void;
-        };
-      };
-    };
+          impactOccurred(
+            style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft'
+          ): void
+          notificationOccurred(type: 'error' | 'success' | 'warning'): void
+          selectionChanged(): void
+        }
+        requestStarPayment?(
+          params: {
+            amount: number
+            currency?: string
+            description?: string
+            payload?: string
+            bot_username?: string
+          },
+          callback: (result: {
+            status: 'paid' | 'pending' | 'failed' | 'cancelled'
+            currency?: string
+            total_amount?: number
+            payload?: string
+            invoice_slug?: string
+            telegram_payment_charge_id?: string
+            provider_payment_charge_id?: string
+            error?: string
+            [key: string]: unknown
+          }) => void
+        ): void
+        openInvoice?(
+          slug: string,
+          callback: (result: {
+            status: 'paid' | 'pending' | 'failed' | 'cancelled'
+            [key: string]: unknown
+          }) => void
+        ): void
+      }
+    }
   }
 }

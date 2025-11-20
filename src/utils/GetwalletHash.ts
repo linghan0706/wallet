@@ -1,8 +1,10 @@
 import { Cell } from '@ton/core'
 import { DEFAULT_NETWORK } from '@/lib/ton-config'
 
+/** 钱包交易记录所属网络 */
 export type WalletNetwork = 'mainnet' | 'testnet'
 
+/** 本地存储的交易记录条目 */
 export interface WalletTransactionRecord {
   hash: string
   sender: string
@@ -11,27 +13,32 @@ export interface WalletTransactionRecord {
   timestamp: number
 }
 
+/** 新增交易记录所需的最小载荷 */
 export interface WalletTransactionPayload {
   boc: string
   sender?: string | null
   network?: WalletNetwork
 }
 
+// 本地存储键与历史条数上限
 const STORAGE_KEY = 'wallet:transactions'
 const HISTORY_LIMIT = 20
 
+// 判断是否运行在浏览器环境（是否可用 localStorage）
 function isBrowserEnvironment(): boolean {
   return (
     typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
   )
 }
 
+// Uint8Array 转十六进制字符串（小写，不带 0x 前缀）
 function toHex(bytes: Uint8Array): string {
   return Array.from(bytes)
     .map(byte => byte.toString(16).padStart(2, '0'))
     .join('')
 }
 
+// 从 BOC 文本中计算交易哈希；无效时抛错
 export function extractTransactionHash(boc: string): string {
   if (!boc || typeof boc !== 'string') {
     throw new Error('Transaction BOC is required to compute hash')
@@ -47,6 +54,7 @@ export function extractTransactionHash(boc: string): string {
   }
 }
 
+// 从 localStorage 读取交易历史（已做容错）
 function readStoredHistory(): WalletTransactionRecord[] {
   if (!isBrowserEnvironment()) return []
 
@@ -56,6 +64,7 @@ function readStoredHistory(): WalletTransactionRecord[] {
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
 
+    // 过滤掉无效条目，仅保留合法记录
     return parsed.filter(isWalletTransactionRecord)
   } catch (error) {
     console.warn('[wallet-hash] Failed to read transaction history', error)
@@ -63,6 +72,7 @@ function readStoredHistory(): WalletTransactionRecord[] {
   }
 }
 
+// 持久化交易历史到 localStorage，并裁剪到固定长度
 function persistHistory(records: WalletTransactionRecord[]): void {
   if (!isBrowserEnvironment()) return
 
@@ -74,6 +84,7 @@ function persistHistory(records: WalletTransactionRecord[]): void {
   }
 }
 
+// 运行时类型守卫：校验对象是否为 WalletTransactionRecord
 function isWalletTransactionRecord(
   value: unknown
 ): value is WalletTransactionRecord {
@@ -91,6 +102,7 @@ function isWalletTransactionRecord(
   return true
 }
 
+// 记录一次钱包交易：计算哈希、整理字段并写入历史
 export function recordWalletTransaction({
   boc,
   sender,
@@ -117,15 +129,18 @@ export function recordWalletTransaction({
   return record
 }
 
+// 获取全部钱包交易历史（新→旧）
 export function getWalletTransactionHistory(): WalletTransactionRecord[] {
   return readStoredHistory()
 }
 
+// 获取最近的一条交易记录，没有则返回 null
 export function getLatestWalletTransaction(): WalletTransactionRecord | null {
   const [latest] = readStoredHistory()
   return latest ?? null
 }
 
+// 清空钱包交易历史
 export function clearWalletTransactionHistory(): void {
   if (!isBrowserEnvironment()) return
 

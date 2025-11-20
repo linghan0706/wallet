@@ -50,29 +50,6 @@ yarn install
 cp env.example .env.local
 ```
 
-编辑 `.env.local` 文件，填入必要的配置：
-
-```env
-# TON API ����
-NEXT_PUBLIC_TON_API_KEY=your_ton_api_key_here
-
-# TON Connect ����
-NEXT_PUBLIC_TONCONNECT_MANIFEST_URL=/api/tonconnect/manifest
-NEXT_PUBLIC_TONCONNECT_ICON_URL=
-NEXT_PUBLIC_TONCONNECT_TERMS_URL=
-NEXT_PUBLIC_TONCONNECT_PRIVACY_URL=
-
-# Ӧ������
-NEXT_PUBLIC_APP_URL=https://your-domain.example
-NEXT_PUBLIC_APP_NAME=Nova Explorer Bot
-
-# ��������
-NEXT_PUBLIC_NETWORK=mainnet
-```
-
-> ��Telegram WebApp�л���ʱ�������TON Connect�����ύ��HTTPS������ַ���Ա������CSP���ơ
-> ���ʹ���Զ���·�������ɷ�����`/api/tonconnect/manifest`
-
 ### 启动开发服务器
 
 ```bash

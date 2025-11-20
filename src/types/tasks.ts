@@ -35,6 +35,11 @@ export interface Datum {
   totalRewardDisplay?: string
   showProgress?: boolean
   progressPercent?: number
+  requiresTelegramVerification?: boolean
+  telegramVerified?: boolean
+  telegramVerificationStatus?: string
+  telegramVerificationMessage?: string
+  telegramRequirementLabel?: string
   [property: string]: unknown
 }
 
