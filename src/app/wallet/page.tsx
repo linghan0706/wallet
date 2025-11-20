@@ -8,7 +8,7 @@ import {
   TonConnectUIProvider,
   CHAIN as TON_CHAIN_UI,
 } from '@tonconnect/ui-react'
-import { tonConnectConfig } from '@/lib/ton-config'
+import { tonConnectConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
 
 export default function WalletPage() {
   const [manifestUrl, setManifestUrl] = useState(tonConnectConfig.manifestUrl)
@@ -38,12 +38,11 @@ export default function WalletPage() {
     { ssr: false }
   )
 
+  const chain =
+    DEFAULT_NETWORK === 'testnet' ? TON_CHAIN_UI.TESTNET : TON_CHAIN_UI.MAINNET
+
   return (
-    <TonConnectUIProvider
-      manifestUrl={manifestUrl}
-      chain={TON_CHAIN_UI.MAINNET}
-      reconnect
-    >
+    <TonConnectUIProvider manifestUrl={manifestUrl} chain={chain} reconnect>
       <div className="min-h-screen w-full flex items-center justify-center p-4">
         <NoSSRWalletConnect />
       </div>

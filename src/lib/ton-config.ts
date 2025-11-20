@@ -1,8 +1,18 @@
 const DEFAULT_MANIFEST_PATH = '/api/tonconnect/manifest'
 const STATIC_MANIFEST_FALLBACK = '/tonconnect-manifest.json'
+const KNOWN_NETWORKS = ['mainnet', 'testnet'] as const
 
-const rawManifestUrl = process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL?.trim()
-const rawAppUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
+type TonNetwork = (typeof KNOWN_NETWORKS)[number]
+
+type NetworkSettings = {
+  rpcEndpoint: string
+  apiEndpoint: string
+}
+
+const rawManifestUrl = readEnvValue(
+  process.env.NEXT_PUBLIC_TONCONNECT_MANIFEST_URL
+)
+const rawAppUrl = readEnvValue(process.env.NEXT_PUBLIC_APP_URL)
 
 const resolvedManifestUrl =
   resolveManifestUrl(rawManifestUrl, rawAppUrl) ??
@@ -10,34 +20,45 @@ const resolvedManifestUrl =
   resolveManifestUrl(STATIC_MANIFEST_FALLBACK, rawAppUrl) ??
   DEFAULT_MANIFEST_PATH
 
-// TON Connect 配置
 export const tonConnectConfig = {
   manifestUrl: resolvedManifestUrl,
   walletsListSource:
     'https://raw.githubusercontent.com/ton-community/tonconnect-utils/main/tonconnect-wallets.json',
-  walletsListCacheTTLMs: 1000 * 60 * 60 * 24, // 24 hours
+  walletsListCacheTTLMs: 1000 * 60 * 60 * 24,
 }
 
-// TON API 配置
-export const tonApiConfig = {
-  apiKey: process.env.NEXT_PUBLIC_TON_API_KEY || '',
-  baseUrl: 'https://tonapi.io',
-}
+const resolvedNetwork = resolveNetwork(
+  readEnvValue(process.env.NEXT_PUBLIC_NETWORK)
+)
 
-// 网络配置
-export const networkConfig = {
+const networkConfigDefaults: Record<TonNetwork, NetworkSettings> = {
   mainnet: {
-    rpcEndpoint: 'https://toncenter.com/api/v2/jsonRPC',
-    apiEndpoint: 'https://tonapi.io',
+    rpcEndpoint:
+      readEnvValue(process.env.NEXT_PUBLIC_TON_MAINNET_RPC_ENDPOINT) ??
+      'https://toncenter.com/api/v2/jsonRPC',
+    apiEndpoint:
+      readEnvValue(process.env.NEXT_PUBLIC_TON_MAINNET_API_ENDPOINT) ??
+      'https://tonapi.io',
   },
   testnet: {
-    rpcEndpoint: 'https://testnet.toncenter.com/api/v2/jsonRPC',
-    apiEndpoint: 'https://testnet.tonapi.io',
+    rpcEndpoint:
+      readEnvValue(process.env.NEXT_PUBLIC_TON_TESTNET_RPC_ENDPOINT) ??
+      'https://testnet.toncenter.com/api/v2/jsonRPC',
+    apiEndpoint:
+      readEnvValue(process.env.NEXT_PUBLIC_TON_TESTNET_API_ENDPOINT) ??
+      'https://testnet.tonapi.io',
   },
 }
 
-// 默认网络
-export const DEFAULT_NETWORK = 'mainnet' as keyof typeof networkConfig
+export const networkConfig = networkConfigDefaults
+export const DEFAULT_NETWORK = resolvedNetwork
+
+export const tonApiConfig = {
+  apiKey: readEnvValue(process.env.NEXT_PUBLIC_TON_API_KEY) ?? '',
+  baseUrl:
+    readEnvValue(process.env.NEXT_PUBLIC_TON_API_BASE_URL) ??
+    networkConfig[DEFAULT_NETWORK].apiEndpoint,
+}
 
 function resolveManifestUrl(manifest?: string, appUrl?: string): string | null {
   if (!manifest) {
@@ -66,4 +87,25 @@ function isAbsoluteUrl(url: string) {
 function ensureTrailingSlash(url: string) {
   if (!url) return url
   return url.endsWith('/') ? url : `${url}/`
+}
+
+function resolveNetwork(value?: string): TonNetwork {
+  if (!value) {
+    return 'mainnet'
+  }
+
+  const normalized = value.toLowerCase()
+  return isTonNetwork(normalized) ? (normalized as TonNetwork) : 'mainnet'
+}
+
+function isTonNetwork(value: string): value is TonNetwork {
+  return (KNOWN_NETWORKS as readonly string[]).includes(value)
+}
+
+function readEnvValue(value?: string | null) {
+  if (typeof value !== 'string') {
+    return undefined
+  }
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : undefined
 }
