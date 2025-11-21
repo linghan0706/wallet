@@ -128,9 +128,10 @@ async function requestStarPaymentViaApi(
     bot_username: options.botUsername,
   }
 
-  if (typeof app.requestStarPayment === 'function') {
+  const requestStarPayment = app.requestStarPayment
+  if (typeof requestStarPayment === 'function') {
     return new Promise((resolve, reject) => {
-      app.requestStarPayment(requestPayload, result => {
+      requestStarPayment(requestPayload, result => {
         if (!result) {
           reject(new Error('No response received from Telegram Star payment'))
           return
@@ -144,9 +145,10 @@ async function requestStarPaymentViaApi(
     ? { invoiceSlug: options.invoiceSlug, invoiceUrl: options.invoiceSlug }
     : await createStarInvoice(options)
 
-  if (typeof app.openInvoice === 'function') {
+  const openInvoice = app.openInvoice
+  if (typeof openInvoice === 'function') {
     return new Promise(resolve => {
-      app.openInvoice(invoice.invoiceSlug, result => {
+      openInvoice(invoice.invoiceSlug, result => {
         const merged =
           result === undefined
             ? {
