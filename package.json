@@ -36,6 +36,7 @@
     "@ton/ton": "^16.0.0",
     "@tonconnect/sdk": "^3.3.1",
     "@tonconnect/ui-react": "^2.3.1",
+    "@twa-dev/sdk": "^8.0.2",
     "antd": "^5.27.5",
     "framer-motion": "^12.23.24",
     "next": "15.5.6",
