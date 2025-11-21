@@ -4,11 +4,8 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import {
-  TonConnectUIProvider,
-  CHAIN as TON_CHAIN_UI,
-} from '@tonconnect/ui-react'
-import { tonConnectConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
+import { TonConnectUIProvider } from '@tonconnect/ui-react'
+import { tonConnectConfig } from '@/lib/ton-config'
 
 export default function WalletPage() {
   const [manifestUrl, setManifestUrl] = useState(tonConnectConfig.manifestUrl)
@@ -44,11 +41,8 @@ export default function WalletPage() {
     }
   )
 
-  const chain =
-    DEFAULT_NETWORK === 'testnet' ? TON_CHAIN_UI.TESTNET : TON_CHAIN_UI.MAINNET
-
   return (
-    <TonConnectUIProvider manifestUrl={manifestUrl} chain={chain} reconnect>
+    <TonConnectUIProvider manifestUrl={manifestUrl} restoreConnection>
       <div className="min-h-screen w-full flex flex-col gap-8 items-center justify-center p-4 mt-[56px]">
         <NoSSRWalletConnect />
         <NoSSRTelegramStarPay />
