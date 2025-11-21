@@ -22,6 +22,13 @@ type TelegramStarPaymentCallback =
     }
   | undefined
 
+type CreateStarInvoiceResponse = {
+  success: boolean
+  invoiceUrl?: string
+  invoiceSlug?: string
+  message?: string
+}
+
 export type StarPaymentRequest = {
   /** Amount of Stars (XTR) to charge. */
   amount: number
@@ -75,20 +82,54 @@ function getTelegramWebApp(): TelegramWebApp {
   return app
 }
 
-function requestStarPaymentViaApi(
+async function createStarInvoice(
+  options: StarPaymentRequest
+): Promise<{ invoiceUrl: string; invoiceSlug: string }> {
+  if (!isClient()) {
+    throw new Error('Star payments are only available inside Telegram')
+  }
+
+  const response = await fetch('/api/telegram/createStarInvoice', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      amount: options.amount,
+      payload: options.payload ?? `asset-${options.assetId}`,
+      description: options.description ?? 'Telegram Stars purchase',
+      title: options.description ?? 'Telegram Stars purchase',
+      assetId: options.assetId,
+    }),
+    cache: 'no-store',
+  })
+
+  const data = (await response.json().catch(() => ({}))) as
+    | CreateStarInvoiceResponse
+    | undefined
+
+  if (!response.ok || !data?.success || !data.invoiceUrl) {
+    throw new Error(data?.message || 'Failed to create Star invoice')
+  }
+
+  return {
+    invoiceUrl: data.invoiceUrl,
+    invoiceSlug: data.invoiceSlug || data.invoiceUrl,
+  }
+}
+
+async function requestStarPaymentViaApi(
   app: TelegramWebApp,
   options: StarPaymentRequest
 ): Promise<TelegramStarPaymentCallback> {
-  return new Promise((resolve, reject) => {
-    const requestPayload = {
-      amount: options.amount,
-      currency: options.currency || DEFAULT_CURRENCY,
-      description: options.description,
-      payload: options.payload,
-      bot_username: options.botUsername,
-    }
+  const requestPayload = {
+    amount: options.amount,
+    currency: options.currency || DEFAULT_CURRENCY,
+    description: options.description,
+    payload: options.payload,
+    bot_username: options.botUsername,
+  }
 
-    if (typeof app.requestStarPayment === 'function') {
+  if (typeof app.requestStarPayment === 'function') {
+    return new Promise((resolve, reject) => {
       app.requestStarPayment(requestPayload, result => {
         if (!result) {
           reject(new Error('No response received from Telegram Star payment'))
@@ -96,22 +137,41 @@ function requestStarPaymentViaApi(
         }
         resolve(result)
       })
-      return
-    }
+    })
+  }
 
-    if (typeof app.openInvoice === 'function' && options.invoiceSlug) {
-      app.openInvoice(options.invoiceSlug, result => {
-        resolve(result as TelegramStarPaymentCallback)
+  const invoice = options.invoiceSlug
+    ? { invoiceSlug: options.invoiceSlug, invoiceUrl: options.invoiceSlug }
+    : await createStarInvoice(options)
+
+  if (typeof app.openInvoice === 'function') {
+    return new Promise(resolve => {
+      app.openInvoice(invoice.invoiceSlug, result => {
+        const merged =
+          result === undefined
+            ? {
+                status: 'pending',
+                invoice_slug: invoice.invoiceSlug,
+                invoice_url: invoice.invoiceUrl,
+              }
+            : {
+                ...result,
+                invoice_slug:
+                  (result as TelegramStarPaymentCallback)?.invoice_slug ??
+                  invoice.invoiceSlug,
+                invoice_url:
+                  (result as TelegramStarPaymentCallback)?.invoice_url ??
+                  invoice.invoiceUrl,
+              }
+
+        resolve(merged as TelegramStarPaymentCallback)
       })
-      return
-    }
+    })
+  }
 
-    reject(
-      new Error(
-        'Telegram environment does not support Star payments or invoice fallback'
-      )
-    )
-  })
+  throw new Error(
+    'Telegram client does not expose Star payment methods. Please update Telegram.'
+  )
 }
 
 function persistPaymentRecord(record: StarPaymentRecord): void {
@@ -163,6 +223,14 @@ export async function processStarPayment(
   }
 
   const app = getTelegramWebApp()
+  if (typeof app.ready === 'function') {
+    try {
+      app.ready()
+    } catch (error) {
+      console.warn('Telegram WebApp ready() failed (continuing):', error)
+    }
+  }
+
   const response = await requestStarPaymentViaApi(app, request)
 
   const status =

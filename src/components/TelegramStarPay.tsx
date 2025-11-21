@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { processStarPayment } from '@/utils/StarPay'
+import { initializeTelegramApp } from '@/telegramWebApp/telegrambot'
 
 type Product = {
   id: string
@@ -67,8 +68,8 @@ export default function TelegramStarPay() {
   )
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    setIsTelegramReady(Boolean(window.Telegram?.WebApp))
+    const app = initializeTelegramApp()
+    setIsTelegramReady(Boolean(app))
   }, [])
 
   const handlePurchase = async (product: Product) => {
