@@ -148,22 +148,25 @@ async function requestStarPaymentViaApi(
   const openInvoice = app.openInvoice
   if (typeof openInvoice === 'function') {
     return new Promise(resolve => {
-      openInvoice(invoice.invoiceSlug, result => {
+      const invoiceTarget = invoice.invoiceUrl || invoice.invoiceSlug
+      openInvoice(invoiceTarget, result => {
         const merged =
           result === undefined
             ? {
                 status: 'pending',
-                invoice_slug: invoice.invoiceSlug,
-                invoice_url: invoice.invoiceUrl,
+                invoice_slug: invoice.invoiceSlug ?? invoiceTarget,
+                invoice_url: invoice.invoiceUrl ?? invoiceTarget,
               }
             : {
                 ...result,
                 invoice_slug:
                   (result as TelegramStarPaymentCallback)?.invoice_slug ??
-                  invoice.invoiceSlug,
+                  invoice.invoiceSlug ??
+                  invoiceTarget,
                 invoice_url:
                   (result as TelegramStarPaymentCallback)?.invoice_url ??
-                  invoice.invoiceUrl,
+                  invoice.invoiceUrl ??
+                  invoiceTarget,
               }
 
         resolve(merged as TelegramStarPaymentCallback)
