@@ -37,14 +37,21 @@ export default function WalletPage() {
     () => import('@/components/WalletConnect'),
     { ssr: false }
   )
+  const NoSSRTelegramStarPay = dynamic(
+    () => import('@/components/TelegramStarPay'),
+    {
+      ssr: false,
+    }
+  )
 
   const chain =
     DEFAULT_NETWORK === 'testnet' ? TON_CHAIN_UI.TESTNET : TON_CHAIN_UI.MAINNET
 
   return (
     <TonConnectUIProvider manifestUrl={manifestUrl} chain={chain} reconnect>
-      <div className="min-h-screen w-full flex items-center justify-center p-4">
+      <div className="min-h-screen w-full flex flex-col gap-8 items-center justify-center p-4 mt-[56px]">
         <NoSSRWalletConnect />
+        <NoSSRTelegramStarPay />
       </div>
     </TonConnectUIProvider>
   )
