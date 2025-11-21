@@ -153,6 +153,14 @@ async function requestStarPaymentViaApi(
       target: string
     ): Promise<TelegramStarPaymentCallback> =>
       new Promise(resolve => {
+        if (!target) {
+          resolve({
+            status: 'failed',
+            error: 'No invoice target provided',
+          } as TelegramStarPaymentCallback)
+          return
+        }
+
         openInvoice(target, result => {
           const merged =
             result === undefined
@@ -177,16 +185,23 @@ async function requestStarPaymentViaApi(
         })
       })
 
-    // Prefer slug for WebApp compatibility; fall back to the full URL if slug fails synchronously.
+    // Prefer full URL first; if it fails synchronously, fall back to slug.
     try {
-      if (invoice.invoiceSlug) {
-        return await attemptOpenInvoice(invoice.invoiceSlug)
+      if (invoice.invoiceUrl) {
+        return await attemptOpenInvoice(invoice.invoiceUrl)
       }
     } catch (error) {
-      console.warn('openInvoice with slug failed, retrying with URL:', error)
+      console.warn(
+        'openInvoice with invoiceUrl failed, retrying with slug:',
+        error
+      )
     }
 
-    return attemptOpenInvoice(invoice.invoiceUrl || invoice.invoiceSlug || '')
+    if (invoice.invoiceSlug) {
+      return attemptOpenInvoice(invoice.invoiceSlug)
+    }
+
+    return attemptOpenInvoice('')
   }
 
   throw new Error(
