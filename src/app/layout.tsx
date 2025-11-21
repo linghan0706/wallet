@@ -10,8 +10,6 @@ import { MainLayout } from '@/components/layout'
 import { LoadingProvider } from '@/components/ui/LoadingProvider'
 import { WebVitals } from '@/components/analytics/WebVitals'
 
-// console.log("userData", Telegram.getTelegramUser());
-
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
 const jersey10 = Jersey_10({
   subsets: ['latin'],
