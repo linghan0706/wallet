@@ -10,6 +10,7 @@ import {
   isTelegramEnvironment,
 } from '@/telegramWebApp/telegrambot'
 import { initData, telegramLogin } from '@/utils/api'
+import Wallet from '@/app/wallet/page'
 export default function HomePage() {
   useEffect(() => {
     const data = getInitData()
@@ -64,8 +65,9 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-white text-2xl font-bold mb-4">个人中心</h1>
-          <p className="text-gray-400">个人中心功能开发中...</p>
+          {/* <h1 className="text-white text-2xl font-bold mb-4">个人中心</h1>
+          <p className="text-gray-400">个人中心功能开发中...</p> */}
+          <Wallet />
         </MotionDiv>
       </div>
     </div>

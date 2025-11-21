@@ -50,20 +50,6 @@ yarn install
 cp env.example .env.local
 ```
 
-编辑 `.env.local` 文件，填入必要的配置：
-
-```env
-# TON API 配置
-NEXT_PUBLIC_TON_API_KEY=your_ton_api_key_here
-
-# 应用配置
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_APP_NAME=Nova Explorer Bot
-
-# 网络配置
-NEXT_PUBLIC_NETWORK=mainnet
-```
-
 ### 启动开发服务器
 
 ```bash

@@ -1,7 +1,8 @@
-
 // 导出所有工具函数
 export * from './format'
 export * from './validation'
+export * from './GetwalletHash'
+export * from './StarPay'
 
 /**
  * 延迟执行函数
@@ -23,12 +24,12 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) {
       clearTimeout(timeout)
     }
-    
+
     timeout = setTimeout(() => {
       func(...args)
     }, wait)
@@ -46,7 +47,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args)
@@ -87,5 +88,3 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     return false
   }
 }
-
-

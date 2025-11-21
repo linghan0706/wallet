@@ -5,46 +5,73 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from 'axios'
+import {
+  AUTH_EXCLUDE_PATTERNS,
+  AUTH_HEADER,
+  BEARER_PREFIX,
+} from '../config/auth'
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
+  getRefreshToken,
+} from './auth/token'
 
 // 计算基础地址：统一从环境变量读取后端服务地址，若未配置则退回同源
 function resolveBaseURL(): string {
-  return ''
+  return '/api/proxy'
 }
 
 // 创建 axios 实例（统一后端基础地址配置）
 const http: AxiosInstance = axios.create({
-  // 统一设置后端基础地址（同源优先，避免 Mixed Content）
-  baseURL: resolveBaseURL(),
-  timeout: 10000, // 10秒超时
+  baseURL: resolveBaseURL() || '',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// 请求拦截器
+const authHttp: AxiosInstance = axios.create({
+  baseURL: resolveBaseURL() || '',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+type RequestConfigWithAuth = InternalAxiosRequestConfig & { skipAuth?: boolean }
+
+function isAuthExcluded(url: string): boolean {
+  const u = url || ''
+  return AUTH_EXCLUDE_PATTERNS.some(p => u.startsWith(p))
+}
+// 判断是否为鉴权接口，若为true则不添加token
+function shouldAttachAuth(config: RequestConfigWithAuth): boolean {
+  if (config.skipAuth === true) return false
+  const url = config.url || ''
+  if (isAuthExcluded(url)) return false
+  return true
+}
+
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // 在发送请求之前做些什么
-    console.log('Sending request:', config.method?.toUpperCase(), config.url)
-
-    // 添加认证 token（如果存在）
-    const token = localStorage.getItem('token')
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-
-    // 添加时间戳防止缓存
-    if (config.method === 'get') {
-      config.params = {
-        ...config.params,
-        _t: Date.now(),
+    const cfg = config as RequestConfigWithAuth
+    if (shouldAttachAuth(cfg)) {
+      const token = getAccessToken()
+      if (token) {
+        cfg.headers = cfg.headers || {}
+        const v = token.startsWith(BEARER_PREFIX)
+          ? token
+          : `${BEARER_PREFIX}${token}`
+        if (!cfg.headers[AUTH_HEADER]) cfg.headers[AUTH_HEADER] = v
       }
     }
-
-    return config
+    if (cfg.method === 'get') {
+      cfg.params = { ...cfg.params, _t: Date.now() }
+    }
+    return cfg
   },
   (error: AxiosError) => {
-    // 对请求错误做些什么
     console.error('Request error:', error)
     return Promise.reject(error)
   }
@@ -92,7 +119,7 @@ http.interceptors.response.use(
 
     if (error.response) {
       // 服务器响应了错误状态码
-      const { status, data } = error.response
+      const { status, data, headers } = error.response as AxiosResponse
 
       switch (status) {
         case 400:
@@ -100,10 +127,53 @@ http.interceptors.response.use(
           break
         case 401:
           errorMessage = 'Unauthorized, please login again'
-          // 清除本地 token
-          localStorage.removeItem('token')
-          // 可以在这里跳转到登录页
-          // window.location.href = '/login'
+          {
+            const originalConfig =
+              (error.response as AxiosResponse).config || {}
+            const originalUrl = originalConfig.url || ''
+            const isAuthEndpoint = isAuthExcluded(originalUrl)
+            if (!isAuthEndpoint) {
+              try {
+                const refreshToken = getRefreshToken()
+                if (refreshToken) {
+                  return authHttp
+                    .post('/auth/refresh', { refreshToken })
+                    .then(res => {
+                      const rdata = res.data
+                      let newToken: string | undefined
+                      if (rdata && typeof rdata === 'object') {
+                        if ('code' in rdata) {
+                          if (rdata.code === 200 || rdata.code === 0) {
+                            const payload = rdata.data || rdata
+                            newToken = payload?.accessToken
+                          }
+                        } else if ('success' in rdata) {
+                          if (rdata.success && rdata.data) {
+                            newToken = rdata.data.accessToken
+                          }
+                        }
+                      }
+                      if (newToken) {
+                        setAccessToken(newToken)
+                        originalConfig.headers = originalConfig.headers || {}
+                        const v = newToken.startsWith(BEARER_PREFIX)
+                          ? newToken
+                          : `${BEARER_PREFIX}${newToken}`
+                        originalConfig.headers[AUTH_HEADER] = v
+                        return http.request(originalConfig)
+                      }
+                      clearAccessToken()
+                      return Promise.reject(new Error('Token refresh failed'))
+                    })
+                    .catch(() => {
+                      clearAccessToken()
+                      return Promise.reject(new Error('Unauthorized'))
+                    })
+                }
+              } catch {}
+            }
+            clearAccessToken()
+          }
           break
         case 403:
           errorMessage = 'Access denied'
@@ -132,6 +202,11 @@ http.interceptors.response.use(
           errorMessage = data.error as string
         }
       }
+      const upstream =
+        headers && (headers['x-proxy-upstream'] as string | undefined)
+      if (upstream) {
+        console.error('Upstream:', upstream)
+      }
     } else if (error.request) {
       // 请求已发出但没有收到响应
       errorMessage = 'Network connection timeout, please check your network'
@@ -155,8 +230,12 @@ export const httpUtils = {
   },
 
   // POST 请求
-  post<T = unknown>(url: string, data?: unknown): Promise<T> {
-    return http.post(url, data)
+  post<T = unknown>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    return http.post(url, data, config)
   },
 
   // PUT 请求

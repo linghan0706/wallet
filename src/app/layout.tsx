@@ -8,8 +8,7 @@ import zhCN from 'antd/locale/zh_CN'
 import { MainLayout } from '@/components/layout'
 import { LoadingProvider } from '@/components/ui/LoadingProvider'
 import { WebVitals } from '@/components/analytics/WebVitals'
-
-// console.log("userData", Telegram.getTelegramUser());
+import { TelegramScript } from '@/components/TelegramScript'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
 const jersey10 = Jersey_10({
@@ -38,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${jersey10.variable} ${jersey25.variable}`}
       >
+        <TelegramScript />
         <AntdRegistry>
           <ConfigProvider locale={zhCN}>
             <LoadingProvider>

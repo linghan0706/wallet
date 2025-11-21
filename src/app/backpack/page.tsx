@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import MotionDiv from '@/components/motion/MotionDiv'
 import StageProgressCard from '@/components/backpackCard/StageProgressCard'
-// import NoseSection from '@/components/backpack_up/nosesection'
 import SelectCard, {
   BackpackItem,
   BackpackCategory,

@@ -1,11 +1,10 @@
-// 导出所有服务
+// �������з���
 export * from './api'
 export * from './ton'
 
-// 创建服务实例
+// ��������ʵ��
 import { TonService } from './ton'
+import { DEFAULT_NETWORK } from '@/lib/ton-config'
 
-// 根据环境变量或配置创建服务实例
-const network = (process.env.NEXT_PUBLIC_TON_NETWORK as 'mainnet' | 'testnet') || 'mainnet'
-
-export const tonService = new TonService(network)
+// ���ݻ������������ô�������ʵ��
+export const tonService = new TonService(DEFAULT_NETWORK)
