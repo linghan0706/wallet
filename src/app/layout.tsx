@@ -3,6 +3,7 @@ import { Inter, Jersey_10, Jersey_25 } from 'next/font/google'
 import '@/styles/globals.css'
 import '@/styles/font.css'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
+import Script from 'next/script'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import { MainLayout } from '@/components/layout'
@@ -38,6 +39,10 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${jersey10.variable} ${jersey25.variable}`}
       >
+        <Script
+          src="https://telegram.org/js/telegram-web-app.js"
+          strategy="beforeInteractive"
+        />
         <AntdRegistry>
           <ConfigProvider locale={zhCN}>
             <LoadingProvider>

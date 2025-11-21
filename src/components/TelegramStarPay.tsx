@@ -69,7 +69,21 @@ export default function TelegramStarPay() {
 
   useEffect(() => {
     const app = initializeTelegramApp()
-    setIsTelegramReady(Boolean(app))
+    if (app) {
+      setIsTelegramReady(true)
+      return
+    }
+
+    // Telegram injects WebApp after script load; retry briefly in case it is late to attach.
+    const retryTimer = setInterval(() => {
+      const readyApp = initializeTelegramApp()
+      if (readyApp) {
+        setIsTelegramReady(true)
+        clearInterval(retryTimer)
+      }
+    }, 300)
+
+    return () => clearInterval(retryTimer)
   }, [])
 
   const handlePurchase = async (product: Product) => {

@@ -1,4 +1,4 @@
-import http, { httpUtils } from './http'
+import { httpUtils } from './http'
 import { getFormattedInitData } from '../telegramWebApp/telegrambot'
 
 // 定义 Telegram 登录相关的类型
