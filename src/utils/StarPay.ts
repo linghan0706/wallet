@@ -66,6 +66,8 @@ export type StarPaymentRecord = {
 
 const STORAGE_KEY = 'telegram_star_payments'
 const DEFAULT_CURRENCY = 'XTR'
+const DEFAULT_BOT_USERNAME =
+  process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.replace('@', '') || undefined
 
 function isClient(): boolean {
   return typeof window !== 'undefined'
@@ -125,7 +127,7 @@ async function requestStarPaymentViaApi(
     currency: options.currency || DEFAULT_CURRENCY,
     description: options.description,
     payload: options.payload,
-    bot_username: options.botUsername,
+    bot_username: options.botUsername ?? DEFAULT_BOT_USERNAME,
   }
 
   const requestStarPayment = app.requestStarPayment
@@ -147,31 +149,44 @@ async function requestStarPaymentViaApi(
 
   const openInvoice = app.openInvoice
   if (typeof openInvoice === 'function') {
-    return new Promise(resolve => {
-      const invoiceTarget = invoice.invoiceUrl || invoice.invoiceSlug
-      openInvoice(invoiceTarget, result => {
-        const merged =
-          result === undefined
-            ? {
-                status: 'pending',
-                invoice_slug: invoice.invoiceSlug ?? invoiceTarget,
-                invoice_url: invoice.invoiceUrl ?? invoiceTarget,
-              }
-            : {
-                ...result,
-                invoice_slug:
-                  (result as TelegramStarPaymentCallback)?.invoice_slug ??
-                  invoice.invoiceSlug ??
-                  invoiceTarget,
-                invoice_url:
-                  (result as TelegramStarPaymentCallback)?.invoice_url ??
-                  invoice.invoiceUrl ??
-                  invoiceTarget,
-              }
+    const attemptOpenInvoice = (
+      target: string
+    ): Promise<TelegramStarPaymentCallback> =>
+      new Promise(resolve => {
+        openInvoice(target, result => {
+          const merged =
+            result === undefined
+              ? {
+                  status: 'pending',
+                  invoice_slug: invoice.invoiceSlug ?? target,
+                  invoice_url: invoice.invoiceUrl ?? target,
+                }
+              : {
+                  ...result,
+                  invoice_slug:
+                    (result as TelegramStarPaymentCallback)?.invoice_slug ??
+                    invoice.invoiceSlug ??
+                    target,
+                  invoice_url:
+                    (result as TelegramStarPaymentCallback)?.invoice_url ??
+                    invoice.invoiceUrl ??
+                    target,
+                }
 
-        resolve(merged as TelegramStarPaymentCallback)
+          resolve(merged as TelegramStarPaymentCallback)
+        })
       })
-    })
+
+    // Prefer slug for WebApp compatibility; fall back to the full URL if slug fails synchronously.
+    try {
+      if (invoice.invoiceSlug) {
+        return await attemptOpenInvoice(invoice.invoiceSlug)
+      }
+    } catch (error) {
+      console.warn('openInvoice with slug failed, retrying with URL:', error)
+    }
+
+    return attemptOpenInvoice(invoice.invoiceUrl || invoice.invoiceSlug || '')
   }
 
   throw new Error(
