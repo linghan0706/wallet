@@ -1,4 +1,6 @@
 import http from '../../http'
+import { AUTH_HEADER, BEARER_PREFIX } from '@/config/auth'
+import { getAccessToken } from '@/utils/auth/token'
 
 {
   /**Store基础类型定义*/
@@ -83,6 +85,26 @@ export type PurchaseSubmitRequest = {
   rawTransactionData: Record<string, unknown>
 }
 
+export type StarInvoiceRequest = {
+  itemId: number
+  quantity: number
+}
+
+export type StarInvoiceResponseData = {
+  status: string
+  messageId?: number
+  chatId?: number
+  currency?: string
+  totalAmount?: number
+  invoicePayload?: string
+}
+
+export type StarInvoiceResponse = {
+  code: string | number
+  data?: StarInvoiceResponseData
+  message?: string
+}
+
 {
   /**资产兑换*/
 }
@@ -132,6 +154,71 @@ export async function submitStorePurchase(
 ): Promise<ApiSuccess<StoreOrder>> {
   const res = await http.post('/store/purchase/submit', payload)
   return res as unknown as ApiSuccess<StoreOrder>
+}
+
+/**
+ *提交一个 Stars 购买发票请求
+ */
+export async function requestStarPurchaseInvoice(
+  payload: StarInvoiceRequest
+): Promise<StarInvoiceResponseData> {
+  const itemId = Number(payload?.itemId)
+  const quantity = Number(payload?.quantity)
+
+  if (!Number.isFinite(itemId)) {
+    throw new Error('itemId is required')
+  }
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    throw new Error('Quantity must be a positive number')
+  }
+
+  const token = typeof window === 'undefined' ? null : getAccessToken()
+  if (!token) {
+    throw new Error('Missing access token, please login first')
+  }
+
+  const baseUrl = (http.defaults?.baseURL || '/api/proxy').replace(/\/$/, '')
+  const url = `${baseUrl}/store/purchase/star/invoice`
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    [AUTH_HEADER]: token.startsWith(BEARER_PREFIX)
+      ? token
+      : `${BEARER_PREFIX}${token}`,
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      itemId,
+      quantity: Math.max(1, Math.floor(quantity)),
+    }),
+  })
+
+  const data = (await response
+    .json()
+    .catch(() => null)) as StarInvoiceResponse | null
+
+  if (!response.ok) {
+    const message =
+      data?.message || `Request failed with status ${response.status}`
+    throw new Error(message)
+  }
+
+  const code = data?.code
+  const success =
+    code === 'SUCCESS' || code === 200 || code === 0 || code === '200'
+
+  if (!data || !success) {
+    throw new Error(data?.message || 'Failed to submit order')
+  }
+
+  if (!data.data) {
+    throw new Error('No invoice data returned')
+  }
+
+  return data.data
 }
 
 /**

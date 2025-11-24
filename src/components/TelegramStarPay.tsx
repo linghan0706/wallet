@@ -1,118 +1,98 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
-import { processStarPayment } from '@/utils/StarPay'
-import { initializeTelegramApp } from '@/telegramWebApp/telegrambot'
+import {
+  requestStarPurchaseInvoice,
+  type StarInvoiceResponseData,
+} from '@/utils/api/store/api'
 
 type Product = {
   id: string
+  itemId: number
   title: string
   description: string
   price: number
   icon: string
-  assetId: number
 }
 
 type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
+const PRODUCTS: Product[] = [
+  {
+    id: 'collector-primary',
+    itemId: 101,
+    title: 'Primary Collector',
+    description: 'Entry-level auto collector',
+    price: 1,
+    icon: '/stores/AutomaticCollector/primary.svg',
+  },
+  {
+    id: 'collector-intermediate',
+    itemId: 102,
+    title: 'Intermediate Collector',
+    description: 'Faster collection speed',
+    price: 3,
+    icon: '/stores/AutomaticCollector/intermediate.svg',
+  },
+  {
+    id: 'collector-advanced',
+    itemId: 103,
+    title: 'Advanced Collector',
+    description: 'Enhanced efficiency boost',
+    price: 5,
+    icon: '/stores/AutomaticCollector/advanced.svg',
+  },
+  {
+    id: 'collector-super',
+    itemId: 104,
+    title: 'Super Collector',
+    description: 'Top-tier auto collection power',
+    price: 8,
+    icon: '/stores/AutomaticCollector/super.svg',
+  },
+]
+
+function formatInvoiceMessage(invoice: StarInvoiceResponseData): string {
+  const parts = [`Status: ${invoice.status || 'UNKNOWN'}`]
+
+  if (invoice.totalAmount && invoice.currency) {
+    parts.push(`Total: ${invoice.totalAmount} ${invoice.currency}`)
+  }
+  if (invoice.chatId) parts.push(`Chat ID: ${invoice.chatId}`)
+  if (invoice.messageId) parts.push(`Message ID: ${invoice.messageId}`)
+
+  return parts.join(' | ')
+}
+
 export default function TelegramStarPay() {
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [isTelegramReady, setIsTelegramReady] = useState(false)
   const [banner, setBanner] = useState<BannerState>({
     type: 'idle',
     message: '',
   })
 
-  {
-    /**道具配置信息 */
-  }
-  const products: Product[] = useMemo(
-    () => [
-      {
-        id: 'collector-primary',
-        title: 'Primary Collector',
-        description: 'Entry-level auto collector',
-        price: 1,
-        icon: '/stores/AutomaticCollector/primary.svg',
-        assetId: 2001,
-      },
-      {
-        id: 'collector-intermediate',
-        title: 'Intermediate Collector',
-        description: 'Faster collection speed',
-        price: 3,
-        icon: '/stores/AutomaticCollector/intermediate.svg',
-        assetId: 2002,
-      },
-      {
-        id: 'collector-advanced',
-        title: 'Advanced Collector',
-        description: 'Enhanced efficiency boost',
-        price: 5,
-        icon: '/stores/AutomaticCollector/advanced.svg',
-        assetId: 2003,
-      },
-      {
-        id: 'collector-super',
-        title: 'Super Collector',
-        description: 'Top-tier auto collection power',
-        price: 8,
-        icon: '/stores/AutomaticCollector/super.svg',
-        assetId: 2004,
-      },
-    ],
-    []
-  )
-
-  useEffect(() => {
-    const app = initializeTelegramApp()
-    if (app) {
-      setIsTelegramReady(true)
-      return
-    }
-
-    // Telegram injects WebApp after script load; retry briefly in case it is late to attach.
-    const retryTimer = setInterval(() => {
-      const readyApp = initializeTelegramApp()
-      if (readyApp) {
-        setIsTelegramReady(true)
-        clearInterval(retryTimer)
-      }
-    }, 300)
-
-    return () => clearInterval(retryTimer)
-  }, [])
-
   const handlePurchase = async (product: Product) => {
-    if (!isTelegramReady) {
-      setBanner({
-        type: 'error',
-        message: '请在 Telegram Mini App 中打开以完成 Star 支付',
-      })
-      return
-    }
-
     setActiveId(product.id)
     setBanner({ type: 'idle', message: '' })
 
     try {
-      const record = await processStarPayment({
-        amount: product.price,
-        assetId: product.assetId,
-        description: product.description,
-        payload: product.id,
+      const invoice = await requestStarPurchaseInvoice({
+        itemId: product.itemId,
+        quantity: 1,
       })
 
       setBanner({
         type: 'success',
-        message: `${product.title} 订单已提交，状态：${record.status}`,
+        message: `Order submitted. The invoice will be sent via Telegram. ${formatInvoiceMessage(invoice)}`,
       })
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Star 支付失败，请稍后重试'
+        error instanceof Error
+          ? error.message
+          : 'Failed to submit order. Please try again.'
       setBanner({ type: 'error', message })
     } finally {
       setActiveId(null)
@@ -123,16 +103,15 @@ export default function TelegramStarPay() {
     <div className="min-h-screen bg-[#f9fafb] text-[#1f2a36] px-4 py-8 flex justify-center">
       <div className="w-full max-w-lg">
         <div className="flex items-center justify-center gap-2 text-2xl font-bold mb-6">
-          <span className="text-2xl">✨</span>
-          <span>Star 商店</span>
+          <span>Star Store</span>
         </div>
 
         <div className="mb-3 text-lg font-semibold text-[#1f2a36]">
-          可用商品
+          Select an item to send an invoice request
         </div>
 
         <div className="space-y-3">
-          {products.map(product => (
+          {PRODUCTS.map(product => (
             <div
               key={product.id}
               className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3"
@@ -154,6 +133,10 @@ export default function TelegramStarPay() {
                   <div className="text-sm text-gray-500">
                     {product.description}
                   </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Item #{product.itemId} | Quantity 1 | Est. {product.price}{' '}
+                    XTR
+                  </div>
                 </div>
               </div>
               <button
@@ -161,8 +144,9 @@ export default function TelegramStarPay() {
                 disabled={activeId === product.id}
                 className="flex items-center gap-2 rounded-xl bg-[#5fb5f7] px-4 py-2 text-white font-semibold shadow-md transition hover:brightness-105 active:translate-y-[1px] disabled:opacity-70"
               >
-                <span className="text-base leading-none">{product.price}</span>
-                <span className="text-lg leading-none">⭐</span>
+                <span className="text-sm leading-none">
+                  {activeId === product.id ? 'Sending...' : 'Send order'}
+                </span>
               </button>
             </div>
           ))}

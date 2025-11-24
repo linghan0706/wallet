@@ -2,7 +2,6 @@
 export * from './format'
 export * from './validation'
 export * from './GetwalletHash'
-export * from './StarPay'
 
 /**
  * 延迟执行函数
