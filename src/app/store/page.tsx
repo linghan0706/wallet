@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import backImage from '@/public/backImage.png'
@@ -18,6 +18,18 @@ const StoresTransactionCardLazy = dynamic(
     ssr: false,
   }
 )
+
+type TelegramWebApp = {
+  viewportHeight?: number
+  viewportStableHeight?: number
+  onEvent?: (e: 'viewportChanged', cb: () => void) => void
+  offEvent?: (e: 'viewportChanged', cb: () => void) => void
+}
+
+type TelegramWindow = Window &
+  typeof globalThis & {
+    Telegram?: { WebApp?: TelegramWebApp }
+  }
 
 function CardBackground({
   isFlipped,
@@ -240,6 +252,7 @@ export default function StorePage() {
   const tab = (search.get('tab') as 'raffle' | 'collector') || 'raffle'
   const { isOpen, payload, openModal, closeModal } = useTransactionModalStore()
   const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
   const [svgSize, setSvgSize] = useState<{ width: number; height: number }>({
     width: 0,
     height: 278,
@@ -280,11 +293,12 @@ export default function StorePage() {
     return { width, height }
   }
 
-  const measureSvgSize = () => {
+  const measureSvgSize = useCallback(() => {
     const el = wrapperRef.current
     if (!el) return
     const grid = el.querySelector('[role="grid"]') as HTMLElement | null
-    const containerWidth = el.clientWidth || 361
+    const containerWidth =
+      el.clientWidth || el.getBoundingClientRect().width || 361
     let count = 0
     if (grid) {
       const children = Array.from(grid.children) as HTMLElement[]
@@ -296,17 +310,32 @@ export default function StorePage() {
     }
     const predicted = computeSvgSize(count, containerWidth)
     const rect = el.getBoundingClientRect()
-    const height = Math.round(rect.height) || predicted.height
-    const width = Math.round(rect.width) || containerWidth
+    const viewportH =
+      viewportHeight ??
+      (typeof window !== 'undefined' ? window.innerHeight : null)
+    const targetHeight =
+      viewportH !== null
+        ? Math.max(
+            predicted.height,
+            Math.max(278, viewportH - (containerWidth >= 640 ? 280 : 260))
+          )
+        : predicted.height
+    const scrollH = el.scrollHeight || 0
+    const height = Math.max(
+      Math.round(el.clientHeight || rect.height || targetHeight) ||
+        targetHeight,
+      scrollH
+    )
+    const width = Math.round(el.clientWidth || rect.width || containerWidth)
     setSvgSize({ width, height })
-  }
+  }, [tab, viewportHeight])
 
   const recalc = useMemo(
     () =>
       debounce(() => {
         measureSvgSize()
       }, 150),
-    [tab]
+    [measureSvgSize]
   )
 
   useEffect(() => {
@@ -335,7 +364,43 @@ export default function StorePage() {
       if (resizeObs) resizeObs.disconnect()
       if (mutationObs) mutationObs.disconnect()
     }
-  }, [tab, recalc])
+  }, [measureSvgSize, recalc])
+
+  useEffect(() => {
+    const updateViewportHeight = () => {
+      if (typeof window === 'undefined') return
+      const tg = (window as TelegramWindow)?.Telegram?.WebApp
+      const h = tg?.viewportHeight || tg?.viewportStableHeight
+      setViewportHeight(h ?? window.innerHeight ?? null)
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => measureSvgSize())
+      } else {
+        measureSvgSize()
+      }
+    }
+
+    updateViewportHeight()
+    window.addEventListener('resize', updateViewportHeight)
+    const tg = (window as TelegramWindow)?.Telegram?.WebApp
+    const handler = () => updateViewportHeight()
+    tg?.onEvent?.('viewportChanged', handler)
+
+    return () => {
+      window.removeEventListener('resize', updateViewportHeight)
+      tg?.offEvent?.('viewportChanged', handler)
+    }
+  }, [measureSvgSize])
+
+  const containerWidthForHeight =
+    wrapperRef.current?.clientWidth || svgSize.width || 361
+  const bgMinHeight = svgSize.height ? `${svgSize.height}px` : undefined
+  const dynamicHeight =
+    viewportHeight !== null
+      ? `${Math.max(
+          278,
+          viewportHeight - (containerWidthForHeight >= 640 ? 280 : 260)
+        )}px`
+      : undefined
 
   const handlePurchase = (payload: {
     id?: string
@@ -392,6 +457,8 @@ export default function StorePage() {
           id="store-scroll-container"
           className="relative w-[361px] max-w-[380px] sm:max-w-[400px] mx-auto mt-[20px] sm:mt-3 p-5 sm:p-6 bg-[#29006E] overflow-y-auto no-scrollbar overflow-anchor-none h-[calc(100vh-260px)] sm:h-[calc(100vh-280px)]"
           style={{
+            height: dynamicHeight,
+            minHeight: bgMinHeight,
             backgroundColor: '#29006E',
             borderRadius: '12px',
             border: '1px solid rgba(255,255,255,0.10)',
