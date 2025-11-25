@@ -20,6 +20,8 @@ type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
+const STAR_LABEL = 'XTR (Telegram Stars)'
+
 function getTelegramWebApp() {
   if (typeof window === 'undefined') return null
   return window.Telegram?.WebApp ?? null
@@ -88,7 +90,8 @@ export default function TelegramStarPay() {
 
       setBanner({
         type: 'success',
-        message: 'Invoice created, opening Telegram payment sheet...',
+        message:
+          'Invoice created, opening Telegram Stars (XTR) payment sheet...',
       })
 
       // Prefer Telegram's invoice API; fall back to openLink if the method is unavailable.
@@ -140,7 +143,7 @@ export default function TelegramStarPay() {
         setBanner({
           type: 'success',
           message:
-            'Opening Telegram to complete payment. After paying, backend will place the order automatically.',
+            'Opening Telegram to complete payment with Stars (XTR). After paying, backend will place the order automatically.',
         })
       } else {
         // Fallback for unexpected environments: navigate directly to the invoice link.
@@ -148,7 +151,7 @@ export default function TelegramStarPay() {
         setBanner({
           type: 'success',
           message:
-            'Redirecting to payment. If payment does not open, please try again inside Telegram.',
+            'Redirecting to payment. If payment does not open, please try again inside Telegram to pay with Stars (XTR).',
         })
       }
     } catch (error) {
@@ -198,7 +201,7 @@ export default function TelegramStarPay() {
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
                     Item #{product.itemId} | Quantity 1 | Est. {product.price}{' '}
-                    XTR
+                    {STAR_LABEL}
                   </div>
                 </div>
               </div>
