@@ -75,11 +75,6 @@ export default function TelegramStarPay() {
       const webApp = getTelegramWebApp()
       const tgOpenInvoice = webApp?.openInvoice
       const tgOpenLink = webApp?.openTelegramLink || webApp?.openLink
-      if (!tgOpenInvoice && !tgOpenLink) {
-        throw new Error(
-          'Please open this page inside Telegram to pay with Stars.'
-        )
-      }
 
       const invoice: StarInvoiceResult = await requestStarPurchaseInvoice({
         itemId: product.itemId,
@@ -146,6 +141,14 @@ export default function TelegramStarPay() {
           type: 'success',
           message:
             'Opening Telegram to complete payment. After paying, backend will place the order automatically.',
+        })
+      } else {
+        // Fallback for unexpected environments: navigate directly to the invoice link.
+        window.location.href = invoiceLink
+        setBanner({
+          type: 'success',
+          message:
+            'Redirecting to payment. If payment does not open, please try again inside Telegram.',
         })
       }
     } catch (error) {
