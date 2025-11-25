@@ -6,6 +6,7 @@ import zhCN from 'antd/locale/zh_CN'
 import { MainLayout } from '@/components/layout'
 import { LoadingProvider } from '@/components/ui/LoadingProvider'
 import { WebVitals } from '@/components/analytics/WebVitals'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
 const jersey10 = Jersey_10({
