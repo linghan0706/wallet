@@ -134,7 +134,8 @@ export async function checkTaskProgress(
   taskId: number | string
 ): Promise<GetTaskDetail> {
   await enforceTelegramFollowRequirement(taskId)
-  const res = await http.get(`/tasks/${encodeURIComponent(taskId)}/check`)
+  // Use POST for task progress checks to align with backend action endpoint
+  const res = await http.post(`/tasks/${encodeURIComponent(taskId)}/check`)
   const parsed = res as unknown as GetTaskDetail
   const formatted = formatTaskDetailResponse(parsed)
   const [annotated] = await annotateTelegramTasks([formatted.data])

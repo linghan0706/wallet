@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import {
   requestStarPurchaseInvoice,
-  type StarInvoiceResponseData,
+  type StarInvoiceResult,
 } from '@/utils/api/store/api'
 
 type Product = {
@@ -20,52 +20,45 @@ type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
+function getTelegramWebApp() {
+  if (typeof window === 'undefined') return null
+  return window.Telegram?.WebApp ?? null
+}
+
 const PRODUCTS: Product[] = [
   {
     id: 'collector-primary',
-    itemId: 101,
+    itemId: 5,
     title: 'Primary Collector',
     description: 'Entry-level auto collector',
-    price: 1,
+    price: 60,
     icon: '/stores/AutomaticCollector/primary.svg',
   },
   {
     id: 'collector-intermediate',
-    itemId: 102,
+    itemId: 6,
     title: 'Intermediate Collector',
     description: 'Faster collection speed',
-    price: 3,
+    price: 180,
     icon: '/stores/AutomaticCollector/intermediate.svg',
   },
   {
     id: 'collector-advanced',
-    itemId: 103,
+    itemId: 7,
     title: 'Advanced Collector',
     description: 'Enhanced efficiency boost',
-    price: 5,
+    price: 350,
     icon: '/stores/AutomaticCollector/advanced.svg',
   },
   {
     id: 'collector-super',
-    itemId: 104,
+    itemId: 8,
     title: 'Super Collector',
     description: 'Top-tier auto collection power',
-    price: 8,
+    price: 700,
     icon: '/stores/AutomaticCollector/super.svg',
   },
 ]
-
-function formatInvoiceMessage(invoice: StarInvoiceResponseData): string {
-  const parts = [`Status: ${invoice.status || 'UNKNOWN'}`]
-
-  if (invoice.totalAmount && invoice.currency) {
-    parts.push(`Total: ${invoice.totalAmount} ${invoice.currency}`)
-  }
-  if (invoice.chatId) parts.push(`Chat ID: ${invoice.chatId}`)
-  if (invoice.messageId) parts.push(`Message ID: ${invoice.messageId}`)
-
-  return parts.join(' | ')
-}
 
 export default function TelegramStarPay() {
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -79,14 +72,69 @@ export default function TelegramStarPay() {
     setBanner({ type: 'idle', message: '' })
 
     try {
-      const invoice = await requestStarPurchaseInvoice({
+      const webApp = getTelegramWebApp()
+      if (!webApp?.openInvoice) {
+        throw new Error(
+          'Please open this page inside Telegram to pay with Stars.'
+        )
+      }
+
+      const invoice: StarInvoiceResult = await requestStarPurchaseInvoice({
         itemId: product.itemId,
         quantity: 1,
       })
 
+      const invoiceLink = invoice.invoiceLink
+      if (!invoiceLink) {
+        throw new Error('No invoice link received from server.')
+      }
+
       setBanner({
         type: 'success',
-        message: `Order submitted. The invoice will be sent via Telegram. ${formatInvoiceMessage(invoice)}`,
+        message: 'Invoice created, opening Telegram payment sheet...',
+      })
+
+      await new Promise<void>((resolve, reject) => {
+        try {
+          webApp.openInvoice(invoiceLink, result => {
+            const status = result?.status || 'unknown'
+            if (status === 'paid') {
+              setBanner({
+                type: 'success',
+                message:
+                  'Payment completed! Backend will create the order automatically. You can check order status in the Orders list shortly.',
+              })
+            } else if (status === 'pending') {
+              setBanner({
+                type: 'success',
+                message:
+                  'Payment is pending. The backend will place the order automatically once confirmed.',
+              })
+            } else if (status === 'cancelled') {
+              setBanner({
+                type: 'error',
+                message: 'Payment was cancelled.',
+              })
+            } else if (status === 'failed') {
+              setBanner({
+                type: 'error',
+                message: 'Payment failed. Please try again.',
+              })
+            } else {
+              setBanner({
+                type: 'error',
+                message: `Invoice status: ${status}`,
+              })
+            }
+            resolve()
+          })
+        } catch (err) {
+          reject(
+            err instanceof Error
+              ? err
+              : new Error('Failed to open invoice in Telegram.')
+          )
+        }
       })
     } catch (error) {
       const message =

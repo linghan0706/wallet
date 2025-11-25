@@ -91,7 +91,8 @@ export type StarInvoiceRequest = {
 }
 
 export type StarInvoiceResponseData = {
-  status: string
+  invoiceLink?: string
+  status?: string
   messageId?: number
   chatId?: number
   currency?: string
@@ -100,9 +101,16 @@ export type StarInvoiceResponseData = {
 }
 
 export type StarInvoiceResponse = {
-  code: string | number
+  code?: string | number
   data?: StarInvoiceResponseData
+  success?: boolean
   message?: string
+  invoiceLink?: string
+  [key: string]: unknown
+}
+
+export type StarInvoiceResult = StarInvoiceResponseData & {
+  invoiceLink: string
 }
 
 {
@@ -161,7 +169,7 @@ export async function submitStorePurchase(
  */
 export async function requestStarPurchaseInvoice(
   payload: StarInvoiceRequest
-): Promise<StarInvoiceResponseData> {
+): Promise<StarInvoiceResult> {
   const itemId = Number(payload?.itemId)
   const quantity = Number(payload?.quantity)
 
@@ -208,17 +216,32 @@ export async function requestStarPurchaseInvoice(
 
   const code = data?.code
   const success =
-    code === 'SUCCESS' || code === 200 || code === 0 || code === '200'
+    data?.success === true ||
+    code === 'SUCCESS' ||
+    code === 200 ||
+    code === 0 ||
+    code === '200'
 
-  if (!data || !success) {
+  const payloadData =
+    (data?.data as StarInvoiceResponseData | undefined) ||
+    (data as unknown as StarInvoiceResponseData | undefined) ||
+    {}
+
+  const invoiceLink =
+    payloadData?.invoiceLink ||
+    (payloadData as Record<string, unknown>)?.invoice_link ||
+    data?.invoiceLink ||
+    (data as Record<string, unknown>)?.invoice_link
+
+  if (!success && !invoiceLink) {
     throw new Error(data?.message || 'Failed to submit order')
   }
 
-  if (!data.data) {
-    throw new Error('No invoice data returned')
+  if (!invoiceLink || typeof invoiceLink !== 'string') {
+    throw new Error('No invoice link returned')
   }
 
-  return data.data
+  return { ...payloadData, invoiceLink }
 }
 
 /**
