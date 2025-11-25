@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter, Jersey_10, Jersey_25 } from 'next/font/google'
+import '@/styles/globals.css'
+import '@/styles/font.css'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import { MainLayout } from '@/components/layout'
 import { LoadingProvider } from '@/components/ui/LoadingProvider'
 import { WebVitals } from '@/components/analytics/WebVitals'
-import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true })
 const jersey10 = Jersey_10({
