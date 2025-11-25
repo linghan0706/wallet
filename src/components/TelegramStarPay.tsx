@@ -74,7 +74,8 @@ export default function TelegramStarPay() {
     try {
       const webApp = getTelegramWebApp()
       const tgOpenInvoice = webApp?.openInvoice
-      if (!tgOpenInvoice) {
+      const tgOpenLink = webApp?.openTelegramLink || webApp?.openLink
+      if (!tgOpenInvoice && !tgOpenLink) {
         throw new Error(
           'Please open this page inside Telegram to pay with Stars.'
         )
@@ -95,48 +96,58 @@ export default function TelegramStarPay() {
         message: 'Invoice created, opening Telegram payment sheet...',
       })
 
-      await new Promise<void>((resolve, reject) => {
-        try {
-          tgOpenInvoice(invoiceLink, result => {
-            const status = result?.status || 'unknown'
-            if (status === 'paid') {
-              setBanner({
-                type: 'success',
-                message:
-                  'Payment completed! Backend will create the order automatically. You can check order status in the Orders list shortly.',
-              })
-            } else if (status === 'pending') {
-              setBanner({
-                type: 'success',
-                message:
-                  'Payment is pending. The backend will place the order automatically once confirmed.',
-              })
-            } else if (status === 'cancelled') {
-              setBanner({
-                type: 'error',
-                message: 'Payment was cancelled.',
-              })
-            } else if (status === 'failed') {
-              setBanner({
-                type: 'error',
-                message: 'Payment failed. Please try again.',
-              })
-            } else {
-              setBanner({
-                type: 'error',
-                message: `Invoice status: ${status}`,
-              })
-            }
-            resolve()
-          })
-        } catch (err) {
-          reject(
-            err instanceof Error
-              ? err
-              : new Error('Failed to open invoice in Telegram.')
-          )
-        }
-      })
+      // Prefer Telegram's invoice API; fall back to openLink if the method is unavailable.
+      if (tgOpenInvoice) {
+        await new Promise<void>((resolve, reject) => {
+          try {
+            tgOpenInvoice(invoiceLink, result => {
+              const status = result?.status || 'unknown'
+              if (status === 'paid') {
+                setBanner({
+                  type: 'success',
+                  message:
+                    'Payment completed! Backend will create the order automatically. You can check order status in the Orders list shortly.',
+                })
+              } else if (status === 'pending') {
+                setBanner({
+                  type: 'success',
+                  message:
+                    'Payment is pending. The backend will place the order automatically once confirmed.',
+                })
+              } else if (status === 'cancelled') {
+                setBanner({
+                  type: 'error',
+                  message: 'Payment was cancelled.',
+                })
+              } else if (status === 'failed') {
+                setBanner({
+                  type: 'error',
+                  message: 'Payment failed. Please try again.',
+                })
+              } else {
+                setBanner({
+                  type: 'error',
+                  message: `Invoice status: ${status}`,
+                })
+              }
+              resolve()
+            })
+          } catch (err) {
+            reject(
+              err instanceof Error
+                ? err
+                : new Error('Failed to open invoice in Telegram.')
+            )
+          }
+        })
+      } else if (tgOpenLink) {
+        tgOpenLink(invoiceLink)
+        setBanner({
+          type: 'success',
+          message:
+            'Opening Telegram to complete payment. After paying, backend will place the order automatically.',
+        })
+      }
     } catch (error) {
       const message =
         error instanceof Error
