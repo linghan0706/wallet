@@ -73,7 +73,8 @@ export default function TelegramStarPay() {
 
     try {
       const webApp = getTelegramWebApp()
-      if (!webApp?.openInvoice) {
+      const tgOpenInvoice = webApp?.openInvoice
+      if (!tgOpenInvoice) {
         throw new Error(
           'Please open this page inside Telegram to pay with Stars.'
         )
@@ -96,7 +97,7 @@ export default function TelegramStarPay() {
 
       await new Promise<void>((resolve, reject) => {
         try {
-          webApp.openInvoice(invoiceLink, result => {
+          tgOpenInvoice(invoiceLink, result => {
             const status = result?.status || 'unknown'
             if (status === 'paid') {
               setBanner({
