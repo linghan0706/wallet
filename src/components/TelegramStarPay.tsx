@@ -33,7 +33,7 @@ const PRODUCTS: Product[] = [
     itemId: 5,
     title: 'Primary Collector',
     description: 'Entry-level auto collector',
-    price: 6,
+    price: 1,
     icon: '/stores/AutomaticCollector/primary.svg',
   },
   {
