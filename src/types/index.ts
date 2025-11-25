@@ -181,6 +181,8 @@ declare global {
             [key: string]: unknown
           }) => void
         ): void
+        openLink?(url: string): void
+        openTelegramLink?(url: string): void
       }
     }
   }
