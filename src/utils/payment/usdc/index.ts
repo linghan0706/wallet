@@ -43,6 +43,27 @@ export type PaymentResult = {
   network?: string
 }
 
+function normalizeRawAddress(address?: string | null): string | null {
+  if (!address) return null
+  try {
+    return Address.parse(address).toRawString()
+  } catch {
+    return null
+  }
+}
+
+function toFriendlyAddress(address?: string | null): string | null {
+  if (!address) return null
+  try {
+    return Address.parse(address).toString({
+      bounceable: true,
+      urlSafe: true,
+    })
+  } catch {
+    return null
+  }
+}
+
 function toJettonUnits(amount: number, decimals = 6): bigint {
   const factor = 10 ** Math.max(0, Math.min(decimals, 18))
   return BigInt(Math.round(amount * factor))
@@ -52,10 +73,12 @@ async function fetchJettonWalletAddress(
   owner: string,
   jettonMaster: string
 ): Promise<string | null> {
-  if (!owner || !jettonMaster) return null
+  const ownerRaw = normalizeRawAddress(owner)
+  const jettonMasterRaw = normalizeRawAddress(jettonMaster)
+  if (!ownerRaw || !jettonMasterRaw) return null
   try {
     const baseUrl = tonApiConfig.baseUrl.replace(/\/$/, '')
-    const url = `${baseUrl}/v2/accounts/${owner}/jettons`
+    const url = `${baseUrl}/v2/accounts/${ownerRaw}/jettons`
     const res = await fetch(url, {
       headers: tonApiConfig.apiKey
         ? { Authorization: `Bearer ${tonApiConfig.apiKey}` }
@@ -64,17 +87,29 @@ async function fetchJettonWalletAddress(
     if (!res.ok) return null
     const data = (await res.json()) as {
       balances?: Array<{
-        jetton?: { address?: string }
+        jetton?: { address?: string; wallet_address?: string }
         wallet_address?: string
+        walletAddress?: string | { address?: string }
       }>
     }
-    const match = data.balances?.find(
-      b => b.jetton?.address?.toLowerCase() === jettonMaster.toLowerCase()
-    )
-    const addr =
-      match?.wallet_address ||
-      (match?.jetton as unknown as { wallet_address?: string })?.wallet_address
-    return addr || null
+    const match = data.balances?.find(b => {
+      const candidate = normalizeRawAddress(
+        (b.jetton as { address?: string } | undefined)?.address
+      )
+      return candidate === jettonMasterRaw
+    })
+    const rawWalletAddress =
+      normalizeRawAddress(match?.wallet_address) ??
+      normalizeRawAddress(
+        typeof match?.walletAddress === 'string'
+          ? match.walletAddress
+          : match?.walletAddress?.address
+      ) ??
+      normalizeRawAddress(
+        (match?.jetton as unknown as { wallet_address?: string })
+          ?.wallet_address
+      )
+    return toFriendlyAddress(rawWalletAddress) || null
   } catch (error) {
     console.warn('Failed to fetch jetton wallet address', error)
     return null
@@ -118,19 +153,25 @@ export async function payWithUsdc({
   label,
   expectedNetwork,
 }: UsdcPayParams): Promise<PaymentResult> {
+  const normalizedWalletAddress = toFriendlyAddress(wallet?.address)
+  if (!normalizedWalletAddress) {
+    return { success: false, error: 'Wallet address is invalid or missing' }
+  }
+
+  const paymentAddr = toFriendlyAddress(paymentAddress)
+  if (!paymentAddr) {
+    return {
+      success: false,
+      error: 'USDC payment address is not configured correctly',
+    }
+  }
+
+  const jettonMasterRaw = normalizeRawAddress(jettonMaster)
+
   if (!wallet?.sendTransaction) {
     return { success: false, error: 'Wallet adapter unavailable' }
   }
-  if (!wallet.address) {
-    return {
-      success: false,
-      error: 'Wallet address is missing, please connect',
-    }
-  }
-  if (!paymentAddress) {
-    return { success: false, error: 'USDC payment address is not configured' }
-  }
-  if (!jettonMaster) {
+  if (!jettonMasterRaw) {
     return { success: false, error: 'USDC jetton master is not configured' }
   }
   if (
@@ -149,8 +190,8 @@ export async function payWithUsdc({
 
   try {
     const jettonWalletAddress = await fetchJettonWalletAddress(
-      wallet.address,
-      jettonMaster
+      normalizedWalletAddress,
+      jettonMasterRaw
     )
 
     if (!jettonWalletAddress) {
@@ -164,8 +205,8 @@ export async function payWithUsdc({
     const jettonAmount = toJettonUnits(amount, decimals)
     const body = buildJettonTransferBody({
       amount: jettonAmount,
-      destination: paymentAddress,
-      responseAddress: wallet.address,
+      destination: paymentAddr,
+      responseAddress: normalizedWalletAddress,
       forwardTonAmount: gasTon,
       comment:
         `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim(),
@@ -196,8 +237,8 @@ export async function payWithUsdc({
     return {
       success: true,
       txHash,
-      from: wallet.address ?? null,
-      to: paymentAddress,
+      from: normalizedWalletAddress,
+      to: paymentAddr,
       amount,
     }
   } catch (error) {
