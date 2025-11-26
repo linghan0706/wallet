@@ -57,10 +57,13 @@ function normalizeRawAddress(address?: string | null): string | null {
 function toFriendlyAddress(address?: string | Address | null): string | null {
   if (!address) return null
   try {
-    const parsed =
-      typeof address === 'string' ? Address.parse(address) : address
-    return parsed.toString({
-      bounceable: true,
+    if (typeof address === 'string') {
+      const trimmed = address.trim()
+      Address.parse(trimmed) // validate only
+      return trimmed
+    }
+    return address.toString({
+      bounceable: false,
       urlSafe: true,
     })
   } catch {
