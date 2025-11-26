@@ -73,6 +73,16 @@ function toJettonUnits(amount: number, decimals = 6): bigint {
   return BigInt(Math.round(amount * factor))
 }
 
+function toNumber(
+  value: string | number | undefined,
+  fallback: number
+): number {
+  const num = typeof value === 'string' ? Number(value) : value
+  return Number.isFinite(num) && (num as number) > 0
+    ? (num as number)
+    : fallback
+}
+
 async function fetchJettonWalletAddress(
   owner: string,
   jettonMaster: string,
@@ -225,6 +235,14 @@ export async function payWithUsdc({
     return { success: false, error: 'Invalid USDC payment amount' }
   }
 
+  const totalGasTon = toNumber(gasTon, 0.05)
+  // 留出一部分给 jetton wallet 作为执行费用，避免全部都被 forward 导致模拟失败
+  const forwardTonAmount =
+    totalGasTon <= 0.02
+      ? totalGasTon * 0.6
+      : Math.max(totalGasTon - 0.02, totalGasTon * 0.6)
+  const forwardTonAmountStr = forwardTonAmount.toFixed(6)
+
   try {
     const jettonWalletAddress = await fetchJettonWalletAddress(
       normalizedWalletAddress,
@@ -245,14 +263,14 @@ export async function payWithUsdc({
       amount: jettonAmount,
       destination: paymentAddr,
       responseAddress: normalizedWalletAddress,
-      forwardTonAmount: gasTon,
+      forwardTonAmount: forwardTonAmountStr,
       comment:
         `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim(),
     })
 
     const result = await wallet.sendTransaction({
       to: jettonWalletAddress,
-      amount: toNano(gasTon).toString(),
+      amount: toNano(totalGasTon).toString(),
       payload: body.toBoc().toString('base64'),
     })
 
