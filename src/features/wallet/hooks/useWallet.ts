@@ -159,12 +159,15 @@ export function useWallet() {
           ],
         })
 
+        let txHash: string | undefined
+
         try {
-          recordWalletTransaction({
+          const record = recordWalletTransaction({
             boc: result.boc,
             sender: address ?? tonConnectUI.account?.address ?? null,
             network,
           })
+          txHash = record.hash
         } catch (hashError) {
           console.warn('Failed to persist transaction hash', hashError)
         }
@@ -176,7 +179,7 @@ export function useWallet() {
           refreshBalance()
         }, 2000)
 
-        return { success: true, data: result }
+        return { success: true, data: result, hash: txHash }
       } catch (error) {
         console.error('Transaction error:', error)
         message.error('交易发送失败')

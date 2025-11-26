@@ -12,6 +12,7 @@ import {
   fetchFormattedStore,
   type PaymentMethod,
 } from '@/utils/api/store/api'
+import { payWithUsdc } from '@/utils/payment/usdc'
 
 type BannerState =
   | { type: 'idle'; message: '' }
@@ -19,6 +20,10 @@ type BannerState =
 
 const TON_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS || ''
 const USDC_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_USDC_PAYMENT_ADDRESS || ''
+const USDC_JETTON_MASTER = process.env.NEXT_PUBLIC_USDC_JETTON_MASTER || ''
+const USDC_JETTON_GAS_TON =
+  process.env.NEXT_PUBLIC_USDC_JETTON_GAS_TON || '0.05'
+const USDC_DECIMALS = Number(process.env.NEXT_PUBLIC_USDC_DECIMALS ?? '') || 6
 
 const paymentOptions: {
   key: PaymentMethod
@@ -242,7 +247,8 @@ export default function TelegramStarPay() {
     if (!price) {
       setBanner({
         type: 'error',
-        message: '当前支付方式暂不可用，请切换其他方式。',
+        message:
+          'Selected payment method is unavailable. Please choose another.',
       })
       return
     }
@@ -250,7 +256,7 @@ export default function TelegramStarPay() {
     if (!hasWalletConnection) {
       setBanner({
         type: 'error',
-        message: '请先通过 WalletConnect 连接 TON 钱包。',
+        message: 'Please connect your TON wallet via WalletConnect first.',
       })
       return
     }
@@ -258,7 +264,15 @@ export default function TelegramStarPay() {
     if (!paymentAddress) {
       setBanner({
         type: 'error',
-        message: '商户收款地址未配置，请联系管理员补充环境变量。',
+        message: 'Payment address is not configured. Please contact support.',
+      })
+      return
+    }
+
+    if (method === 'usdc' && !USDC_JETTON_MASTER) {
+      setBanner({
+        type: 'error',
+        message: 'USDC jetton master is not configured.',
       })
       return
     }
@@ -268,14 +282,27 @@ export default function TelegramStarPay() {
 
     try {
       if (method === 'usdc') {
-        setBanner({
-          type: 'success',
-          message: `钱包已连接，请向 ${shorten(
-            paymentAddress,
-            6,
-            6
-          )} 转入 ${price.amount} ${price.label} 并在链上确认。`,
+        const result = await payWithUsdc({
+          wallet,
+          amount: price.amount,
+          paymentAddress,
+          jettonMaster: USDC_JETTON_MASTER,
+          gasTon: USDC_JETTON_GAS_TON,
+          decimals: USDC_DECIMALS,
+          itemId: item.itemId,
+          label: price.label,
         })
+
+        if (result.success) {
+          setBanner({
+            type: 'success',
+            message: `USDC payment submitted${
+              result.txHash ? ` (tx: ${shorten(result.txHash, 6, 6)})` : ''
+            }. Waiting for confirmation.`,
+          })
+        } else {
+          throw new Error(result.error || 'USDC payment failed')
+        }
         return
       }
 
@@ -283,24 +310,26 @@ export default function TelegramStarPay() {
       const result = await wallet.sendTransaction({
         to: paymentAddress,
         amount,
-        comment: `Store item #${item.itemId} · ${price.label}`,
+        comment: `Store item #${item.itemId} - ${price.label}`,
       })
 
       if (result?.success) {
         setBanner({
           type: 'success',
-          message: `已提交 TON 支付至 ${shorten(
+          message: `Submitted TON payment to ${shorten(
             paymentAddress,
             4,
             6
-          )}，等待链上确认后会生成订单。`,
+          )}. Waiting for confirmation.`,
         })
       } else {
-        throw new Error(result?.error || 'TON 支付未完成')
+        throw new Error(result?.error || 'TON payment not sent')
       }
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : '链上支付失败，请稍后再试。'
+        error instanceof Error
+          ? error.message
+          : 'On-chain payment failed, please try again.'
       setBanner({ type: 'error', message })
     } finally {
       setActiveId(null)

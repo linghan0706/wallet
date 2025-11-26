@@ -2,6 +2,7 @@
 
 import { Address, beginCell, toNano } from '@ton/core'
 import { tonApiConfig } from '@/lib/ton-config'
+import { extractTransactionHash } from '@/utils'
 
 type WalletAdapter = {
   address?: string | null
@@ -10,7 +11,12 @@ type WalletAdapter = {
     amount: string
     comment?: string
     payload?: string
-  }) => Promise<{ success: boolean; error?: string; hash?: string }>
+  }) => Promise<{
+    success: boolean
+    error?: string
+    hash?: string
+    data?: { boc?: string }
+  }>
 }
 
 export type UsdcPayParams = {
@@ -113,16 +119,19 @@ export async function payWithUsdc({
     return { success: false, error: 'Wallet adapter unavailable' }
   }
   if (!wallet.address) {
-    return { success: false, error: '未获取到钱包地址，请重新连接钱包' }
+    return {
+      success: false,
+      error: 'Wallet address is missing, please connect',
+    }
   }
   if (!paymentAddress) {
-    return { success: false, error: 'USDC 收款地址未配置' }
+    return { success: false, error: 'USDC payment address is not configured' }
   }
   if (!jettonMaster) {
-    return { success: false, error: 'USDC jetton master 未配置' }
+    return { success: false, error: 'USDC jetton master is not configured' }
   }
   if (!Number.isFinite(amount) || amount <= 0) {
-    return { success: false, error: 'USDC 支付金额不合法' }
+    return { success: false, error: 'Invalid USDC payment amount' }
   }
 
   try {
@@ -134,7 +143,8 @@ export async function payWithUsdc({
     if (!jettonWalletAddress) {
       return {
         success: false,
-        error: '未找到 USDC Jetton 钱包，请确认钱包内持有 USDC。',
+        error:
+          'No USDC jetton wallet found. Please ensure your wallet holds USDC.',
       }
     }
 
@@ -145,7 +155,7 @@ export async function payWithUsdc({
       responseAddress: wallet.address,
       forwardTonAmount: gasTon,
       comment:
-        `Store item #${itemId ?? ''}${label ? ` · ${label}` : ''}`.trim(),
+        `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim(),
     })
 
     const result = await wallet.sendTransaction({
@@ -155,12 +165,24 @@ export async function payWithUsdc({
     })
 
     if (!result?.success) {
-      return { success: false, error: result?.error || 'USDC 支付未完成' }
+      return { success: false, error: result?.error || 'USDC payment not sent' }
+    }
+
+    let txHash = result.hash
+    if (!txHash) {
+      const boc = (result as { data?: { boc?: string } })?.data?.boc
+      if (boc) {
+        try {
+          txHash = extractTransactionHash(boc)
+        } catch {
+          txHash = undefined
+        }
+      }
     }
 
     return {
       success: true,
-      txHash: result.hash,
+      txHash,
       from: wallet.address ?? null,
       to: paymentAddress,
       amount,
@@ -168,7 +190,7 @@ export async function payWithUsdc({
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'USDC 支付失败',
+      error: error instanceof Error ? error.message : 'USDC payment failed',
     }
   }
 }
