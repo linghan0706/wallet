@@ -54,10 +54,12 @@ function normalizeRawAddress(address?: string | null): string | null {
   }
 }
 
-function toFriendlyAddress(address?: string | null): string | null {
+function toFriendlyAddress(address?: string | Address | null): string | null {
   if (!address) return null
   try {
-    return Address.parse(address).toString({
+    const parsed =
+      typeof address === 'string' ? Address.parse(address) : address
+    return parsed.toString({
       bounceable: true,
       urlSafe: true,
     })
@@ -87,14 +89,12 @@ async function fetchJettonWalletAddress(
       Address.parse(ownerRaw),
       Address.parse(jettonMasterRaw)
     )
-    const jettonWallet =
-      (balance.walletAddress as { address?: string } | undefined)?.address ||
-      (balance.walletAddress as unknown as string)
-    const friendly = toFriendlyAddress(
-      typeof jettonWallet === 'string'
-        ? jettonWallet
-        : (jettonWallet as Address | undefined)?.toString()
-    )
+    const jettonWallet = (
+      balance.walletAddress as { address?: Address | string } | undefined
+    )?.address
+    const friendly =
+      toFriendlyAddress(jettonWallet) ||
+      toFriendlyAddress(balance.walletAddress as unknown as string)
     if (friendly) return friendly
   } catch (error) {
     console.warn('TonAPI jetton balance lookup failed', error)
