@@ -322,9 +322,9 @@ export default function TelegramStarPay() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-3 sm:px-4 py-5 pb-16 flex justify-center">
-      <div className="w-full max-w-xl space-y-4 sm:space-y-5">
-        <div className="rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-4 sm:p-5">
+    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-3 sm:px-4 py-5 pb-16 flex justify-center overflow-x-hidden">
+      <div className="w-full max-w-[420px] sm:max-w-xl space-y-4 sm:space-y-5">
+        <div className="w-full rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-2 sm:gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-white/60">
@@ -343,8 +343,8 @@ export default function TelegramStarPay() {
             </div>
           </div>
 
-          <div className="mt-4">
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0 sm:mx-0">
+          <div className="mt-4 w-full">
+            <div className="flex gap-2 overflow-x-auto pb-1 px-1 w-full max-w-full snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0">
               {paymentOptions.map(option => {
                 const isActive = selectedMethod === option.key
                 return (
@@ -417,7 +417,7 @@ export default function TelegramStarPay() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-3.5 sm:p-4 space-y-3">
+        <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-3.5 sm:p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-white/70">选择商品并提交支付</div>
@@ -463,7 +463,7 @@ export default function TelegramStarPay() {
               return (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] min-h-[132px] sm:min-h-[136px]"
+                  className="w-full rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] min-h-[132px] sm:min-h-[136px]"
                 >
                   <div className="flex items-start gap-3 min-w-0">
                     <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
