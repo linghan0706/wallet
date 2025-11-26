@@ -17,14 +17,8 @@ type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
-const TON_PAYMENT_ADDRESS =
-  process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS ||
-  process.env.NEXT_PUBLIC_TON_TREASURY_ADDRESS ||
-  ''
-const USDC_PAYMENT_ADDRESS =
-  process.env.NEXT_PUBLIC_USDC_PAYMENT_ADDRESS ||
-  process.env.NEXT_PUBLIC_U_PAYMENT_ADDRESS ||
-  ''
+const TON_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS || ''
+const USDC_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_USDC_PAYMENT_ADDRESS || ''
 
 const paymentOptions: {
   key: PaymentMethod
