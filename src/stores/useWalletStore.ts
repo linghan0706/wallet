@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { DEFAULT_NETWORK } from '@/lib/ton-config'
 
 interface WalletState {
   isConnected: boolean
@@ -18,7 +19,7 @@ export const useWalletStore = create<WalletState>()(
       isConnected: false,
       address: null,
       balance: null,
-      network: 'mainnet',
+      network: DEFAULT_NETWORK,
       connectWallet: (address: string) => set({ isConnected: true, address }),
       disconnectWallet: () =>
         set({ isConnected: false, address: null, balance: null }),
