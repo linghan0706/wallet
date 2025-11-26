@@ -463,10 +463,10 @@ export default function TelegramStarPay() {
               return (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] min-h-[132px] sm:min-h-[136px]"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
                       <Image
                         src={item.icon}
                         alt={item.title}
@@ -475,17 +475,17 @@ export default function TelegramStarPay() {
                         className="object-contain"
                       />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="text-base font-semibold">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 min-w-0">
+                        <div className="min-w-0">
+                          <div className="text-base font-semibold break-words leading-tight">
                             {item.title}
                           </div>
-                          <div className="text-sm text-white/70">
+                          <div className="text-sm text-white/70 break-words">
                             {item.description}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-wrap shrink-0">
                           <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
                             #{item.itemId}
                           </div>
@@ -495,7 +495,7 @@ export default function TelegramStarPay() {
                         </div>
                       </div>
                       <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="space-y-1 text-sm">
+                        <div className="space-y-1 text-sm min-w-0">
                           <div className="text-white/60">支付金额</div>
                           <div className="font-semibold text-lg">
                             {priceLabel}
@@ -504,7 +504,7 @@ export default function TelegramStarPay() {
                         <button
                           onClick={() => handlePay(item)}
                           disabled={isProcessing || !price}
-                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
                         >
                           {isProcessing
                             ? '处理中…'
