@@ -21,7 +21,6 @@ type TelegramStarPaymentCallback =
     }
   | undefined
 
-// Define a minimal interface for the Telegram WebApp API we use.
 interface TelegramWebAppInterface {
   requestStarPayment?: (
     payload: TelegramStarRequestPayload,
@@ -49,6 +48,7 @@ export type StarPaymentRequest = {
   description?: string
   payload?: string
   botUsername?: string
+  invoiceSlug?: string
   metadata?: Record<string, unknown>
   currency?: string
 }
