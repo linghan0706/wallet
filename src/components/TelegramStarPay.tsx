@@ -333,13 +333,6 @@ export default function TelegramStarPay() {
               <h1 className="text-xl sm:text-2xl font-semibold leading-tight mt-1">
                 星球商店 · Stars / TON / U
               </h1>
-              <p className="text-sm text-white/70 mt-1.5 sm:mt-2 leading-relaxed">
-                为移动端优化的快速支付体验，支持 Telegram Stars 与 WalletConnect
-                链上支付。
-              </p>
-            </div>
-            <div className="px-3 py-2 rounded-2xl bg-white/10 text-xs text-white/80">
-              Mobile Ready
             </div>
           </div>
 
@@ -425,16 +418,13 @@ export default function TelegramStarPay() {
                 支持 {paymentOptions.find(p => p.key === selectedMethod)?.label}
               </div>
             </div>
-            <div className="px-3 py-1 rounded-full bg-white/10 text-xs text-white/70">
-              移动端友好
-            </div>
           </div>
 
           {loadingProducts &&
             Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
-                className="h-[80px] sm:h-[88px] rounded-[14px] sm:rounded-[16px] border border-white/10 bg-white/5 animate-pulse"
+                className="h-[132px] sm:h-[136px] rounded-2xl bg-white/10 border border-white/5 animate-pulse"
               />
             ))}
 
@@ -456,76 +446,66 @@ export default function TelegramStarPay() {
               const priceLabel = price
                 ? `${formatAmount(price.amount)} ${price.label}`
                 : '当前方式暂不支持'
+              const methodLabel =
+                paymentOptions.find(p => p.key === selectedMethod)?.label || ''
               const isProcessing = activeId === item.id
-              const buttonDisabled = isProcessing || !price
-              const buttonLabel = isProcessing
-                ? '...'
-                : price
-                  ? selectedMethod === 'star'
-                    ? 'Stars 支付'
-                    : '链上支付'
-                  : '不可用'
 
               return (
                 <div
                   key={item.id}
-                  className="relative w-full h-[80px] sm:h-[88px]"
+                  className="w-full rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] min-h-[132px] sm:min-h-[136px] overflow-hidden"
                 >
-                  <div
-                    className="absolute inset-0 backdrop-blur-[25px] rounded-[14px] sm:rounded-[16px] border border-white/10"
-                    style={{ backdropFilter: 'blur(25px)' }}
-                  />
-                  <div
-                    className="absolute inset-0 rounded-[14px] sm:rounded-[16px]"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, rgba(34,26,76,0.9) 0%, rgba(34,26,76,0.7) 100%)',
-                      boxShadow:
-                        '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    }}
-                  />
-                  <div className="relative w-full h-full flex items-center px-3 sm:px-4">
-                    <div className="flex items-center flex-1 min-w-0">
-                      <div className="w-[48px] h-[48px] sm:w-[48px] sm:h-[48px] flex items-center justify-center relative flex-shrink-0">
-                        <div
-                          className="absolute inset-0 rounded-full"
-                          style={{
-                            background:
-                              'linear-gradient(135deg, rgba(107,10,233,0.3) 0%, rgba(100,16,177,0.3) 100%)',
-                          }}
-                        />
-                        <Image
-                          src={item.icon}
-                          alt={item.title}
-                          width={48}
-                          height={48}
-                          className="relative z-10"
-                          style={{ width: 'auto', height: 'auto' }}
-                        />
-                      </div>
-                      <div className="ml-3 sm:ml-4 flex-1 min-w-0">
-                        <div className="text-white text-[22px] sm:text-[20px] leading-[22px] sm:leading-[24px] font-normal font-jersey-10 mb-1 truncate">
-                          {item.title}
-                        </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <span className="text-white text-[14px] sm:text-[16px] leading-[22px] sm:leading-[20px] font-normal font-exo2 text-center">
-                            {priceLabel}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
+                      <Image
+                        src={item.icon}
+                        alt={item.title}
+                        width={56}
+                        height={56}
+                        className="object-contain"
+                      />
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-                      <div className="flex-shrink-0">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-base font-semibold leading-tight break-words">
+                            {item.title}
+                          </div>
+                          <div className="mt-0.5 text-sm text-white/70 break-words">
+                            {item.description}
+                          </div>
+                          <div className="mt-2 flex items-center gap-1.5 flex-wrap shrink-0">
+                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
+                              #{item.itemId}
+                            </div>
+                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70 capitalize">
+                              {methodLabel || '当前方式'}
+                            </div>
+                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/80">
+                              {priceLabel}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="space-y-1 text-sm min-w-0">
+                          <div className="text-white/60">支付金额</div>
+                          <div className="font-semibold text-lg">
+                            {priceLabel}
+                          </div>
+                        </div>
                         <button
-                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-[8px] w-[69px] height-[34px] sm:rounded-[12px] min-w-[70px] sm:min-w-[80px] h-[36px] sm:h-[40px] flex items-center justify-center text-white text-[16px] sm:text-[16px] leading-[22px] sm:leading-[20px] font-normal font-jersey-10 transition-all duration-300 transform ${
-                            buttonDisabled
-                              ? 'bg-gray-600/60 cursor-not-allowed opacity-70'
-                              : 'bg-gradient-to-r from-[#6B0AE9] to-[#6410B1] hover:from-[#7B1AF9] hover:to-[#7420C1] hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl active:scale-95'
-                          }`}
-                          disabled={buttonDisabled}
                           onClick={() => handlePay(item)}
+                          disabled={isProcessing || !price}
+                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
                         >
-                          {buttonLabel}
+                          {isProcessing
+                            ? '处理中…'
+                            : price
+                              ? selectedMethod === 'star'
+                                ? 'Stars 支付'
+                                : '链上支付'
+                              : '暂不支持'}
                         </button>
                       </div>
                     </div>
