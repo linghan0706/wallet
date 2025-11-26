@@ -1,8 +1,6 @@
 // 导出所有工具函数
 export * from './validation'
 export * from './GetwalletHash'
-// 为兼容旧命名，导出 shortenAddress（内部使用 formatAddress）
-export { formatAddress as shortenAddress } from './format'
 
 /**
  * 延迟执行函数

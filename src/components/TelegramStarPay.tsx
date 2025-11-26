@@ -12,6 +12,7 @@ import {
   type PaymentMethod,
 } from '@/utils/api/store/api'
 import { payWithTon, payWithUsdc, paymentConfig } from '@/utils/payment'
+import { formatAddress } from '@/utils/format'
 
 type BannerState =
   | { type: 'idle'; message: '' }
@@ -63,12 +64,6 @@ const paymentOptions: {
 function getTelegramWebApp() {
   if (typeof window === 'undefined') return null
   return window.Telegram?.WebApp ?? null
-}
-
-function shorten(value?: string | null, head = 4, tail = 4) {
-  if (!value) return ''
-  if (value.length <= head + tail + 3) return value
-  return `${value.slice(0, head)}...${value.slice(-tail)}`
 }
 
 function formatAmount(amount?: number) {
@@ -129,7 +124,7 @@ export default function TelegramStarPay() {
   const walletLabel = useMemo(
     () =>
       hasWalletConnection
-        ? `已连接 · ${shorten(wallet.address, 6, 6)}`
+        ? `已连接 · ${formatAddress(wallet.address ?? '')}`
         : '未连接 TON 钱包',
     [hasWalletConnection, wallet.address]
   )
@@ -299,7 +294,9 @@ export default function TelegramStarPay() {
           setBanner({
             type: 'success',
             message: `USDC payment submitted${
-              result.txHash ? ` (tx: ${shorten(result.txHash, 6, 6)})` : ''
+              result.txHash
+                ? ` (tx: ${formatAddress(result.txHash, 6, 6)})`
+                : ''
             }. Waiting for confirmation.`,
           })
         } else {
@@ -320,11 +317,11 @@ export default function TelegramStarPay() {
       if (tonResult.success) {
         setBanner({
           type: 'success',
-          message: `Submitted TON payment to ${shorten(
+          message: `Submitted TON payment to ${formatAddress(
             paymentAddress,
             4,
             6
-          )}${tonResult.txHash ? ` (tx: ${shorten(tonResult.txHash, 6, 6)})` : ''}. Waiting for confirmation.`,
+          )}${tonResult.txHash ? ` (tx: ${formatAddress(tonResult.txHash, 6, 6)})` : ''}. Waiting for confirmation.`,
         })
       } else {
         throw new Error(tonResult.error || 'TON payment not sent')
@@ -437,7 +434,7 @@ export default function TelegramStarPay() {
             </div>
             {selectedPaymentAddress && (
               <div className="mt-3 text-xs text-white/60">
-                收款地址: {shorten(selectedPaymentAddress, 6, 6)}
+                收款地址: {formatAddress(selectedPaymentAddress, 6, 6)}
               </div>
             )}
           </div>
