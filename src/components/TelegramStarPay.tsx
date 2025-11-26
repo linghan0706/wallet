@@ -1,20 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import {
   requestStarPurchaseInvoice,
   type StarInvoiceResult,
+  type FormattedStoreItem,
+  fetchFormattedStore,
 } from '@/utils/api/store/api'
-
-type Product = {
-  id: string
-  itemId: number
-  title: string
-  description: string
-  price: number
-  icon: string
-}
 
 type BannerState =
   | { type: 'idle'; message: '' }
@@ -27,51 +20,65 @@ function getTelegramWebApp() {
   return window.Telegram?.WebApp ?? null
 }
 
-const PRODUCTS: Product[] = [
-  {
-    id: 'collector-primary',
-    itemId: 5,
-    title: 'Primary Collector',
-    description: 'Entry-level auto collector',
-    price: 1,
-    icon: '/stores/AutomaticCollector/primary.svg',
-  },
-  {
-    id: 'collector-intermediate',
-    itemId: 6,
-    title: 'Intermediate Collector',
-    description: 'Faster collection speed',
-    price: 180,
-    icon: '/stores/AutomaticCollector/intermediate.svg',
-  },
-  {
-    id: 'collector-advanced',
-    itemId: 7,
-    title: 'Advanced Collector',
-    description: 'Enhanced efficiency boost',
-    price: 350,
-    icon: '/stores/AutomaticCollector/advanced.svg',
-  },
-  {
-    id: 'collector-super',
-    itemId: 8,
-    title: 'Super Collector',
-    description: 'Top-tier auto collection power',
-    price: 700,
-    icon: '/stores/AutomaticCollector/super.svg',
-  },
-]
-
 export default function TelegramStarPay() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [banner, setBanner] = useState<BannerState>({
     type: 'idle',
     message: '',
   })
+  const [items, setItems] = useState<FormattedStoreItem[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [productError, setProductError] = useState<string | null>(null)
 
-  const handlePurchase = async (product: Product) => {
-    setActiveId(product.id)
+  useEffect(() => {
+    let mounted = true
+
+    const loadProducts = async () => {
+      setLoadingProducts(true)
+      setProductError(null)
+      try {
+        const { items } = await fetchFormattedStore()
+        if (mounted) {
+          setItems(items)
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to load store items. Please try again.'
+        if (mounted) {
+          setProductError(message)
+        }
+      } finally {
+        if (mounted) {
+          setLoadingProducts(false)
+        }
+      }
+    }
+
+    loadProducts()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const getStarPrice = (item: FormattedStoreItem) =>
+    item.prices.find(p => p.paymentMethod === 'star')
+
+  const handlePurchase = async (item: FormattedStoreItem) => {
+    setActiveId(item.id)
     setBanner({ type: 'idle', message: '' })
+
+    const starPrice = getStarPrice(item)
+    if (!starPrice) {
+      setBanner({
+        type: 'error',
+        message: 'This item is not available for Stars payment.',
+      })
+      setActiveId(null)
+      return
+    }
 
     try {
       const webApp = getTelegramWebApp()
@@ -79,7 +86,7 @@ export default function TelegramStarPay() {
       const tgOpenLink = webApp?.openTelegramLink || webApp?.openLink
 
       const invoice: StarInvoiceResult = await requestStarPurchaseInvoice({
-        itemId: product.itemId,
+        itemId: item.itemId,
         quantity: 1,
       })
 
@@ -177,45 +184,99 @@ export default function TelegramStarPay() {
         </div>
 
         <div className="space-y-3">
-          {PRODUCTS.map(product => (
-            <div
-              key={product.id}
-              className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center shadow-inner overflow-hidden">
-                  <Image
-                    src={product.icon}
-                    alt={product.title}
-                    width={48}
-                    height={48}
-                    className="object-contain"
-                  />
-                </div>
-                <div>
-                  <div className="text-base font-semibold text-[#2f3a4a]">
-                    {product.title}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {product.description}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Item #{product.itemId} | Quantity 1 | Est. {product.price}{' '}
-                    {STAR_LABEL}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => handlePurchase(product)}
-                disabled={activeId === product.id}
-                className="flex items-center gap-2 rounded-xl bg-[#5fb5f7] px-4 py-2 text-white font-semibold shadow-md transition hover:brightness-105 active:translate-y-[1px] disabled:opacity-70"
-              >
-                <span className="text-sm leading-none">
-                  {activeId === product.id ? 'Sending...' : 'Send order'}
-                </span>
-              </button>
+          {loadingProducts &&
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div
+                key={`skeleton-${idx}`}
+                className="h-[92px] rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3 animate-pulse"
+              />
+            ))}
+
+          {!loadingProducts && productError && (
+            <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+              {productError}
             </div>
-          ))}
+          )}
+
+          {!loadingProducts && !productError && items.length === 0 && (
+            <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
+              No store items available.
+            </div>
+          )}
+
+          {!loadingProducts &&
+            items.map(item => {
+              const starPrice = getStarPrice(item)
+              const priceLabel =
+                starPrice?.amount !== undefined
+                  ? `${starPrice.amount.toLocaleString()} ${STAR_LABEL}`
+                  : 'Stars not supported'
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center shadow-inner overflow-hidden">
+                      <Image
+                        src={item.icon}
+                        alt={item.title}
+                        width={48}
+                        height={48}
+                        className="object-contain"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-base font-semibold text-[#2f3a4a]">
+                        {item.title}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {item.description}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        Item #{item.itemId} | Quantity 1 | Est. {priceLabel}
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {item.prices.map(price => (
+                          <div
+                            key={`${price.paymentMethod}-${price.assetId}`}
+                            className="flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1 text-xs text-[#2f3a4a] border border-slate-100"
+                            title={price.label}
+                          >
+                            {price.assetIcon && (
+                              <Image
+                                src={price.assetIcon}
+                                alt={price.label}
+                                width={14}
+                                height={14}
+                                className="object-contain"
+                              />
+                            )}
+                            <span>
+                              {price.amount} {price.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handlePurchase(item)}
+                    disabled={activeId === item.id || !starPrice}
+                    className="flex items-center gap-2 rounded-xl bg-[#5fb5f7] px-4 py-2 text-white font-semibold shadow-md transition hover:brightness-105 active:translate-y-[1px] disabled:opacity-70"
+                  >
+                    <span className="text-sm leading-none">
+                      {activeId === item.id
+                        ? 'Sending...'
+                        : starPrice
+                          ? 'Send order'
+                          : 'Stars unavailable'}
+                    </span>
+                  </button>
+                </div>
+              )
+            })}
         </div>
 
         {banner.type !== 'idle' && (
