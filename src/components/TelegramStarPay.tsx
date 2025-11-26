@@ -1,12 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { TonConnectButton } from '@tonconnect/ui-react'
+import { toNano } from '@ton/core'
+import { useWallet } from '@/features/wallet'
 import {
   requestStarPurchaseInvoice,
   type StarInvoiceResult,
   type FormattedStoreItem,
   fetchFormattedStore,
+  type PaymentMethod,
 } from '@/utils/api/store/api'
 
 type BannerState =
@@ -14,10 +18,67 @@ type BannerState =
   | { type: 'success' | 'error'; message: string }
 
 const STAR_LABEL = 'XTR (Telegram Stars)'
+const TON_PAYMENT_ADDRESS =
+  process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS ||
+  process.env.NEXT_PUBLIC_TON_TREASURY_ADDRESS ||
+  ''
+const USDC_PAYMENT_ADDRESS =
+  process.env.NEXT_PUBLIC_USDC_PAYMENT_ADDRESS ||
+  process.env.NEXT_PUBLIC_U_PAYMENT_ADDRESS ||
+  ''
+
+const paymentOptions: {
+  key: PaymentMethod
+  label: string
+  badge: string
+  accent: string
+  chip: string
+  description: string
+}[] = [
+  {
+    key: 'star',
+    label: 'Stars',
+    badge: 'Telegram',
+    accent: 'from-[#5b8dff] via-[#6ec1ff] to-[#a9d8ff]',
+    chip: 'bg-white/10 text-[#e3edff]',
+    description: '一键打开小程序支付，不跳转。',
+  },
+  {
+    key: 'ton',
+    label: 'TON',
+    badge: 'WalletConnect',
+    accent: 'from-[#3c8ce7] via-[#00b7ff] to-[#00f2ff]',
+    chip: 'bg-white/10 text-[#d5f0ff]',
+    description: '通过 TonConnect 调起钱包完成链上支付。',
+  },
+  {
+    key: 'usdc',
+    label: 'U (USDC)',
+    badge: 'WalletConnect',
+    accent: 'from-[#6e7bff] via-[#9d6bff] to-[#ff8ec7]',
+    chip: 'bg-white/10 text-[#f9e8ff]',
+    description: '稳定币支付，适合跨境用户。',
+  },
+]
 
 function getTelegramWebApp() {
   if (typeof window === 'undefined') return null
   return window.Telegram?.WebApp ?? null
+}
+
+function shorten(value?: string | null, head = 4, tail = 4) {
+  if (!value) return ''
+  if (value.length <= head + tail + 3) return value
+  return `${value.slice(0, head)}...${value.slice(-tail)}`
+}
+
+function formatAmount(amount?: number) {
+  if (amount === undefined || amount === null) return '—'
+  return amount >= 1000 ? amount.toLocaleString() : `${amount}`
+}
+
+function getPriceByMethod(item: FormattedStoreItem, method: PaymentMethod) {
+  return item.prices.find(price => price.paymentMethod === method)
 }
 
 export default function TelegramStarPay() {
@@ -29,6 +90,8 @@ export default function TelegramStarPay() {
   const [items, setItems] = useState<FormattedStoreItem[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
   const [productError, setProductError] = useState<string | null>(null)
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('star')
+  const wallet = useWallet()
 
   useEffect(() => {
     let mounted = true
@@ -63,18 +126,27 @@ export default function TelegramStarPay() {
     }
   }, [])
 
-  const getStarPrice = (item: FormattedStoreItem) =>
-    item.prices.find(p => p.paymentMethod === 'star')
+  const hasWalletConnection = wallet.isConnected
+  const walletLabel = useMemo(
+    () =>
+      hasWalletConnection
+        ? `已连接 · ${shorten(wallet.address, 6, 6)}`
+        : '未连接 TON 钱包',
+    [hasWalletConnection, wallet.address]
+  )
 
-  const handlePurchase = async (item: FormattedStoreItem) => {
+  const selectedPaymentAddress =
+    selectedMethod === 'ton' ? TON_PAYMENT_ADDRESS : USDC_PAYMENT_ADDRESS
+
+  const handleStarPayment = async (item: FormattedStoreItem) => {
     setActiveId(item.id)
     setBanner({ type: 'idle', message: '' })
 
-    const starPrice = getStarPrice(item)
+    const starPrice = getPriceByMethod(item, 'star')
     if (!starPrice) {
       setBanner({
         type: 'error',
-        message: 'This item is not available for Stars payment.',
+        message: '当前商品暂不支持 Stars 支付。',
       })
       setActiveId(null)
       return
@@ -97,11 +169,9 @@ export default function TelegramStarPay() {
 
       setBanner({
         type: 'success',
-        message:
-          'Invoice created, opening Telegram Stars (XTR) payment sheet...',
+        message: '账单已生成，正在调起 Telegram Stars (XTR) 支付…',
       })
 
-      // Prefer Telegram's invoice API; fall back to openLink if the method is unavailable.
       if (tgOpenInvoice) {
         await new Promise<void>((resolve, reject) => {
           try {
@@ -111,28 +181,27 @@ export default function TelegramStarPay() {
                 setBanner({
                   type: 'success',
                   message:
-                    'Payment completed! Backend will create the order automatically. You can check order status in the Orders list shortly.',
+                    '支付完成！后台会自动创建订单，可稍后在订单列表查看状态。',
                 })
               } else if (status === 'pending') {
                 setBanner({
                   type: 'success',
-                  message:
-                    'Payment is pending. The backend will place the order automatically once confirmed.',
+                  message: '支付处理中，确认后会自动创建订单。',
                 })
               } else if (status === 'cancelled') {
                 setBanner({
                   type: 'error',
-                  message: 'Payment was cancelled.',
+                  message: '支付已取消。',
                 })
               } else if (status === 'failed') {
                 setBanner({
                   type: 'error',
-                  message: 'Payment failed. Please try again.',
+                  message: '支付失败，请重试。',
                 })
               } else {
                 setBanner({
                   type: 'error',
-                  message: `Invoice status: ${status}`,
+                  message: `账单状态：${status}`,
                 })
               }
               resolve()
@@ -149,16 +218,13 @@ export default function TelegramStarPay() {
         tgOpenLink(invoiceLink)
         setBanner({
           type: 'success',
-          message:
-            'Opening Telegram to complete payment with Stars (XTR). After paying, backend will place the order automatically.',
+          message: '已跳转至 Telegram 支付 Stars，支付后订单会自动创建。',
         })
       } else {
-        // Fallback for unexpected environments: navigate directly to the invoice link.
         window.location.href = invoiceLink
         setBanner({
           type: 'success',
-          message:
-            'Redirecting to payment. If payment does not open, please try again inside Telegram to pay with Stars (XTR).',
+          message: '正在打开支付页。如未能自动调起，请在 Telegram 内重试。',
         })
       }
     } catch (error) {
@@ -172,108 +238,307 @@ export default function TelegramStarPay() {
     }
   }
 
+  const handleOnChainPayment = async (
+    item: FormattedStoreItem,
+    method: PaymentMethod
+  ) => {
+    const price = getPriceByMethod(item, method)
+    const paymentAddress =
+      method === 'ton' ? TON_PAYMENT_ADDRESS : USDC_PAYMENT_ADDRESS
+
+    if (!price) {
+      setBanner({
+        type: 'error',
+        message: '当前支付方式暂不可用，请切换其他方式。',
+      })
+      return
+    }
+
+    if (!hasWalletConnection) {
+      setBanner({
+        type: 'error',
+        message: '请先通过 WalletConnect 连接 TON 钱包。',
+      })
+      return
+    }
+
+    if (!paymentAddress) {
+      setBanner({
+        type: 'error',
+        message: '商户收款地址未配置，请联系管理员补充环境变量。',
+      })
+      return
+    }
+
+    setActiveId(item.id)
+    setBanner({ type: 'idle', message: '' })
+
+    try {
+      if (method === 'usdc') {
+        setBanner({
+          type: 'success',
+          message: `钱包已连接，请向 ${shorten(
+            paymentAddress,
+            6,
+            6
+          )} 转入 ${price.amount} ${price.label} 并在链上确认。`,
+        })
+        return
+      }
+
+      const amount = toNano(price.amount.toString()).toString()
+      const result = await wallet.sendTransaction({
+        to: paymentAddress,
+        amount,
+        comment: `Store item #${item.itemId} · ${price.label}`,
+      })
+
+      if (result?.success) {
+        setBanner({
+          type: 'success',
+          message: `已提交 TON 支付至 ${shorten(
+            paymentAddress,
+            4,
+            6
+          )}，等待链上确认后会生成订单。`,
+        })
+      } else {
+        throw new Error(result?.error || 'TON 支付未完成')
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : '链上支付失败，请稍后再试。'
+      setBanner({ type: 'error', message })
+    } finally {
+      setActiveId(null)
+    }
+  }
+
+  const handlePay = (item: FormattedStoreItem) => {
+    if (selectedMethod === 'star') {
+      return handleStarPayment(item)
+    }
+    return handleOnChainPayment(item, selectedMethod)
+  }
+
   return (
-    <div className="min-h-screen bg-[#f9fafb] text-[#1f2a36] px-4 py-8 flex justify-center">
-      <div className="w-full max-w-lg">
-        <div className="flex items-center justify-center gap-2 text-2xl font-bold mb-6">
-          <span>Star Store</span>
+    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-4 py-6 pb-16 flex justify-center">
+      <div className="w-full max-w-xl space-y-5">
+        <div className="rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
+                Telegram · Web3 Checkout
+              </p>
+              <h1 className="text-2xl font-semibold leading-tight mt-1">
+                星球商店 · Stars / TON / U
+              </h1>
+              <p className="text-sm text-white/70 mt-2">
+                为移动端优化的快速支付体验，支持 Telegram Stars 与 WalletConnect
+                链上支付。
+              </p>
+            </div>
+            <div className="px-3 py-2 rounded-2xl bg-white/10 text-xs text-white/80">
+              Mobile Ready
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            {paymentOptions.map(option => {
+              const isActive = selectedMethod === option.key
+              return (
+                <button
+                  key={option.key}
+                  onClick={() => setSelectedMethod(option.key)}
+                  className={`relative overflow-hidden rounded-2xl border border-white/10 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                    isActive
+                      ? 'shadow-lg shadow-black/30'
+                      : 'bg-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${option.accent} opacity-60 ${
+                      isActive ? 'visible' : 'invisible'
+                    }`}
+                    aria-hidden
+                  />
+                  <div className="relative space-y-1">
+                    <div className="text-[11px] uppercase tracking-wide text-white/70">
+                      {option.badge}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg font-semibold">
+                        {option.label}
+                      </span>
+                      {isActive && (
+                        <span className="h-2 w-2 rounded-full bg-white shadow" />
+                      )}
+                    </div>
+                    <p className="text-xs text-white/70 leading-snug">
+                      {option.description}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="space-y-1">
+                <div className="text-xs text-white/60 uppercase tracking-wide">
+                  WalletConnect
+                </div>
+                <div className="text-sm font-semibold">{walletLabel}</div>
+                <div className="text-xs text-white/60">
+                  网络: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <TonConnectButton />
+                {!hasWalletConnection && (
+                  <button
+                    onClick={wallet.connect}
+                    disabled={wallet.isConnecting}
+                    className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/20 transition disabled:opacity-60"
+                  >
+                    {wallet.isConnecting ? '连接中…' : '一键连接'}
+                  </button>
+                )}
+              </div>
+            </div>
+            {selectedPaymentAddress && (
+              <div className="mt-3 text-xs text-white/60">
+                收款地址: {shorten(selectedPaymentAddress, 6, 6)}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="mb-3 text-lg font-semibold text-[#1f2a36]">
-          Select an item to send an invoice request
-        </div>
+        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-white/70">选择商品并提交支付</div>
+              <div className="text-lg font-semibold">
+                支持 {paymentOptions.find(p => p.key === selectedMethod)?.label}
+              </div>
+            </div>
+            <div className="px-3 py-1 rounded-full bg-white/10 text-xs text-white/70">
+              移动端友好
+            </div>
+          </div>
 
-        <div className="space-y-3">
           {loadingProducts &&
             Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
-                className="h-[92px] rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3 animate-pulse"
+                className="h-[110px] rounded-2xl bg-white/10 border border-white/5 animate-pulse"
               />
             ))}
 
           {!loadingProducts && productError && (
-            <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100 shadow-inner">
               {productError}
             </div>
           )}
 
           {!loadingProducts && !productError && items.length === 0 && (
-            <div className="rounded-2xl border border-gray-100 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
-              No store items available.
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
+              暂无可售商品。
             </div>
           )}
 
           {!loadingProducts &&
             items.map(item => {
-              const starPrice = getStarPrice(item)
-              const priceLabel =
-                starPrice?.amount !== undefined
-                  ? `${starPrice.amount.toLocaleString()} ${STAR_LABEL}`
-                  : 'Stars not supported'
+              const price = getPriceByMethod(item, selectedMethod)
+              const starPrice = getPriceByMethod(item, 'star')
+              const priceLabel = price
+                ? `${formatAmount(price.amount)} ${price.label}`
+                : '当前方式暂不支持'
+              const secondaryLabel = starPrice
+                ? `${formatAmount(starPrice.amount)} ${STAR_LABEL}`
+                : 'Stars 不支持'
+              const isProcessing = activeId === item.id
 
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-gray-100 px-4 py-3"
+                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center shadow-inner overflow-hidden">
+                  <div className="flex items-start gap-3">
+                    <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10">
                       <Image
                         src={item.icon}
                         alt={item.title}
-                        width={48}
-                        height={48}
+                        width={56}
+                        height={56}
                         className="object-contain"
                       />
                     </div>
-                    <div>
-                      <div className="text-base font-semibold text-[#2f3a4a]">
-                        {item.title}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="text-base font-semibold">
+                            {item.title}
+                          </div>
+                          <div className="text-sm text-white/70">
+                            {item.description}
+                          </div>
+                        </div>
+                        <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
+                          #{item.itemId}
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {item.description}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        Item #{item.itemId} | Quantity 1 | Est. {priceLabel}
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {item.prices.map(price => (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {item.prices.map(priceItem => (
                           <div
-                            key={`${price.paymentMethod}-${price.assetId}`}
-                            className="flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1 text-xs text-[#2f3a4a] border border-slate-100"
-                            title={price.label}
+                            key={`${priceItem.paymentMethod}-${priceItem.assetId}`}
+                            className={`flex items-center gap-1 rounded-full border border-white/10 px-2 py-[6px] text-xs ${
+                              priceItem.paymentMethod === selectedMethod
+                                ? 'bg-white/20 text-white'
+                                : 'bg-white/5 text-white/70'
+                            }`}
+                            title={priceItem.label}
                           >
-                            {price.assetIcon && (
+                            {priceItem.assetIcon && (
                               <Image
-                                src={price.assetIcon}
-                                alt={price.label}
+                                src={priceItem.assetIcon}
+                                alt={priceItem.label}
                                 width={14}
                                 height={14}
                                 className="object-contain"
                               />
                             )}
                             <span>
-                              {price.amount} {price.label}
+                              {priceItem.amount} {priceItem.label}
                             </span>
                           </div>
                         ))}
                       </div>
+                      <div className="mt-3 grid grid-cols-[1.4fr,1fr] gap-2 items-center">
+                        <div className="space-y-1 text-sm">
+                          <div className="text-white/60">当前支付方式</div>
+                          <div className="font-semibold">{priceLabel}</div>
+                          <div className="text-xs text-white/50">
+                            Stars 参考价：{secondaryLabel}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handlePay(item)}
+                          disabled={isProcessing || !price}
+                          className="w-full rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {isProcessing
+                            ? '处理中…'
+                            : price
+                              ? selectedMethod === 'star'
+                                ? 'Stars 支付'
+                                : '链上支付'
+                              : '暂不支持'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handlePurchase(item)}
-                    disabled={activeId === item.id || !starPrice}
-                    className="flex items-center gap-2 rounded-xl bg-[#5fb5f7] px-4 py-2 text-white font-semibold shadow-md transition hover:brightness-105 active:translate-y-[1px] disabled:opacity-70"
-                  >
-                    <span className="text-sm leading-none">
-                      {activeId === item.id
-                        ? 'Sending...'
-                        : starPrice
-                          ? 'Send order'
-                          : 'Stars unavailable'}
-                    </span>
-                  </button>
                 </div>
               )
             })}
@@ -281,10 +546,10 @@ export default function TelegramStarPay() {
 
         {banner.type !== 'idle' && (
           <div
-            className={`mt-6 rounded-xl px-4 py-3 text-sm ${
+            className={`rounded-2xl px-4 py-3 text-sm border ${
               banner.type === 'success'
-                ? 'bg-green-50 text-green-700 border border-green-100'
-                : 'bg-red-50 text-red-700 border border-red-100'
+                ? 'bg-emerald-500/10 text-emerald-100 border-emerald-500/30'
+                : 'bg-red-500/10 text-red-100 border-red-500/40'
             }`}
             role="status"
             aria-live="polite"
