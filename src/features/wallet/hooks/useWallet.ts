@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTonConnectUI } from '@tonconnect/ui-react'
+import { beginCell } from '@ton/core'
 import { useWalletStore } from '@/stores/useWalletStore'
 import { tonService } from '@/services'
 import { message } from 'antd'
@@ -119,6 +120,21 @@ export function useWallet() {
   )
 
   // 发送交易
+
+  const buildPayload = (comment?: string) => {
+    if (!comment) return undefined
+    try {
+      const cell = beginCell()
+        .storeUint(0, 32)
+        .storeStringTail(comment)
+        .endCell()
+      return cell.toBoc().toString('base64')
+    } catch (error) {
+      console.warn('Failed to encode comment payload', error)
+      return undefined
+    }
+  }
+
   const sendTransaction = useCallback(
     async (transaction: { to: string; amount: string; comment?: string }) => {
       if (!tonConnectUI.connected) {
@@ -133,7 +149,7 @@ export function useWallet() {
             {
               address: transaction.to,
               amount: transaction.amount,
-              payload: transaction.comment,
+              payload: buildPayload(transaction.comment),
             },
           ],
         })
