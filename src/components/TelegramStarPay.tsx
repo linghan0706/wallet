@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { TonConnectButton } from '@tonconnect/ui-react'
-import { toNano } from '@ton/core'
-import { useWallet } from '@/features/wallet'
+import { useWallet } from '@/hooks/useWallet'
 import {
   requestStarPurchaseInvoice,
   type StarInvoiceResult,
@@ -12,18 +11,20 @@ import {
   fetchFormattedStore,
   type PaymentMethod,
 } from '@/utils/api/store/api'
-import { payWithUsdc } from '@/utils/payment/usdc'
+import { payWithTon, payWithUsdc, paymentConfig } from '@/utils/payment'
 
 type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
-const TON_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS || ''
-const USDC_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_USDC_PAYMENT_ADDRESS || ''
-const USDC_JETTON_MASTER = process.env.NEXT_PUBLIC_USDC_JETTON_MASTER || ''
-const USDC_JETTON_GAS_TON =
-  process.env.NEXT_PUBLIC_USDC_JETTON_GAS_TON || '0.05'
-const USDC_DECIMALS = Number(process.env.NEXT_PUBLIC_USDC_DECIMALS ?? '') || 6
+const {
+  defaultNetwork,
+  tonPaymentAddress: TON_PAYMENT_ADDRESS,
+  usdcPaymentAddress: USDC_PAYMENT_ADDRESS,
+  usdcJettonMaster: USDC_JETTON_MASTER,
+  usdcJettonGasTon: USDC_JETTON_GAS_TON,
+  usdcDecimals: USDC_DECIMALS,
+} = paymentConfig
 
 const paymentOptions: {
   key: PaymentMethod
@@ -291,6 +292,7 @@ export default function TelegramStarPay() {
           decimals: USDC_DECIMALS,
           itemId: item.itemId,
           label: price.label,
+          expectedNetwork: defaultNetwork,
         })
 
         if (result.success) {
@@ -306,24 +308,26 @@ export default function TelegramStarPay() {
         return
       }
 
-      const amount = toNano(price.amount.toString()).toString()
-      const result = await wallet.sendTransaction({
-        to: paymentAddress,
-        amount,
+      const tonResult = await payWithTon({
+        wallet,
+        amount: price.amount,
+        paymentAddress,
+        itemId: item.itemId,
+        label: price.label,
         comment: `Store item #${item.itemId} - ${price.label}`,
       })
 
-      if (result?.success) {
+      if (tonResult.success) {
         setBanner({
           type: 'success',
           message: `Submitted TON payment to ${shorten(
             paymentAddress,
             4,
             6
-          )}. Waiting for confirmation.`,
+          )}${tonResult.txHash ? ` (tx: ${shorten(tonResult.txHash, 6, 6)})` : ''}. Waiting for confirmation.`,
         })
       } else {
-        throw new Error(result?.error || 'TON payment not sent')
+        throw new Error(tonResult.error || 'TON payment not sent')
       }
     } catch (error) {
       const message =
@@ -344,9 +348,9 @@ export default function TelegramStarPay() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-3 sm:px-4 py-5 pb-16 flex justify-center overflow-x-hidden">
-      <div className="w-full max-w-[420px] sm:max-w-xl space-y-4 sm:space-y-5">
-        <div className="w-full rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-4 sm:p-5">
+    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-3 sm:px-4 py-5 pb-16 flex justify-center">
+      <div className="w-full max-w-xl space-y-4 sm:space-y-5">
+        <div className="rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-2 sm:gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-white/60">
@@ -355,11 +359,18 @@ export default function TelegramStarPay() {
               <h1 className="text-xl sm:text-2xl font-semibold leading-tight mt-1">
                 星球商店 · Stars / TON / U
               </h1>
+              <p className="text-sm text-white/70 mt-1.5 sm:mt-2 leading-relaxed">
+                为移动端优化的快速支付体验，支持 Telegram Stars 与 WalletConnect
+                链上支付。
+              </p>
+            </div>
+            <div className="px-3 py-2 rounded-2xl bg-white/10 text-xs text-white/80">
+              Mobile Ready
             </div>
           </div>
 
-          <div className="mt-4 w-full">
-            <div className="flex gap-2 overflow-x-auto pb-1 px-1 w-full max-w-full snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0">
+          <div className="mt-4">
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0 sm:mx-0">
               {paymentOptions.map(option => {
                 const isActive = selectedMethod === option.key
                 return (
@@ -401,7 +412,7 @@ export default function TelegramStarPay() {
           </div>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center justify-between gap-2">
               <div className="space-y-1">
                 <div className="text-xs text-white/60 uppercase tracking-wide">
                   WalletConnect
@@ -411,7 +422,7 @@ export default function TelegramStarPay() {
                   网络: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-wrap justify-end">
+              <div className="flex items-center gap-2">
                 <TonConnectButton />
                 {!hasWalletConnection && (
                   <button
@@ -432,7 +443,7 @@ export default function TelegramStarPay() {
           </div>
         </div>
 
-        <div className="w-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-3.5 sm:p-4 space-y-3">
+        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-3.5 sm:p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-white/70">选择商品并提交支付</div>
@@ -446,7 +457,7 @@ export default function TelegramStarPay() {
             Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
-                className="h-[132px] sm:h-[136px] rounded-2xl bg-white/10 border border-white/5 animate-pulse"
+                className="h-[104px] rounded-2xl bg-white/10 border border-white/5 animate-pulse"
               />
             ))}
 
@@ -475,10 +486,10 @@ export default function TelegramStarPay() {
               return (
                 <div
                   key={item.id}
-                  className="w-full rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)] min-h-[132px] sm:min-h-[136px] overflow-hidden"
+                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
                 >
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
+                  <div className="flex items-start gap-3">
+                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10">
                       <Image
                         src={item.icon}
                         alt={item.title}
@@ -487,30 +498,27 @@ export default function TelegramStarPay() {
                         className="object-contain"
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <div className="text-base font-semibold leading-tight truncate whitespace-nowrap">
+                        <div>
+                          <div className="text-base font-semibold">
                             {item.title}
                           </div>
-                          <div className="mt-0.5 text-sm text-white/70 truncate whitespace-nowrap">
+                          <div className="text-sm text-white/70">
                             {item.description}
                           </div>
-                          <div className="mt-2 flex items-center gap-1.5 flex-wrap shrink-0">
-                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
-                              #{item.itemId}
-                            </div>
-                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70 capitalize">
-                              {methodLabel || '当前方式'}
-                            </div>
-                            <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/80">
-                              {priceLabel}
-                            </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
+                            #{item.itemId}
+                          </div>
+                          <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70 capitalize">
+                            {methodLabel || '当前方式'}
                           </div>
                         </div>
                       </div>
                       <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="space-y-1 text-sm min-w-0">
+                        <div className="space-y-1 text-sm">
                           <div className="text-white/60">支付金额</div>
                           <div className="font-semibold text-lg">
                             {priceLabel}
@@ -519,7 +527,7 @@ export default function TelegramStarPay() {
                         <button
                           onClick={() => handlePay(item)}
                           disabled={isProcessing || !price}
-                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
+                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {isProcessing
                             ? '处理中…'

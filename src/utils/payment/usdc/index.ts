@@ -6,6 +6,7 @@ import { extractTransactionHash } from '@/utils'
 
 type WalletAdapter = {
   address?: string | null
+  network?: 'mainnet' | 'testnet' | string | null
   sendTransaction: (tx: {
     to: string
     amount: string
@@ -28,6 +29,7 @@ export type UsdcPayParams = {
   decimals?: number
   itemId?: number
   label?: string
+  expectedNetwork?: 'mainnet' | 'testnet'
 }
 
 export type PaymentResult = {
@@ -114,6 +116,7 @@ export async function payWithUsdc({
   decimals = 6,
   itemId,
   label,
+  expectedNetwork,
 }: UsdcPayParams): Promise<PaymentResult> {
   if (!wallet?.sendTransaction) {
     return { success: false, error: 'Wallet adapter unavailable' }
@@ -129,6 +132,16 @@ export async function payWithUsdc({
   }
   if (!jettonMaster) {
     return { success: false, error: 'USDC jetton master is not configured' }
+  }
+  if (
+    expectedNetwork &&
+    wallet.network &&
+    wallet.network.toLowerCase() !== expectedNetwork
+  ) {
+    return {
+      success: false,
+      error: `USDC payments run on ${expectedNetwork}. Please switch your wallet network.`,
+    }
   }
   if (!Number.isFinite(amount) || amount <= 0) {
     return { success: false, error: 'Invalid USDC payment amount' }

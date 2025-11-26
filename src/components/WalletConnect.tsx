@@ -2,8 +2,8 @@
 
 import { TonConnectButton } from '@tonconnect/ui-react'
 import { Card, Space, Typography } from 'antd'
-import { useWallet } from '@/features/wallet'
-import { WalletCard } from '@/features/wallet'
+import { useWallet } from '@/hooks/useWallet'
+import WalletCard from '@/components/wallet_pay/WalletCard'
 
 const { Text } = Typography
 
@@ -14,9 +14,7 @@ export default function WalletConnect() {
     return (
       <Card title="连接钱包" className="w-full max-w-md">
         <Space direction="vertical" className="w-full">
-          <Text type="secondary">
-            请连接您的TON钱包以开始使用
-          </Text>
+          <Text type="secondary">请连接您的TON钱包以开始使用</Text>
           <TonConnectButton />
         </Space>
       </Card>
@@ -24,7 +22,7 @@ export default function WalletConnect() {
   }
 
   return (
-    <WalletCard 
+    <WalletCard
       wallet={walletState}
       onDisconnect={walletState.disconnect}
       loading={walletState.isDisconnecting}

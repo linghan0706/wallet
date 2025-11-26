@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTonConnectUI } from '@tonconnect/ui-react'
+import { CHAIN } from '@tonconnect/ui'
 import { beginCell } from '@ton/core'
 import { useWalletStore } from '@/stores/useWalletStore'
 import { tonService } from '@/services'
@@ -25,33 +26,33 @@ export function useWallet() {
     setNetwork,
   } = useWalletStore()
 
-  // 连接钱包
+  // Connect wallet
   const connect = useCallback(async () => {
     try {
       setIsConnecting(true)
       await tonConnectUI.connectWallet()
-      message.success('钱包连接成功！')
+      message.success('Wallet connected successfully.')
     } catch (error) {
       setIsConnecting(false)
-      message.error('钱包连接失败，请重试')
+      message.error('Wallet connection failed, please try again.')
       console.error('Wallet connection error:', error)
     }
   }, [tonConnectUI])
 
-  // 断开钱包连接
+  // Disconnect wallet
   const disconnect = useCallback(async () => {
     try {
       setIsDisconnecting(true)
       await tonConnectUI.disconnect()
-      message.success('钱包已断开连接')
+      message.success('Wallet disconnected.')
     } catch (error) {
       setIsDisconnecting(false)
-      message.error('断开连接失败')
+      message.error('Failed to disconnect wallet.')
       console.error('Wallet disconnection error:', error)
     }
   }, [tonConnectUI])
 
-  // 获取余额
+  // Fetch balance
   const fetchBalance = useCallback(
     async (walletAddress?: string) => {
       const targetAddress = walletAddress || address
@@ -65,11 +66,11 @@ export function useWallet() {
           updateBalance(response.data)
         } else {
           console.error('Failed to fetch balance:', response.error)
-          message.error('获取余额失败')
+          message.error('Failed to fetch balance.')
         }
       } catch (error) {
         console.error('Balance fetch error:', error)
-        message.error('获取余额失败')
+        message.error('Failed to fetch balance.')
       } finally {
         setBalanceLoading(false)
       }
@@ -83,12 +84,19 @@ export function useWallet() {
     fetchBalanceRef.current = fetchBalance
   }, [fetchBalance])
 
-  // 监听钱包连接状态变化
+  const mapChainToNetwork = useCallback((chain?: string | null) => {
+    if (chain === CHAIN.TESTNET) return 'testnet' as const
+    return 'mainnet' as const
+  }, [])
+
+  // Watch wallet status changes
   useEffect(() => {
     const unsubscribe = tonConnectUI.onStatusChange(wallet => {
       if (wallet) {
+        const walletNetwork = mapChainToNetwork(wallet.account.chain)
+        setNetwork(walletNetwork)
         connectWallet(wallet.account.address)
-        // 连接成功后获取余额
+        // Fetch balance after successful connection
         fetchBalanceRef.current(wallet.account.address)
       } else {
         disconnectWallet()
@@ -98,20 +106,27 @@ export function useWallet() {
     })
 
     return unsubscribe
-  }, [tonConnectUI, connectWallet, disconnectWallet, fetchBalanceRef])
+  }, [
+    tonConnectUI,
+    connectWallet,
+    disconnectWallet,
+    fetchBalanceRef,
+    mapChainToNetwork,
+    setNetwork,
+  ])
 
-  // 刷新余额
+  // Refresh balance
   const refreshBalance = useCallback(() => {
     if (address) {
       fetchBalance(address)
     }
   }, [address, fetchBalance])
 
-  // 切换网络
+  // Switch network
   const switchNetwork = useCallback(
     (newNetwork: 'mainnet' | 'testnet') => {
       setNetwork(newNetwork)
-      // 切换网络后重新获取余额
+      // Refresh balance after switching network
       if (address) {
         fetchBalance(address)
       }
@@ -119,8 +134,7 @@ export function useWallet() {
     [address, setNetwork, fetchBalance]
   )
 
-  // 发送交易
-
+  // Build transaction payload
   const buildPayload = (comment?: string) => {
     if (!comment) return undefined
     try {
@@ -143,8 +157,8 @@ export function useWallet() {
       payload?: string
     }) => {
       if (!tonConnectUI.connected) {
-        message.error('请先连接钱包')
-        return { success: false, error: '钱包未连接' }
+        message.error('Please connect your wallet first.')
+        return { success: false, error: 'Wallet not connected' }
       }
 
       try {
@@ -172,9 +186,9 @@ export function useWallet() {
           console.warn('Failed to persist transaction hash', hashError)
         }
 
-        message.success('交易发送成功！')
+        message.success('Transaction sent successfully.')
 
-        // 交易成功后刷新余额
+        // Refresh balance after successful transaction
         setTimeout(() => {
           refreshBalance()
         }, 2000)
@@ -182,10 +196,10 @@ export function useWallet() {
         return { success: true, data: result, hash: txHash }
       } catch (error) {
         console.error('Transaction error:', error)
-        message.error('交易发送失败')
+        message.error('Transaction failed to send.')
         return {
           success: false,
-          error: error instanceof Error ? error.message : '交易失败',
+          error: error instanceof Error ? error.message : 'Transaction failed',
         }
       }
     },
@@ -193,7 +207,7 @@ export function useWallet() {
   )
 
   return {
-    // 状态
+    // State
     isConnected,
     address,
     balance,
@@ -202,7 +216,7 @@ export function useWallet() {
     isDisconnecting,
     balanceLoading,
 
-    // 方法
+    // Actions
     connect,
     disconnect,
     refreshBalance,

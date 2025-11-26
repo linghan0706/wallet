@@ -15,7 +15,7 @@ type WalletAdapter = {
 export type TonPayParams = {
   wallet: WalletAdapter
   amount: number
-  to: string
+  paymentAddress: string
   itemId?: number
   label?: string
   comment?: string
@@ -35,7 +35,7 @@ export type PaymentResult = {
 export async function payWithTon({
   wallet,
   amount,
-  to,
+  paymentAddress,
   itemId,
   label,
   comment,
@@ -43,7 +43,13 @@ export async function payWithTon({
   if (!wallet?.sendTransaction) {
     return { success: false, error: 'Wallet adapter unavailable' }
   }
-  if (!to) {
+  if (!wallet.address) {
+    return {
+      success: false,
+      error: 'Wallet address is missing, please connect',
+    }
+  }
+  if (!paymentAddress) {
     return { success: false, error: 'Missing TON payment address' }
   }
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -51,30 +57,30 @@ export async function payWithTon({
   }
 
   const memo =
-    comment || `Store item #${itemId ?? ''}${label ? ` · ${label}` : ''}`.trim()
+    comment || `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim()
 
   try {
     const result = await wallet.sendTransaction({
-      to,
+      to: paymentAddress,
       amount: toNano(amount.toString()).toString(),
       comment: memo,
     })
 
     if (!result?.success) {
-      return { success: false, error: result?.error || 'TON 支付未完成' }
+      return { success: false, error: result?.error || 'TON payment not sent' }
     }
 
     return {
       success: true,
       txHash: result.hash,
       from: wallet.address ?? null,
-      to,
+      to: paymentAddress,
       amount,
     }
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'TON 支付失败',
+      error: error instanceof Error ? error.message : 'TON payment failed',
     }
   }
 }

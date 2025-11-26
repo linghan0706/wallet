@@ -44,7 +44,7 @@ export default function WalletPage() {
   return (
     <TonConnectUIProvider manifestUrl={manifestUrl} restoreConnection>
       <div className="min-h-screen w-full flex flex-col gap-8 items-center justify-center p-4 mt-[56px]">
-        <NoSSRWalletConnect />
+        {/* <NoSSRWalletConnect /> */}
         <NoSSRTelegramStarPay />
       </div>
     </TonConnectUIProvider>
