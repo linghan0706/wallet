@@ -136,7 +136,12 @@ export function useWallet() {
   }
 
   const sendTransaction = useCallback(
-    async (transaction: { to: string; amount: string; comment?: string }) => {
+    async (transaction: {
+      to: string
+      amount: string
+      comment?: string
+      payload?: string
+    }) => {
       if (!tonConnectUI.connected) {
         message.error('请先连接钱包')
         return { success: false, error: '钱包未连接' }
@@ -149,7 +154,7 @@ export function useWallet() {
             {
               address: transaction.to,
               amount: transaction.amount,
-              payload: buildPayload(transaction.comment),
+              payload: transaction.payload ?? buildPayload(transaction.comment),
             },
           ],
         })

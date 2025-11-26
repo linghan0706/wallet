@@ -17,7 +17,6 @@ type BannerState =
   | { type: 'idle'; message: '' }
   | { type: 'success' | 'error'; message: string }
 
-const STAR_LABEL = 'XTR (Telegram Stars)'
 const TON_PAYMENT_ADDRESS =
   process.env.NEXT_PUBLIC_TON_PAYMENT_ADDRESS ||
   process.env.NEXT_PUBLIC_TON_TREASURY_ADDRESS ||
@@ -468,10 +467,10 @@ export default function TelegramStarPay() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <div className="text-base font-semibold leading-tight break-words">
+                          <div className="text-base font-semibold leading-tight truncate whitespace-nowrap">
                             {item.title}
                           </div>
-                          <div className="mt-0.5 text-sm text-white/70 break-words">
+                          <div className="mt-0.5 text-sm text-white/70 truncate whitespace-nowrap">
                             {item.description}
                           </div>
                           <div className="mt-2 flex items-center gap-1.5 flex-wrap shrink-0">
