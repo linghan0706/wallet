@@ -1,7 +1,9 @@
 'use client'
 
 import { Address, beginCell, toNano } from '@ton/core'
-import { tonApiConfig } from '@/lib/ton-config'
+import { JettonMaster } from '@ton/ton'
+import { tonApiConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
+import { createTonApiClient, createTonClient } from '@/lib/ton-client'
 import { extractTransactionHash } from '@/utils'
 
 type WalletAdapter = {
@@ -71,11 +73,34 @@ function toJettonUnits(amount: number, decimals = 6): bigint {
 
 async function fetchJettonWalletAddress(
   owner: string,
-  jettonMaster: string
+  jettonMaster: string,
+  network: 'mainnet' | 'testnet' = DEFAULT_NETWORK
 ): Promise<string | null> {
   const ownerRaw = normalizeRawAddress(owner)
   const jettonMasterRaw = normalizeRawAddress(jettonMaster)
   if (!ownerRaw || !jettonMasterRaw) return null
+
+  // 1) Try TonAPI direct jetton balance (preferred)
+  try {
+    const tonApi = createTonApiClient()
+    const balance = await tonApi.accounts.getAccountJettonBalance(
+      Address.parse(ownerRaw),
+      Address.parse(jettonMasterRaw)
+    )
+    const jettonWallet =
+      (balance.walletAddress as { address?: string } | undefined)?.address ||
+      (balance.walletAddress as unknown as string)
+    const friendly = toFriendlyAddress(
+      typeof jettonWallet === 'string'
+        ? jettonWallet
+        : (jettonWallet as Address | undefined)?.toString()
+    )
+    if (friendly) return friendly
+  } catch (error) {
+    console.warn('TonAPI jetton balance lookup failed', error)
+  }
+
+  // 2) Fallback to TonAPI balances list
   try {
     const baseUrl = tonApiConfig.baseUrl.replace(/\/$/, '')
     const url = `${baseUrl}/v2/accounts/${ownerRaw}/jettons`
@@ -111,7 +136,19 @@ async function fetchJettonWalletAddress(
       )
     return toFriendlyAddress(rawWalletAddress) || null
   } catch (error) {
-    console.warn('Failed to fetch jetton wallet address', error)
+    console.warn('Failed to fetch jetton wallet address via list', error)
+  }
+
+  // 3) Fallback: derive jetton wallet address on-chain
+  try {
+    const client = createTonClient(network)
+    const jetton = client.open(
+      JettonMaster.create(Address.parse(jettonMasterRaw))
+    )
+    const derived = await jetton.getWalletAddress(Address.parse(ownerRaw))
+    return derived.toString({ bounceable: true, urlSafe: true })
+  } catch (error) {
+    console.warn('Failed to derive jetton wallet address on-chain', error)
     return null
   }
 }
@@ -191,7 +228,8 @@ export async function payWithUsdc({
   try {
     const jettonWalletAddress = await fetchJettonWalletAddress(
       normalizedWalletAddress,
-      jettonMasterRaw
+      jettonMasterRaw,
+      expectedNetwork ?? DEFAULT_NETWORK
     )
 
     if (!jettonWalletAddress) {
