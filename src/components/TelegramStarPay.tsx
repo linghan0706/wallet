@@ -444,52 +444,109 @@ export default function TelegramStarPay() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050b15] via-[#0b172a] to-[#0f1f33] text-white px-3 sm:px-4 py-5 pb-16 flex justify-center">
-      <div className="w-full max-w-xl space-y-4 sm:space-y-5">
-        <div className="rounded-3xl bg-gradient-to-br from-white/5 via-white/5 to-white/0 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-2 sm:gap-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/60">
-                Telegram · Web3 Checkout
+    <div className="relative min-h-screen overflow-hidden bg-[#050b15] text-white">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-70"
+        aria-hidden
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(99,149,255,0.26),transparent_35%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(255,141,226,0.2),transparent_30%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(74,222,128,0.15),transparent_32%)]" />
+      </div>
+
+      <div className="relative mx-auto flex max-w-[620px] flex-col gap-4 px-4 pb-16 pt-7 sm:px-6">
+        <section className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_18px_70px_rgba(0,0,0,0.45)] backdrop-blur">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1.5">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/60">
+                Telegram x Web3 Checkout
               </p>
-              <h1 className="text-xl sm:text-2xl font-semibold leading-tight mt-1">
-                星球商店 · Stars / TON / U
+              <h1 className="text-2xl font-semibold leading-tight">
+                移动端优化的 Stars / TON / U 收银台
               </h1>
-              <p className="text-sm text-white/70 mt-1.5 sm:mt-2 leading-relaxed">
-                为移动端优化的快速支付体验，支持 Telegram Stars 与 WalletConnect
-                链上支付。
+              <p className="text-sm leading-relaxed text-white/70">
+                为移动端优化的快速结算体验，支持 Telegram Stars 与 WalletConnect
+                链上支付
               </p>
             </div>
-            <div className="px-3 py-2 rounded-2xl bg-white/10 text-xs text-white/80">
-              Mobile Ready
+            <div className="flex flex-col items-end gap-2 text-xs text-white/80">
+              <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1">
+                Mobile Ready
+              </span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                Touch 优化
+              </span>
             </div>
           </div>
 
-          <div className="mt-4">
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:gap-2 sm:overflow-visible sm:px-0 sm:mx-0">
-              {paymentOptions.map(option => {
-                const isActive = selectedMethod === option.key
-                return (
-                  <button
-                    key={option.key}
-                    onClick={() => setSelectedMethod(option.key)}
-                    className={`relative overflow-hidden rounded-2xl border border-white/10 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 min-w-[150px] sm:min-w-0 snap-center ${
+          <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <div className="text-xs text-white/60">网络</div>
+              <div className="font-semibold">
+                {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <div className="text-xs text-white/60">TON Balance</div>
+              <div className="font-semibold">
+                {wallet.balanceLoading
+                  ? 'Fetching...'
+                  : formattedTonBalance
+                    ? `${formattedTonBalance} TON`
+                    : 'Unknown'}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <div className="text-xs text-white/60">当前方式</div>
+              <div className="font-semibold">
+                {paymentOptions.find(p => p.key === selectedMethod)?.label}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[24px] border border-white/10 bg-white/5 p-4 shadow-[0_14px_48px_rgba(0,0,0,0.35)]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="text-[11px] uppercase tracking-[0.16em] text-white/60">
+                支付选项
+              </div>
+              <p className="text-sm text-white/70">
+                点击或横滑切换支付方式，移动端同样顺滑
+              </p>
+            </div>
+            <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/80">
+              {paymentOptions.find(p => p.key === selectedMethod)?.label}
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {paymentOptions.map(option => {
+              const isActive = selectedMethod === option.key
+              return (
+                <button
+                  key={option.key}
+                  onClick={() => setSelectedMethod(option.key)}
+                  className={`group relative overflow-hidden rounded-2xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                    isActive
+                      ? 'border-white/40 bg-white/10 shadow-[0_12px_45px_rgba(0,0,0,0.35)]'
+                      : 'border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10'
+                  }`}
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${option.accent} transition-opacity ${
                       isActive
-                        ? 'shadow-lg shadow-black/30'
-                        : 'bg-white/5 hover:bg-white/10'
+                        ? 'opacity-70'
+                        : 'opacity-0 group-hover:opacity-40'
                     }`}
-                  >
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${option.accent} opacity-60 ${
-                        isActive ? 'visible' : 'invisible'
-                      }`}
-                      aria-hidden
-                    />
-                    <div className="relative space-y-1">
+                    aria-hidden
+                  />
+                  <div className="relative flex items-start gap-3">
+                    <div className="flex-1 space-y-1">
                       <div className="text-[11px] uppercase tracking-wide text-white/70">
                         {option.badge}
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         <span className="text-lg font-semibold">
                           {option.label}
                         </span>
@@ -497,75 +554,104 @@ export default function TelegramStarPay() {
                           <span className="h-2 w-2 rounded-full bg-white shadow" />
                         )}
                       </div>
-                      <p className="text-xs text-white/70 leading-snug">
+                      <p className="text-xs text-white/75 leading-snug">
                         {option.description}
                       </p>
                     </div>
-                  </button>
-                )
-              })}
+                    <span
+                      className={`rounded-full border border-white/10 px-2 py-1 text-[11px] ${option.chip}`}
+                    >
+                      {isActive ? '使用中' : '切换'}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="rounded-[24px] border border-white/10 bg-white/5 p-4 shadow-[0_14px_40px_rgba(0,0,0,0.35)] space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="text-[11px] uppercase tracking-[0.16em] text-white/60">
+                WalletConnect
+              </div>
+              <div className="text-sm text-white/80 leading-snug">
+                {walletLabel}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <TonConnectButton />
+              {!hasWalletConnection && (
+                <button
+                  onClick={wallet.connect}
+                  disabled={wallet.isConnecting}
+                  className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold text-white shadow-sm shadow-black/30 transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {wallet.isConnecting ? '连接中…' : '一键连接'}
+                </button>
+              )}
             </div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="space-y-1">
-                <div className="text-xs text-white/60 uppercase tracking-wide">
-                  WalletConnect
-                </div>
-                <div className="text-sm font-semibold">{walletLabel}</div>
-                <div className="text-xs text-white/60">
-                  连接网络:{' '}
-                  {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
-                </div>
-                <div className="text-xs text-white/70">
-                  Balance:{' '}
-                  {wallet.balanceLoading
-                    ? 'Fetching...'
-                    : formattedTonBalance
-                      ? `${formattedTonBalance} TON`
-                      : 'Unknown'}
-                </div>
-                {selectedMethod === 'usdc' &&
-                  paymentConfig.usdcJettonMaster && (
-                    <div className="text-xs text-white/70">
-                      USDC:{' '}
-                      {usdcBalanceLoading
-                        ? 'Fetching...'
-                        : usdcBalanceError
-                          ? 'Unavailable'
-                          : `${formatJettonBalance(usdcBalance, USDC_DECIMALS)}${usdcJettonWallet ? ` (wallet: ${formatAddress(usdcJettonWallet, 4, 6)})` : ''}`}
-                    </div>
-                  )}
-              </div>
-              <div className="flex items-center gap-2">
-                <TonConnectButton />
-                {!hasWalletConnection && (
-                  <button
-                    onClick={wallet.connect}
-                    disabled={wallet.isConnecting}
-                    className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold text-white hover:bg-white/20 transition disabled:opacity-60"
-                  >
-                    {wallet.isConnecting ? '连接中…' : '一键连接'}
-                  </button>
-                )}
-              </div>
+          <div className="grid grid-cols-1 gap-2 text-xs text-white/70 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <span className="text-white/50">网络</span>
+              <span className="text-white">
+                {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+              </span>
             </div>
-            {selectedPaymentAddress && (
-              <div className="mt-3 text-xs text-white/60">
-                收款地址: {formatAddress(selectedPaymentAddress, 6, 6)}
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
+              <span className="text-white/50">TON Balance</span>
+              <span className="text-white">
+                {wallet.balanceLoading
+                  ? 'Fetching...'
+                  : formattedTonBalance
+                    ? `${formattedTonBalance} TON`
+                    : 'Unknown'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 sm:col-span-2">
+              <span className="text-white/50">钱包地址</span>
+              <span className="truncate text-white">
+                {wallet.address
+                  ? formatAddress(wallet.address, 6, 6)
+                  : '未连接'}
+              </span>
+            </div>
+            {selectedMethod === 'usdc' && paymentConfig.usdcJettonMaster && (
+              <div className="flex flex-col gap-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 sm:col-span-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/50">USDC</span>
+                  <span className="text-white">
+                    {usdcBalanceLoading
+                      ? 'Fetching...'
+                      : usdcBalanceError
+                        ? 'Unavailable'
+                        : `${formatJettonBalance(usdcBalance, USDC_DECIMALS)}${usdcJettonWallet ? ` · ${formatAddress(usdcJettonWallet, 4, 6)}` : ''}`}
+                  </span>
+                </div>
+                {usdcBalanceError && (
+                  <span className="text-[11px] text-red-200/80">
+                    {usdcBalanceError}
+                  </span>
+                )}
               </div>
             )}
           </div>
-        </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-3.5 sm:p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-white/70">选择商品并提交支付</div>
-              <div className="text-lg font-semibold">
-                支持 {paymentOptions.find(p => p.key === selectedMethod)?.label}
-              </div>
+          {selectedPaymentAddress && (
+            <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/70">
+              收款地址: {formatAddress(selectedPaymentAddress, 6, 6)}
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div className="text-sm text-white/70">选择商品并提交支付</div>
+            <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+              支持 {paymentOptions.find(p => p.key === selectedMethod)?.label}
             </div>
           </div>
 
@@ -573,7 +659,7 @@ export default function TelegramStarPay() {
             Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
-                className="h-[104px] rounded-2xl bg-white/10 border border-white/5 animate-pulse"
+                className="h-[118px] rounded-2xl border border-white/5 bg-white/10 animate-pulse"
               />
             ))}
 
@@ -602,10 +688,10 @@ export default function TelegramStarPay() {
               return (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/0 p-3.5 sm:p-4 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+                  className="rounded-[22px] border border-white/10 bg-white/5 p-4 shadow-[0_12px_45px_rgba(0,0,0,0.32)]"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden border border-white/10">
+                  <div className="flex gap-3">
+                    <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/10">
                       <Image
                         src={item.icon}
                         alt={item.title}
@@ -614,36 +700,47 @@ export default function TelegramStarPay() {
                         className="object-contain"
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 space-y-3">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
+                        <div className="space-y-1">
                           <div className="text-base font-semibold">
                             {item.title}
                           </div>
-                          <div className="text-sm text-white/70">
+                          <div className="text-sm leading-snug text-white/70">
                             {item.description}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70">
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          <span className="rounded-full bg-white/10 px-2 py-1 text-[11px] text-white/70">
                             #{item.itemId}
-                          </div>
-                          <div className="px-2 py-1 rounded-full bg-white/10 text-[11px] text-white/70 capitalize">
+                          </span>
+                          <span className="rounded-full bg-white/10 px-2 py-1 text-[11px] text-white/70 capitalize">
                             {methodLabel || '当前方式'}
-                          </div>
+                          </span>
                         </div>
                       </div>
-                      <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="space-y-1 text-sm">
                           <div className="text-white/60">支付金额</div>
-                          <div className="font-semibold text-lg">
+                          <div className="text-xl font-semibold">
                             {priceLabel}
                           </div>
+                          {selectedMethod !== 'star' && (
+                            <div className="text-[11px] text-white/60">
+                              收款地址{' '}
+                              {formatAddress(
+                                selectedPaymentAddress || '',
+                                4,
+                                6
+                              )}
+                            </div>
+                          )}
                         </div>
                         <button
                           onClick={() => handlePay(item)}
                           disabled={isProcessing || !price}
-                          className="w-full sm:w-auto min-w-[150px] rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] text-[#0a152a] font-semibold py-3 px-4 shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="w-full rounded-xl bg-gradient-to-r from-[#5b8dff] to-[#6fddff] px-4 py-3 text-base font-semibold text-[#0a152a] shadow-lg shadow-black/25 transition hover:brightness-110 active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[160px]"
                         >
                           {isProcessing
                             ? '处理中…'
@@ -659,14 +756,14 @@ export default function TelegramStarPay() {
                 </div>
               )
             })}
-        </div>
+        </section>
 
         {banner.type !== 'idle' && (
           <div
-            className={`rounded-2xl px-4 py-3 text-sm border ${
+            className={`rounded-2xl border px-4 py-3 text-sm ${
               banner.type === 'success'
-                ? 'bg-emerald-500/10 text-emerald-100 border-emerald-500/30'
-                : 'bg-red-500/10 text-red-100 border-red-500/40'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100'
+                : 'border-red-500/40 bg-red-500/10 text-red-100'
             }`}
             role="status"
             aria-live="polite"
