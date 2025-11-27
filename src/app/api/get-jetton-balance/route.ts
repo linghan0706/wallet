@@ -54,10 +54,20 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const result = await client.runMethod(
-        Address.parse(jettonWalletAddress),
-        'get_wallet_data'
-      )
+      const walletAddrParsed = Address.parse(jettonWalletAddress)
+      const deployed = await client.isContractDeployed(walletAddrParsed)
+      if (!deployed) {
+        return NextResponse.json(
+          {
+            balance: '0',
+            jettonWalletAddress,
+            error: 'Jetton wallet not deployed for this user',
+          },
+          { status: 404 }
+        )
+      }
+
+      const result = await client.runMethod(walletAddrParsed, 'get_wallet_data')
       const balance = result.stack.readBigNumber()
       return NextResponse.json({
         balance: balance.toString(),

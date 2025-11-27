@@ -42,6 +42,13 @@ export async function GET(request: NextRequest) {
     const client = createTonClient()
     const jm = client.open(JettonMaster.create(jettonMaster))
     const jw = await jm.getWalletAddress(userWallet)
+    const deployed = await client.isContractDeployed(jw)
+    if (!deployed) {
+      return NextResponse.json(
+        { error: 'Jetton wallet not deployed for this user' },
+        { status: 404 }
+      )
+    }
 
     return NextResponse.json({
       jettonWalletAddress: jw.toString({ urlSafe: true, bounceable: true }),

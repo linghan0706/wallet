@@ -316,6 +316,20 @@ export async function payWithUsdc({
         `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim(),
     })
 
+    // Final safety: ensure the jetton wallet is deployed right before sending,
+    // otherwise TonConnect will reject with "Initial account must be not empty".
+    const finalClient = createTonClient(expectedNetwork ?? DEFAULT_NETWORK)
+    const finalDeployed = await finalClient.isContractDeployed(
+      Address.parse(jettonWalletAddress)
+    )
+    if (!finalDeployed) {
+      return {
+        success: false,
+        error:
+          'No USDC jetton wallet found. Please ensure your wallet holds USDC.',
+      }
+    }
+
     const result = await wallet.sendTransaction({
       to: jettonWalletAddress,
       amount: toNano(totalGasTon).toString(),
