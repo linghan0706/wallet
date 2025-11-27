@@ -284,6 +284,18 @@ export async function payWithUsdc({
       }
     }
 
+    const walletDeployed = await isDeployedWallet(
+      jettonWalletAddress,
+      expectedNetwork ?? DEFAULT_NETWORK
+    )
+    if (!walletDeployed) {
+      return {
+        success: false,
+        error:
+          'USDC jetton wallet is not deployed. Please receive USDC once to initialize it.',
+      }
+    }
+
     const jettonAmount = toJettonUnits(amount, decimals)
     const body = buildJettonTransferBody({
       amount: jettonAmount,

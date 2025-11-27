@@ -91,11 +91,11 @@ function ensureTrailingSlash(url: string) {
 
 function resolveNetwork(value?: string): TonNetwork {
   if (!value) {
-    return 'mainnet'
+    return 'testnet'
   }
 
   const normalized = value.toLowerCase()
-  return isTonNetwork(normalized) ? (normalized as TonNetwork) : 'mainnet'
+  return isTonNetwork(normalized) ? (normalized as TonNetwork) : 'testnet'
 }
 
 function isTonNetwork(value: string): value is TonNetwork {

@@ -110,6 +110,18 @@ function extractInt(item?: ToncenterStackItem | null): bigint | null {
   return null
 }
 
+async function isDeployedWallet(
+  addressFriendly: string,
+  network: TonNetwork
+): Promise<boolean> {
+  try {
+    const client = createTonClient(network)
+    return client.isContractDeployed(Address.parse(addressFriendly))
+  } catch {
+    return false
+  }
+}
+
 async function runToncenterMethod(
   address: string,
   method: string,
@@ -203,7 +215,10 @@ export async function getJettonWalletAddress(
       JettonMaster.create(Address.parse(jettonMasterRaw))
     )
     const walletAddress = await jetton.getWalletAddress(Address.parse(ownerRaw))
-    return walletAddress.toString({ bounceable: true, urlSafe: true })
+    const friendly = walletAddress.toString({ bounceable: true, urlSafe: true })
+    if (await isDeployedWallet(friendly, network)) {
+      return friendly
+    }
   } catch (error) {
     console.warn('Jetton wallet derive failed, fallback to TonAPI', error)
   }
@@ -219,7 +234,7 @@ export async function getJettonWalletAddress(
       (res.walletAddress as { address?: Address | string } | undefined)
         ?.address ?? (res.walletAddress as unknown as string | undefined)
     const friendly = toFriendly(tonApiWallet)
-    if (friendly) return friendly
+    if (friendly && (await isDeployedWallet(friendly, network))) return friendly
   } catch (error) {
     console.warn('TonAPI jetton wallet lookup failed', error)
   }
@@ -227,7 +242,15 @@ export async function getJettonWalletAddress(
   // 3) Toncenter RPC fallback
   const jettonMasterFriendly = toFriendly(jettonMasterRaw)
   if (!jettonMasterFriendly) return null
-  return toncenterJettonWalletAddress(ownerRaw, jettonMasterFriendly, network)
+  const toncenterWallet = await toncenterJettonWalletAddress(
+    ownerRaw,
+    jettonMasterFriendly,
+    network
+  )
+  if (toncenterWallet && (await isDeployedWallet(toncenterWallet, network))) {
+    return toncenterWallet
+  }
+  return null
 }
 
 export async function getJettonBalance(

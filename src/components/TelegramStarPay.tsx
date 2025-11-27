@@ -365,6 +365,15 @@ export default function TelegramStarPay() {
       return
     }
 
+    const walletNetwork = wallet.network?.toLowerCase?.() || ''
+    if (walletNetwork && walletNetwork !== defaultNetwork) {
+      setBanner({
+        type: 'error',
+        message: `Please switch your wallet to ${defaultNetwork} to proceed.`,
+      })
+      return
+    }
+
     setActiveId(item.id)
     setBanner({ type: 'idle', message: '' })
 
