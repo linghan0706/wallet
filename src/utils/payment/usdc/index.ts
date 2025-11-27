@@ -159,6 +159,12 @@ async function fetchJettonWalletAddress(
       JettonMaster.create(Address.parse(jettonMasterRaw))
     )
     const derived = await jetton.getWalletAddress(Address.parse(ownerRaw))
+    // Only use the derived wallet if it is already deployed; otherwise TonConnect
+    // will reject the transaction with "Initial account must be not empty".
+    const isDeployed = await client.isContractDeployed(derived)
+    if (!isDeployed) {
+      return null
+    }
     return derived.toString({ bounceable: true, urlSafe: true })
   } catch (error) {
     console.warn('Failed to derive jetton wallet address on-chain', error)
