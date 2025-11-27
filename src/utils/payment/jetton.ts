@@ -78,7 +78,7 @@ function extractCellBase64(item?: ToncenterStackItem | null): string | null {
       typeof (item as { value?: unknown }).value === 'string'
         ? (item as { value?: string }).value
         : null
-    return value
+    return value ?? null
   }
   return null
 }
@@ -273,10 +273,13 @@ export async function getJettonBalance(
         Address.parse(ownerRaw),
         Address.parse(jettonMasterRaw)
       )
+      const rawBalance = (res as { balance?: unknown }).balance
       const balance =
-        typeof (res as { balance?: unknown }).balance === 'string'
-          ? ((res as { balance?: string }).balance as string)
-          : (res.balance?.toString?.() ?? '0')
+        typeof rawBalance === 'string'
+          ? rawBalance
+          : ((
+              rawBalance as { toString?: () => string } | undefined
+            )?.toString?.() ?? '0')
       return {
         balance,
         jettonWalletAddress:
