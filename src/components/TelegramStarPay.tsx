@@ -75,6 +75,18 @@ function getPriceByMethod(item: FormattedStoreItem, method: PaymentMethod) {
   return item.prices.find(price => price.paymentMethod === method)
 }
 
+function formatTonBalance(balance?: string | null) {
+  if (!balance) return null
+  try {
+    const nano = BigInt(balance)
+    const ton = Number(nano) / 1e9
+    if (!Number.isFinite(ton)) return null
+    return ton.toFixed(3)
+  } catch {
+    return null
+  }
+}
+
 export default function TelegramStarPay() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [banner, setBanner] = useState<BannerState>({
@@ -86,6 +98,10 @@ export default function TelegramStarPay() {
   const [productError, setProductError] = useState<string | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('star')
   const wallet = useWallet()
+  const formattedTonBalance = useMemo(
+    () => formatTonBalance(wallet.balance),
+    [wallet.balance]
+  )
 
   useEffect(() => {
     let mounted = true
@@ -417,6 +433,14 @@ export default function TelegramStarPay() {
                 <div className="text-sm font-semibold">{walletLabel}</div>
                 <div className="text-xs text-white/60">
                   网络: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+                </div>
+                <div className="text-xs text-white/70">
+                  Balance:{' '}
+                  {wallet.balanceLoading
+                    ? 'Fetching...'
+                    : formattedTonBalance
+                      ? `${formattedTonBalance} TON`
+                      : 'Unknown'}
                 </div>
               </div>
               <div className="flex items-center gap-2">
