@@ -5,6 +5,7 @@ import { JettonMaster } from '@ton/ton'
 import { tonApiConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
 import { createTonApiClient, createTonClient } from '@/lib/ton-client'
 import { extractTransactionHash } from '@/utils'
+import { isActiveContract } from '../jetton'
 
 type WalletAdapter = {
   address?: string | null

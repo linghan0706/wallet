@@ -110,7 +110,7 @@ function extractInt(item?: ToncenterStackItem | null): bigint | null {
   return null
 }
 
-async function isActiveContract(
+export async function isActiveContract(
   addressFriendly: string,
   network: TonNetwork
 ): Promise<boolean> {
@@ -124,7 +124,7 @@ async function isActiveContract(
   try {
     const client = createTonClient(network)
     const state = await client.getContractState(Address.parse(friendly))
-    return state.state !== 'notExists'
+    return state.state === 'active' || state.state === 'frozen'
   } catch {
     // ignore
   }
