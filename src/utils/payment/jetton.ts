@@ -217,6 +217,7 @@ export async function getJettonWalletAddress(
   const jettonMasterRaw = normalizeRawAddress(jettonMaster)
   if (!ownerRaw || !jettonMasterRaw) return null
   const masterFriendly = toFriendly(jettonMasterRaw)
+  const ownerFriendly = toFriendly(ownerRaw)
   if (!masterFriendly || !(await isActiveContract(masterFriendly, network))) {
     return null
   }
@@ -229,7 +230,10 @@ export async function getJettonWalletAddress(
     )
     const walletAddress = await jetton.getWalletAddress(Address.parse(ownerRaw))
     const friendly = walletAddress.toString({ bounceable: true, urlSafe: true })
-    if (await isActiveContract(friendly, network)) {
+    if (
+      friendly !== ownerFriendly &&
+      (await isActiveContract(friendly, network))
+    ) {
       return friendly
     }
   } catch (error) {
@@ -247,7 +251,12 @@ export async function getJettonWalletAddress(
       (res.walletAddress as { address?: Address | string } | undefined)
         ?.address ?? (res.walletAddress as unknown as string | undefined)
     const friendly = toFriendly(tonApiWallet)
-    if (friendly && (await isActiveContract(friendly, network))) return friendly
+    if (
+      friendly &&
+      friendly !== ownerFriendly &&
+      (await isActiveContract(friendly, network))
+    )
+      return friendly
   } catch (error) {
     console.warn('TonAPI jetton wallet lookup failed', error)
   }
@@ -258,7 +267,11 @@ export async function getJettonWalletAddress(
     masterFriendly,
     network
   )
-  if (toncenterWallet && (await isActiveContract(toncenterWallet, network))) {
+  if (
+    toncenterWallet &&
+    toncenterWallet !== ownerFriendly &&
+    (await isActiveContract(toncenterWallet, network))
+  ) {
     return toncenterWallet
   }
   return null

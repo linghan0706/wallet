@@ -1,9 +1,8 @@
 'use client'
 
 import { Address, beginCell, toNano } from '@ton/core'
-import { JettonMaster } from '@ton/ton'
-import { tonApiConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
-import { createTonApiClient, createTonClient } from '@/lib/ton-client'
+import { DEFAULT_NETWORK } from '@/lib/ton-config'
+import { createTonClient } from '@/lib/ton-client'
 import { extractTransactionHash } from '@/utils'
 import { getJettonWalletAddress, isActiveContract } from '../jetton'
 
@@ -87,19 +86,7 @@ function toNumber(
     : fallback
 }
 
-async function isDeployedWallet(
-  addressFriendly: string,
-  network: 'mainnet' | 'testnet'
-): Promise<boolean> {
-  try {
-    const client = createTonClient(network)
-    return client.isContractDeployed(Address.parse(addressFriendly))
-  } catch {
-    return false
-  }
-}
-
-function buildJettonTransferBody(options: {
+function createJettonTransferPayload(options: {
   amount: bigint
   destination: string
   responseAddress?: string | null
@@ -112,15 +99,15 @@ function buildJettonTransferBody(options: {
       : null
 
   return beginCell()
-    .storeUint(0xf8a7ea5, 32)
-    .storeUint(0, 64)
+    .storeUint(0xf8a7ea5, 32) // transfer op
+    .storeUint(0, 64) // query id
     .storeCoins(options.amount)
     .storeAddress(Address.parse(options.destination))
     .storeAddress(
       options.responseAddress ? Address.parse(options.responseAddress) : null
     )
     .storeMaybeRef(null)
-    .storeCoins(toNano(options.forwardTonAmount || '0.02'))
+    .storeCoins(toNano(options.forwardTonAmount || '0.01')) // forward_ton_amount
     .storeMaybeRef(forwardPayload)
     .endCell()
 }
@@ -130,7 +117,7 @@ export async function payWithUsdc({
   amount,
   paymentAddress,
   jettonMaster,
-  gasTon = '0.05',
+  gasTon = '0.1',
   decimals = 6,
   itemId,
   label,
@@ -182,13 +169,8 @@ export async function payWithUsdc({
     return { success: false, error: 'Invalid USDC payment amount' }
   }
 
-  const totalGasTon = toNumber(gasTon, 0.05)
-  // 留出一部分给 jetton wallet 作为执行费用，避免全部都被 forward 导致模拟失败
-  const forwardTonAmount =
-    totalGasTon <= 0.02
-      ? totalGasTon * 0.6
-      : Math.max(totalGasTon - 0.02, totalGasTon * 0.6)
-  const forwardTonAmountStr = forwardTonAmount.toFixed(6)
+  const totalGasTon = toNumber(gasTon, 0.1)
+  const forwardTonAmountStr = '0.01'
 
   try {
     const jettonWalletAddress =
@@ -206,20 +188,8 @@ export async function payWithUsdc({
       }
     }
 
-    const walletDeployed = await isDeployedWallet(
-      jettonWalletAddress,
-      expectedNetwork ?? DEFAULT_NETWORK
-    )
-    if (!walletDeployed) {
-      return {
-        success: false,
-        error:
-          'USDC jetton wallet is not deployed. Please receive USDC once to initialize it.',
-      }
-    }
-
     const jettonAmount = toJettonUnits(amount, decimals)
-    const body = buildJettonTransferBody({
+    const body = createJettonTransferPayload({
       amount: jettonAmount,
       destination: paymentAddr,
       responseAddress: normalizedWalletAddress,
