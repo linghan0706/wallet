@@ -86,6 +86,18 @@ function toNumber(
     : fallback
 }
 
+async function isDeployedWallet(
+  addressFriendly: string,
+  network: 'mainnet' | 'testnet'
+): Promise<boolean> {
+  try {
+    const client = createTonClient(network)
+    return client.isContractDeployed(Address.parse(addressFriendly))
+  } catch {
+    return false
+  }
+}
+
 async function fetchJettonWalletAddress(
   owner: string,
   jettonMaster: string,
@@ -108,7 +120,9 @@ async function fetchJettonWalletAddress(
     const friendly =
       toFriendlyAddress(jettonWallet) ||
       toFriendlyAddress(balance.walletAddress as unknown as string)
-    if (friendly) return friendly
+    if (friendly && (await isDeployedWallet(friendly, network))) {
+      return friendly
+    }
   } catch (error) {
     console.warn('TonAPI jetton balance lookup failed', error)
   }
@@ -147,7 +161,10 @@ async function fetchJettonWalletAddress(
         (match?.jetton as unknown as { wallet_address?: string })
           ?.wallet_address
       )
-    return toFriendlyAddress(rawWalletAddress) || null
+    const friendly = toFriendlyAddress(rawWalletAddress)
+    if (friendly && (await isDeployedWallet(friendly, network))) {
+      return friendly
+    }
   } catch (error) {
     console.warn('Failed to fetch jetton wallet address via list', error)
   }
@@ -309,7 +326,10 @@ export async function payWithUsdc({
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'USDC payment failed',
+      error:
+        error instanceof Error
+          ? `USDC payment failed: ${error.message}`
+          : 'USDC payment failed',
     }
   }
 }

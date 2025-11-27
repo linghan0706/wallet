@@ -13,6 +13,7 @@ import {
 } from '@/utils/api/store/api'
 import { payWithTon, payWithUsdc, paymentConfig } from '@/utils/payment'
 import { formatAddress } from '@/utils/format'
+import { getJettonBalance } from '@/utils/payment/jetton'
 
 type BannerState =
   | { type: 'idle'; message: '' }
@@ -181,25 +182,17 @@ export default function TelegramStarPay() {
     setUsdcBalanceLoading(true)
     setUsdcBalanceError(null)
     try {
-      const params = new URLSearchParams({
-        user: userAddress,
-        jetton: paymentConfig.usdcJettonMaster,
-      })
-      const res = await fetch(`/api/get-jetton-balance?${params.toString()}`)
-      if (!res.ok) {
-        const text = await res.text()
-        throw new Error(text || 'Failed to fetch USDC balance')
-      }
-      const data = (await res.json()) as {
-        balance?: string
-        jettonWalletAddress?: string
-        error?: string
-      }
-      if (data.error) {
-        throw new Error(data.error)
-      }
-      setUsdcBalance(data.balance ?? null)
-      setUsdcJettonWallet(data.jettonWalletAddress ?? null)
+      const network =
+        wallet.network === 'testnet'
+          ? ('testnet' as const)
+          : ('mainnet' as const)
+      const { balance, jettonWalletAddress } = await getJettonBalance(
+        userAddress,
+        paymentConfig.usdcJettonMaster,
+        network
+      )
+      setUsdcBalance(balance ?? null)
+      setUsdcJettonWallet(jettonWalletAddress ?? null)
     } catch (error) {
       setUsdcBalance(null)
       setUsdcJettonWallet(null)
