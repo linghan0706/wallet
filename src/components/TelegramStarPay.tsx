@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { TonConnectButton } from '@tonconnect/ui-react'
 import { useWallet } from '@/hooks/useWallet'
@@ -75,6 +75,25 @@ function getPriceByMethod(item: FormattedStoreItem, method: PaymentMethod) {
   return item.prices.find(price => price.paymentMethod === method)
 }
 
+function formatJettonBalance(
+  balance?: string | null,
+  decimals: number = 6
+): string {
+  if (!balance) return '0'
+  try {
+    const bi = BigInt(balance)
+    const factor = BigInt(10) ** BigInt(Math.max(0, decimals))
+    const whole = bi / factor
+    const frac = (bi % factor)
+      .toString()
+      .padStart(decimals, '0')
+      .replace(/0+$/, '')
+    return frac ? `${whole.toString()}.${frac}` : whole.toString()
+  } catch {
+    return '0'
+  }
+}
+
 function formatTonBalance(balance?: string | null) {
   if (!balance) return null
   try {
@@ -98,6 +117,11 @@ export default function TelegramStarPay() {
   const [productError, setProductError] = useState<string | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('star')
   const wallet = useWallet()
+
+  const [usdcBalance, setUsdcBalance] = useState<string | null>(null)
+  const [usdcJettonWallet, setUsdcJettonWallet] = useState<string | null>(null)
+  const [usdcBalanceLoading, setUsdcBalanceLoading] = useState(false)
+  const [usdcBalanceError, setUsdcBalanceError] = useState<string | null>(null)
   const formattedTonBalance = useMemo(
     () => formatTonBalance(wallet.balance),
     [wallet.balance]
@@ -147,6 +171,65 @@ export default function TelegramStarPay() {
 
   const selectedPaymentAddress =
     selectedMethod === 'ton' ? TON_PAYMENT_ADDRESS : USDC_PAYMENT_ADDRESS
+
+  const fetchUsdcBalance = useCallback(async (userAddress: string) => {
+    if (!paymentConfig.usdcJettonMaster) {
+      setUsdcBalance(null)
+      setUsdcJettonWallet(null)
+      return
+    }
+    setUsdcBalanceLoading(true)
+    setUsdcBalanceError(null)
+    try {
+      const params = new URLSearchParams({
+        user: userAddress,
+        jetton: paymentConfig.usdcJettonMaster,
+      })
+      const res = await fetch(`/api/get-jetton-balance?${params.toString()}`)
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(text || 'Failed to fetch USDC balance')
+      }
+      const data = (await res.json()) as {
+        balance?: string
+        jettonWalletAddress?: string
+        error?: string
+      }
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      setUsdcBalance(data.balance ?? null)
+      setUsdcJettonWallet(data.jettonWalletAddress ?? null)
+    } catch (error) {
+      setUsdcBalance(null)
+      setUsdcJettonWallet(null)
+      setUsdcBalanceError(
+        error instanceof Error ? error.message : 'Failed to fetch USDC balance'
+      )
+    } finally {
+      setUsdcBalanceLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (
+      selectedMethod === 'usdc' &&
+      wallet.isConnected &&
+      wallet.address &&
+      paymentConfig.usdcJettonMaster
+    ) {
+      fetchUsdcBalance(wallet.address)
+    } else {
+      setUsdcBalance(null)
+      setUsdcJettonWallet(null)
+    }
+  }, [
+    selectedMethod,
+    wallet.isConnected,
+    wallet.address,
+    fetchUsdcBalance,
+    paymentConfig.usdcJettonMaster,
+  ])
 
   const handleStarPayment = async (item: FormattedStoreItem) => {
     setActiveId(item.id)
@@ -432,7 +515,7 @@ export default function TelegramStarPay() {
                 </div>
                 <div className="text-sm font-semibold">{walletLabel}</div>
                 <div className="text-xs text-white/60">
-                  网络: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+                  ����: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
                 </div>
                 <div className="text-xs text-white/70">
                   Balance:{' '}
@@ -442,6 +525,17 @@ export default function TelegramStarPay() {
                       ? `${formattedTonBalance} TON`
                       : 'Unknown'}
                 </div>
+                {selectedMethod === 'usdc' &&
+                  paymentConfig.usdcJettonMaster && (
+                    <div className="text-xs text-white/70">
+                      USDC:{' '}
+                      {usdcBalanceLoading
+                        ? 'Fetching...'
+                        : usdcBalanceError
+                          ? 'Unavailable'
+                          : `${formatJettonBalance(usdcBalance, USDC_DECIMALS)}${usdcJettonWallet ? ` (wallet: ${formatAddress(usdcJettonWallet, 4, 6)})` : ''}`}
+                    </div>
+                  )}
               </div>
               <div className="flex items-center gap-2">
                 <TonConnectButton />

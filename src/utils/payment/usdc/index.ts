@@ -106,6 +106,25 @@ async function fetchJettonWalletAddress(
     }
   }
 
+  // 0) Try backend helper API (more resilient to node hiccups)
+  try {
+    const params = new URLSearchParams({
+      user: ownerRaw,
+      jetton: jettonMasterRaw,
+    })
+    const res = await fetch(`/api/get-jetton-wallet?${params.toString()}`)
+    if (res.ok) {
+      const data = (await res.json()) as { jettonWalletAddress?: string }
+      const friendly = toFriendlyAddress(data.jettonWalletAddress)
+      if (friendly) {
+        const deployed = await isWalletDeployed(friendly)
+        if (deployed) return friendly
+      }
+    }
+  } catch (error) {
+    console.warn('Backend jetton wallet lookup failed', error)
+  }
+
   // 1) Try TonAPI direct jetton balance (preferred)
   try {
     const tonApi = createTonApiClient()
