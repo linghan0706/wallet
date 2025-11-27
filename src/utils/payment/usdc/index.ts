@@ -95,36 +95,6 @@ async function fetchJettonWalletAddress(
   const jettonMasterRaw = normalizeRawAddress(jettonMaster)
   if (!ownerRaw || !jettonMasterRaw) return null
 
-  let tonClient: ReturnType<typeof createTonClient> | null = null
-  const getTonClient = () => tonClient ?? (tonClient = createTonClient(network))
-  const isWalletDeployed = async (address: string): Promise<boolean | null> => {
-    try {
-      return await getTonClient().isContractDeployed(Address.parse(address))
-    } catch (error) {
-      console.warn('Failed to check jetton wallet deployment', error)
-      return null
-    }
-  }
-
-  // 0) Try backend helper API (more resilient to node hiccups)
-  try {
-    const params = new URLSearchParams({
-      user: ownerRaw,
-      jetton: jettonMasterRaw,
-    })
-    const res = await fetch(`/api/get-jetton-wallet?${params.toString()}`)
-    if (res.ok) {
-      const data = (await res.json()) as { jettonWalletAddress?: string }
-      const friendly = toFriendlyAddress(data.jettonWalletAddress)
-      if (friendly) {
-        const deployed = await isWalletDeployed(friendly)
-        if (deployed) return friendly
-      }
-    }
-  } catch (error) {
-    console.warn('Backend jetton wallet lookup failed', error)
-  }
-
   // 1) Try TonAPI direct jetton balance (preferred)
   try {
     const tonApi = createTonApiClient()
@@ -138,10 +108,7 @@ async function fetchJettonWalletAddress(
     const friendly =
       toFriendlyAddress(jettonWallet) ||
       toFriendlyAddress(balance.walletAddress as unknown as string)
-    if (friendly) {
-      const deployed = await isWalletDeployed(friendly)
-      if (deployed) return friendly
-    }
+    if (friendly) return friendly
   } catch (error) {
     console.warn('TonAPI jetton balance lookup failed', error)
   }
@@ -155,9 +122,7 @@ async function fetchJettonWalletAddress(
         ? { Authorization: `Bearer ${tonApiConfig.apiKey}` }
         : {},
     })
-    if (!res.ok) {
-      throw new Error(`Jetton list request failed with status ${res.status}`)
-    }
+    if (!res.ok) return null
     const data = (await res.json()) as {
       balances?: Array<{
         jetton?: { address?: string; wallet_address?: string }
@@ -182,18 +147,14 @@ async function fetchJettonWalletAddress(
         (match?.jetton as unknown as { wallet_address?: string })
           ?.wallet_address
       )
-    const friendly = toFriendlyAddress(rawWalletAddress)
-    if (friendly) {
-      const deployed = await isWalletDeployed(friendly)
-      if (deployed) return friendly
-    }
+    return toFriendlyAddress(rawWalletAddress) || null
   } catch (error) {
     console.warn('Failed to fetch jetton wallet address via list', error)
   }
 
   // 3) Fallback: derive jetton wallet address on-chain
   try {
-    const client = getTonClient()
+    const client = createTonClient(network)
     const jetton = client.open(
       JettonMaster.create(Address.parse(jettonMasterRaw))
     )
@@ -315,20 +276,6 @@ export async function payWithUsdc({
       comment:
         `Store item #${itemId ?? ''}${label ? ` - ${label}` : ''}`.trim(),
     })
-
-    // Final safety: ensure the jetton wallet is deployed right before sending,
-    // otherwise TonConnect will reject with "Initial account must be not empty".
-    const finalClient = createTonClient(expectedNetwork ?? DEFAULT_NETWORK)
-    const finalDeployed = await finalClient.isContractDeployed(
-      Address.parse(jettonWalletAddress)
-    )
-    if (!finalDeployed) {
-      return {
-        success: false,
-        error:
-          'No USDC jetton wallet found. Please ensure your wallet holds USDC.',
-      }
-    }
 
     const result = await wallet.sendTransaction({
       to: jettonWalletAddress,
