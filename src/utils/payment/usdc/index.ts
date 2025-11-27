@@ -5,7 +5,7 @@ import { JettonMaster } from '@ton/ton'
 import { tonApiConfig, DEFAULT_NETWORK } from '@/lib/ton-config'
 import { createTonApiClient, createTonClient } from '@/lib/ton-client'
 import { extractTransactionHash } from '@/utils'
-import { isActiveContract } from '../jetton'
+import { getJettonWalletAddress, isActiveContract } from '../jetton'
 
 type WalletAdapter = {
   address?: string | null
@@ -96,97 +96,6 @@ async function isDeployedWallet(
     return client.isContractDeployed(Address.parse(addressFriendly))
   } catch {
     return false
-  }
-}
-
-async function fetchJettonWalletAddress(
-  owner: string,
-  jettonMaster: string,
-  network: 'mainnet' | 'testnet' = DEFAULT_NETWORK
-): Promise<string | null> {
-  const ownerRaw = normalizeRawAddress(owner)
-  const jettonMasterRaw = normalizeRawAddress(jettonMaster)
-  if (!ownerRaw || !jettonMasterRaw) return null
-
-  // 1) Try TonAPI direct jetton balance (preferred)
-  try {
-    const tonApi = createTonApiClient()
-    const balance = await tonApi.accounts.getAccountJettonBalance(
-      Address.parse(ownerRaw),
-      Address.parse(jettonMasterRaw)
-    )
-    const jettonWallet = (
-      balance.walletAddress as { address?: Address | string } | undefined
-    )?.address
-    const friendly =
-      toFriendlyAddress(jettonWallet) ||
-      toFriendlyAddress(balance.walletAddress as unknown as string)
-    if (friendly && (await isDeployedWallet(friendly, network))) {
-      return friendly
-    }
-  } catch (error) {
-    console.warn('TonAPI jetton balance lookup failed', error)
-  }
-
-  // 2) Fallback to TonAPI balances list
-  try {
-    const baseUrl = tonApiConfig.baseUrl.replace(/\/$/, '')
-    const url = `${baseUrl}/v2/accounts/${ownerRaw}/jettons`
-    const res = await fetch(url, {
-      headers: tonApiConfig.apiKey
-        ? { Authorization: `Bearer ${tonApiConfig.apiKey}` }
-        : {},
-    })
-    if (!res.ok) return null
-    const data = (await res.json()) as {
-      balances?: Array<{
-        jetton?: { address?: string; wallet_address?: string }
-        wallet_address?: string
-        walletAddress?: string | { address?: string }
-      }>
-    }
-    const match = data.balances?.find(b => {
-      const candidate = normalizeRawAddress(
-        (b.jetton as { address?: string } | undefined)?.address
-      )
-      return candidate === jettonMasterRaw
-    })
-    const rawWalletAddress =
-      normalizeRawAddress(match?.wallet_address) ??
-      normalizeRawAddress(
-        typeof match?.walletAddress === 'string'
-          ? match.walletAddress
-          : match?.walletAddress?.address
-      ) ??
-      normalizeRawAddress(
-        (match?.jetton as unknown as { wallet_address?: string })
-          ?.wallet_address
-      )
-    const friendly = toFriendlyAddress(rawWalletAddress)
-    if (friendly && (await isDeployedWallet(friendly, network))) {
-      return friendly
-    }
-  } catch (error) {
-    console.warn('Failed to fetch jetton wallet address via list', error)
-  }
-
-  // 3) Fallback: derive jetton wallet address on-chain
-  try {
-    const client = createTonClient(network)
-    const jetton = client.open(
-      JettonMaster.create(Address.parse(jettonMasterRaw))
-    )
-    const derived = await jetton.getWalletAddress(Address.parse(ownerRaw))
-    // Only use the derived wallet if it is already deployed; otherwise TonConnect
-    // will reject the transaction with "Initial account must be not empty".
-    const isDeployed = await client.isContractDeployed(derived)
-    if (!isDeployed) {
-      return null
-    }
-    return derived.toString({ bounceable: true, urlSafe: true })
-  } catch (error) {
-    console.warn('Failed to derive jetton wallet address on-chain', error)
-    return null
   }
 }
 
@@ -282,11 +191,12 @@ export async function payWithUsdc({
   const forwardTonAmountStr = forwardTonAmount.toFixed(6)
 
   try {
-    const jettonWalletAddress = await fetchJettonWalletAddress(
-      normalizedWalletAddress,
-      jettonMasterRaw,
-      expectedNetwork ?? DEFAULT_NETWORK
-    )
+    const jettonWalletAddress =
+      (await getJettonWalletAddress(
+        normalizedWalletAddress,
+        jettonMasterRaw,
+        expectedNetwork ?? DEFAULT_NETWORK
+      )) ?? null
 
     if (!jettonWalletAddress) {
       return {
