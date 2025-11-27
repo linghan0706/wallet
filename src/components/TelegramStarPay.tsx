@@ -515,7 +515,7 @@ export default function TelegramStarPay() {
                 </div>
                 <div className="text-sm font-semibold">{walletLabel}</div>
                 <div className="text-xs text-white/60">
-                  ����: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
+                  连接网络: {wallet.network === 'testnet' ? 'Testnet' : 'Mainnet'}
                 </div>
                 <div className="text-xs text-white/70">
                   Balance:{' '}
