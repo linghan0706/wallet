@@ -110,16 +110,25 @@ function extractInt(item?: ToncenterStackItem | null): bigint | null {
   return null
 }
 
-async function isDeployedWallet(
+async function isActiveContract(
   addressFriendly: string,
   network: TonNetwork
 ): Promise<boolean> {
+  const friendly = toFriendly(addressFriendly)
+  if (!friendly) return false
+  try {
+    const tonApi = createTonApiClient()
+    const account = await tonApi.accounts.getAccount(Address.parse(friendly))
+    if ((account as { status?: string }).status === 'active') return true
+  } catch {}
   try {
     const client = createTonClient(network)
-    return client.isContractDeployed(Address.parse(addressFriendly))
+    const state = await client.getContractState(Address.parse(friendly))
+    return state.state !== 'notExists'
   } catch {
-    return false
+    // ignore
   }
+  return false
 }
 
 async function runToncenterMethod(
@@ -207,6 +216,10 @@ export async function getJettonWalletAddress(
   const ownerRaw = normalizeRawAddress(owner)
   const jettonMasterRaw = normalizeRawAddress(jettonMaster)
   if (!ownerRaw || !jettonMasterRaw) return null
+  const masterFriendly = toFriendly(jettonMasterRaw)
+  if (!masterFriendly || !(await isActiveContract(masterFriendly, network))) {
+    return null
+  }
 
   // 1) On-chain derivation via JettonMaster
   try {
@@ -216,7 +229,7 @@ export async function getJettonWalletAddress(
     )
     const walletAddress = await jetton.getWalletAddress(Address.parse(ownerRaw))
     const friendly = walletAddress.toString({ bounceable: true, urlSafe: true })
-    if (await isDeployedWallet(friendly, network)) {
+    if (await isActiveContract(friendly, network)) {
       return friendly
     }
   } catch (error) {
@@ -234,20 +247,18 @@ export async function getJettonWalletAddress(
       (res.walletAddress as { address?: Address | string } | undefined)
         ?.address ?? (res.walletAddress as unknown as string | undefined)
     const friendly = toFriendly(tonApiWallet)
-    if (friendly && (await isDeployedWallet(friendly, network))) return friendly
+    if (friendly && (await isActiveContract(friendly, network))) return friendly
   } catch (error) {
     console.warn('TonAPI jetton wallet lookup failed', error)
   }
 
   // 3) Toncenter RPC fallback
-  const jettonMasterFriendly = toFriendly(jettonMasterRaw)
-  if (!jettonMasterFriendly) return null
   const toncenterWallet = await toncenterJettonWalletAddress(
     ownerRaw,
-    jettonMasterFriendly,
+    masterFriendly,
     network
   )
-  if (toncenterWallet && (await isDeployedWallet(toncenterWallet, network))) {
+  if (toncenterWallet && (await isActiveContract(toncenterWallet, network))) {
     return toncenterWallet
   }
   return null

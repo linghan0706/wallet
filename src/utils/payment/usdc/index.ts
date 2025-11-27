@@ -247,6 +247,17 @@ export async function payWithUsdc({
   if (!jettonMasterRaw) {
     return { success: false, error: 'USDC jetton master is not configured' }
   }
+  const activeMaster = await isActiveContract(
+    jettonMasterRaw,
+    expectedNetwork ?? DEFAULT_NETWORK
+  )
+  if (!activeMaster) {
+    return {
+      success: false,
+      error:
+        'USDC jetton master is not active on this network. Please check testnet configuration.',
+    }
+  }
   if (
     expectedNetwork &&
     wallet.network &&
