@@ -2,6 +2,7 @@
 
 import { PaymentResult as TonPaymentResult } from './ton'
 import { PaymentResult as UsdcPaymentResult } from './usdc'
+import http from '@/utils/http'
 
 export type PaymentMethod = 'ton' | 'usdc' | 'star'
 
@@ -83,18 +84,15 @@ export async function submitPurchase(
     rawTransactionData: {},
   }
 
-  const res = await fetch('/api/store/purchase/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`submitPurchase failed: ${res.status} ${text}`)
+  try {
+    // 使用项目统一的 http 实例（会自动添加 Authorization header）
+    const res = await http.post('/store/purchase/submit', body)
+    return res as unknown as SubmitPurchaseResult
+  } catch (err) {
+    // 保持与之前相似的错误信息格式
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`submitPurchase failed: ${message}`)
   }
-
-  return res.json() as Promise<SubmitPurchaseResult>
 }
 
 /**
@@ -105,34 +103,40 @@ export async function requestStarInvoice(
   itemId: number,
   quantity = 1
 ): Promise<unknown> {
-  const res = await fetch('/api/store/purchase/star/invoice', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ itemId, quantity }),
-  })
-
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`requestStarInvoice failed: ${res.status} ${text}`)
+  try {
+    const res = await http.post('/store/purchase/star/invoice', {
+      itemId,
+      quantity: Math.max(1, Math.floor(quantity)),
+    })
+    return res
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`requestStarInvoice failed: ${message}`)
   }
-
-  return res.json()
 }
 
 /**
  * 查询当前用户的订单列表：`GET /api/store/orders`
  */
 export async function fetchOrders(): Promise<unknown> {
-  const res = await fetch('/api/store/orders')
-  if (!res.ok) throw new Error(`fetchOrders failed: ${res.status}`)
-  return res.json()
+  try {
+    const res = await http.get('/store/orders')
+    return res as unknown
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`fetchOrders failed: ${message}`)
+  }
 }
 
 /**
  * 查询单个订单详情：`GET /api/store/orders/{id}`
  */
 export async function fetchOrder(id: number | string): Promise<unknown> {
-  const res = await fetch(`/api/store/orders/${id}`)
-  if (!res.ok) throw new Error(`fetchOrder failed: ${res.status}`)
-  return res.json()
+  try {
+    const res = await http.get(`/store/orders/${id}`)
+    return res as unknown
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new Error(`fetchOrder failed: ${message}`)
+  }
 }

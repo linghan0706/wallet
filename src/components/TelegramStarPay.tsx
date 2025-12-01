@@ -17,6 +17,7 @@ import {
   paymentConfig,
   submitPurchase,
 } from '@/utils/payment'
+import { getAccessToken } from '@/utils/auth/token'
 import { formatAddress } from '@/utils/format'
 
 type BannerState =
