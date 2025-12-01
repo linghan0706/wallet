@@ -11,16 +11,38 @@ export type OrderPayload = {
   txHash?: string
   payer?: string | null
   payee?: string
+  // 实际在链上发生的支付金额（前端/钱包返回）
   amount?: number
+  // 以下字段来自后端 `/api/store` 返回的价格配置（可选）
+  assetId?: number
+  assetName?: string
+  assetIcon?: string
+  // 后端配置的面额（用于与链上实际支付金额对比/记录）
+  listedAmount?: number
 }
 
-type BasicItem = { id: number }
+type PriceInfo = {
+  assetId: number
+  assetName: string
+  assetIcon?: string
+  amount: number
+}
+
+type BasicItem = { id: number; prices?: PriceInfo[] }
 
 export function toOrderPayload(
   res: TonPaymentResult | UsdcPaymentResult,
   item: BasicItem,
   method: PaymentMethod
 ): OrderPayload {
+  const prices = Array.isArray(item.prices) ? item.prices : undefined
+
+  // 匹配后端配置中的资产名（不区分大小写），例如 'Ton'/'Usdc'/'Star'
+  const targetName = method?.toLowerCase()
+  const matched = prices?.find(
+    p => String(p.assetName || '').toLowerCase() === targetName
+  )
+
   return {
     itemId: item.id,
     paymentMethod: method,
@@ -28,5 +50,89 @@ export function toOrderPayload(
     payer: res.from ?? null,
     payee: res.to,
     amount: res.amount,
+    assetId: matched?.assetId,
+    assetName: matched?.assetName,
+    assetIcon: matched?.assetIcon,
+    listedAmount: matched?.amount,
   }
+}
+
+// 请求后端记录/查询订单的封装
+export type SubmitPurchaseResult = {
+  success: boolean
+  orderId?: number | string
+  message?: string
+  [key: string]: unknown
+}
+
+/**
+ * 提交钱包支付信息到后端 `/api/store/purchase/submit`
+ * 会将常见字段映射为后端预期的字段名。返回解析后的 JSON。
+ */
+export async function submitPurchase(
+  payload: OrderPayload & { quantity?: number }
+): Promise<SubmitPurchaseResult> {
+  const body = {
+    itemId: payload.itemId,
+    assetId: payload.assetId,
+    quantity: payload.quantity ?? 1,
+    // 保证后端接收大写形式（例如 "TON"/"U"/"STAR"）
+    paymentMethod: String(payload.paymentMethod || '').toUpperCase(),
+    transactionHash: payload.txHash,
+    walletAddress: payload.payer,
+    rawTransactionData: {},
+  }
+
+  const res = await fetch('/api/store/purchase/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`submitPurchase failed: ${res.status} ${text}`)
+  }
+
+  return res.json() as Promise<SubmitPurchaseResult>
+}
+
+/**
+ * 请求后端生成 Telegram Stars 发票：`POST /api/store/purchase/star/invoice`
+ * 返回后端原始响应（通常包含 invoiceLink 等信息）。
+ */
+export async function requestStarInvoice(
+  itemId: number,
+  quantity = 1
+): Promise<unknown> {
+  const res = await fetch('/api/store/purchase/star/invoice', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ itemId, quantity }),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`requestStarInvoice failed: ${res.status} ${text}`)
+  }
+
+  return res.json()
+}
+
+/**
+ * 查询当前用户的订单列表：`GET /api/store/orders`
+ */
+export async function fetchOrders(): Promise<unknown> {
+  const res = await fetch('/api/store/orders')
+  if (!res.ok) throw new Error(`fetchOrders failed: ${res.status}`)
+  return res.json()
+}
+
+/**
+ * 查询单个订单详情：`GET /api/store/orders/{id}`
+ */
+export async function fetchOrder(id: number | string): Promise<unknown> {
+  const res = await fetch(`/api/store/orders/${id}`)
+  if (!res.ok) throw new Error(`fetchOrder failed: ${res.status}`)
+  return res.json()
 }

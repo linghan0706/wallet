@@ -29,3 +29,9 @@ export const paymentConfig = {
 
 export { payWithTon, payWithUsdc }
 export type { PaymentNetwork }
+export {
+  submitPurchase,
+  requestStarInvoice,
+  fetchOrders,
+  fetchOrder,
+} from './order'
