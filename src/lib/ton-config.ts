@@ -53,11 +53,13 @@ const networkConfigDefaults: Record<TonNetwork, NetworkSettings> = {
 export const networkConfig = networkConfigDefaults
 export const DEFAULT_NETWORK = resolvedNetwork
 
+const resolvedTonApiBaseUrl = readEnvValue(
+  process.env.NEXT_PUBLIC_TON_API_BASE_URL
+)
+
 export const tonApiConfig = {
   apiKey: readEnvValue(process.env.NEXT_PUBLIC_TON_API_KEY) ?? '',
-  baseUrl:
-    readEnvValue(process.env.NEXT_PUBLIC_TON_API_BASE_URL) ??
-    networkConfig[DEFAULT_NETWORK].apiEndpoint,
+  baseUrl: resolvedTonApiBaseUrl,
 }
 
 function resolveManifestUrl(manifest?: string, appUrl?: string): string | null {

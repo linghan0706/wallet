@@ -3,7 +3,7 @@
 import { Address, beginCell, toNano } from '@ton/core'
 import { DEFAULT_NETWORK } from '@/lib/ton-config'
 import { createTonClient } from '@/lib/ton-client'
-import { extractTransactionHash } from '@/utils'
+import { extractTransactionHash, resolveTransactionHash } from '@/utils'
 import { getJettonWalletAddress, isActiveContract } from '../jetton'
 
 type WalletAdapter = {
@@ -208,21 +208,29 @@ export async function payWithUsdc({
       return { success: false, error: result?.error || 'USDC payment not sent' }
     }
 
-    let txHash = result.hash
-    if (!txHash) {
+    let messageHash = result.hash
+    if (!messageHash) {
       const boc = (result as { data?: { boc?: string } })?.data?.boc
       if (boc) {
         try {
-          txHash = extractTransactionHash(boc)
+          messageHash = extractTransactionHash(boc)
         } catch {
-          txHash = undefined
+          messageHash = undefined
         }
       }
     }
 
+    const walletNetwork = resolveWalletNetwork(wallet.network)
+    const resolvedHash = messageHash
+      ? await resolveTransactionHash({
+          messageHash,
+          network: walletNetwork,
+        })
+      : null
+
     return {
       success: true,
-      txHash,
+      txHash: resolvedHash ?? messageHash,
       from: normalizedWalletAddress,
       to: paymentAddr,
       amount,
@@ -236,4 +244,17 @@ export async function payWithUsdc({
           : 'USDC payment failed',
     }
   }
+}
+
+function resolveWalletNetwork(network?: string | null): 'mainnet' | 'testnet' {
+  if (typeof network === 'string') {
+    const normalized = network.toLowerCase()
+    if (normalized === 'mainnet') {
+      return 'mainnet'
+    }
+    if (normalized === 'testnet') {
+      return 'testnet'
+    }
+  }
+  return DEFAULT_NETWORK
 }

@@ -1,9 +1,12 @@
 'use client'
 
 import { toNano } from '@ton/core'
+import { DEFAULT_NETWORK } from '@/lib/ton-config'
+import { resolveTransactionHash } from '@/utils'
 
 type WalletAdapter = {
   address?: string | null
+  network?: string | null
   sendTransaction: (tx: {
     to: string
     amount: string
@@ -70,9 +73,17 @@ export async function payWithTon({
       return { success: false, error: result?.error || 'TON payment not sent' }
     }
 
+    const walletNetwork = resolveWalletNetwork(wallet.network)
+    const resolvedHash = result.hash
+      ? await resolveTransactionHash({
+          messageHash: result.hash,
+          network: walletNetwork,
+        })
+      : null
+
     return {
       success: true,
-      txHash: result.hash,
+      txHash: resolvedHash ?? result.hash,
       from: wallet.address ?? null,
       to: paymentAddress,
       amount,
@@ -83,4 +94,17 @@ export async function payWithTon({
       error: error instanceof Error ? error.message : 'TON payment failed',
     }
   }
+}
+
+function resolveWalletNetwork(network?: string | null): 'mainnet' | 'testnet' {
+  if (typeof network === 'string') {
+    const normalized = network.toLowerCase()
+    if (normalized === 'mainnet') {
+      return 'mainnet'
+    }
+    if (normalized === 'testnet') {
+      return 'testnet'
+    }
+  }
+  return DEFAULT_NETWORK
 }

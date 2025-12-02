@@ -1,5 +1,6 @@
 import { Cell } from '@ton/core'
 import { DEFAULT_NETWORK } from '@/lib/ton-config'
+import { createTonApiClient } from '@/lib/ton-client'
 
 /** 钱包交易记录所属网络 */
 export type WalletNetwork = 'mainnet' | 'testnet'
@@ -20,9 +21,20 @@ export interface WalletTransactionPayload {
   network?: WalletNetwork
 }
 
+export interface ResolveTransactionHashOptions {
+  messageHash?: string | null
+  network?: WalletNetwork
+  timeoutMs?: number
+  pollIntervalMs?: number
+}
+
 // 本地存储键与历史条数上限
 const STORAGE_KEY = 'wallet:transactions'
 const HISTORY_LIMIT = 20
+const DEFAULT_TX_POLL_TIMEOUT_MS = 60_000
+const DEFAULT_TX_POLL_INTERVAL_MS = 3_000
+
+const resolvedHashCache = new Map<string, string>()
 
 // 判断是否运行在浏览器环境（是否可用 localStorage）
 function isBrowserEnvironment(): boolean {
@@ -140,6 +152,52 @@ export function getLatestWalletTransaction(): WalletTransactionRecord | null {
   return latest ?? null
 }
 
+export async function resolveTransactionHash({
+  messageHash,
+  network = DEFAULT_NETWORK,
+  timeoutMs = DEFAULT_TX_POLL_TIMEOUT_MS,
+  pollIntervalMs = DEFAULT_TX_POLL_INTERVAL_MS,
+}: ResolveTransactionHashOptions): Promise<string | null> {
+  const normalizedHash = normalizeHash(messageHash)
+  if (!normalizedHash) {
+    return null
+  }
+
+  const normalizedNetwork = normalizeNetwork(network)
+  const cacheKey = `${normalizedNetwork}:${normalizedHash}`
+  const cached = resolvedHashCache.get(cacheKey)
+  if (cached) {
+    return cached
+  }
+
+  const tonApi = createTonApiClient(normalizedNetwork)
+  const interval = Math.max(500, pollIntervalMs)
+  const timeoutAt = Date.now() + Math.max(2000, timeoutMs)
+
+  while (Date.now() < timeoutAt) {
+    try {
+      const tx =
+        await tonApi.blockchain.getBlockchainTransactionByMessageHash(
+          normalizedHash
+        )
+      const resolvedHash = (tx as { hash?: string }).hash
+      if (resolvedHash) {
+        resolvedHashCache.set(cacheKey, resolvedHash)
+        return resolvedHash
+      }
+    } catch (error) {
+      const status = getHttpStatus(error)
+      if (status && status !== 404 && status < 500) {
+        console.warn('[wallet-hash] resolveTransactionHash aborted', error)
+        break
+      }
+    }
+    await sleep(interval)
+  }
+
+  return null
+}
+
 // 清空钱包交易历史
 export function clearWalletTransactionHistory(): void {
   if (!isBrowserEnvironment()) return
@@ -149,4 +207,32 @@ export function clearWalletTransactionHistory(): void {
   } catch (error) {
     console.warn('[wallet-hash] Failed to clear transaction history', error)
   }
+}
+
+function normalizeHash(hash?: string | null): string | null {
+  if (typeof hash !== 'string') {
+    return null
+  }
+  const trimmed = hash.trim()
+  return trimmed.length > 0 ? trimmed.toLowerCase() : null
+}
+
+function normalizeNetwork(network?: WalletNetwork): WalletNetwork {
+  return network === 'mainnet' ? 'mainnet' : 'testnet'
+}
+
+function getHttpStatus(error: unknown): number | null {
+  if (typeof error === 'object' && error !== null) {
+    const maybeStatus = (error as { status?: number }).status
+    if (typeof maybeStatus === 'number') {
+      return maybeStatus
+    }
+  }
+  return null
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
 }

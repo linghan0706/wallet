@@ -7,9 +7,14 @@ import { tonApiConfig, networkConfig, DEFAULT_NETWORK } from './ton-config'
 const rpcApiKey =
   readServerEnv('TONCENTER_API_KEY') ?? readServerEnv('TON_RPC_API_KEY')
 
-export const createTonApiClient = () => {
+export const createTonApiClient = (
+  network: keyof typeof networkConfig = DEFAULT_NETWORK
+) => {
+  const config = networkConfig[network] ?? networkConfig[DEFAULT_NETWORK]
+  const baseUrl = tonApiConfig.baseUrl ?? config.apiEndpoint
+
   return new TonApiClient({
-    baseUrl: tonApiConfig.baseUrl,
+    baseUrl,
     apiKey: tonApiConfig.apiKey,
   })
 }
