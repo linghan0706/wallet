@@ -26,6 +26,7 @@ interface StyleConfig {
   flexGrow?: number
   textShadow?: string
   border?: string
+  borderImageSource?: string
   marginTop?: string
 }
 
@@ -53,25 +54,23 @@ const guidancePages: GuidancePageData[] = [
     description: 'Collect energy and search for spaceship parts',
     styles: {
       mainTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10  text-6xl font-bold  bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent  ',
         fontSize: '54px',
         lineHeight: '58px',
-        color: '#FFFFFF',
         height: '58px',
-        textShadow: '0px 0px 1px #BC13FE',
+        border: '1px solid',
+        borderImageSource:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-bold text-7xl',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -93,17 +92,13 @@ const guidancePages: GuidancePageData[] = [
     description: 'Collect energy and search for spaceship parts',
     styles: {
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -125,17 +120,13 @@ const guidancePages: GuidancePageData[] = [
     description: 'Roam the planets and explore the mysteries',
     styles: {
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -157,17 +148,13 @@ const guidancePages: GuidancePageData[] = [
     description: 'Traverse the wormholes and challenge the unknown',
     styles: {
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -189,17 +176,13 @@ const guidancePages: GuidancePageData[] = [
     description: 'Time-space Jump, Become a Legend',
     styles: {
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -221,25 +204,23 @@ const guidancePages: GuidancePageData[] = [
     description: 'your legend, eternally written in the cosmos',
     styles: {
       mainTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10  text-6xl font-bold  bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent  ',
         fontSize: '54px',
         lineHeight: '58px',
-        color: '#FFFFFF',
         height: '58px',
-        textShadow: '0px 0px 1px #BC13FE',
+        border: '1px solid',
+        borderImageSource:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       subTitle: {
-        className: 'font-jersey-10',
+        className:
+          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
         fontSize: '54px',
         lineHeight: '32px',
-        background:
-          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
-        backgroundClip: 'text',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textFillColor: 'transparent',
         height: '48px',
-        textShadow: '0px 0px 1px #BC13FE',
+        background:
+          'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       description: {
         className: 'font-exo2',
@@ -280,6 +261,13 @@ const getStyleForElement = (
   // 只有当width属性存在时才添加到样式中
   if (styleConfig.width) {
     baseStyle.width = styleConfig.width
+  }
+
+  // 添加borderImageSource如果存在
+  if (styleConfig.borderImageSource) {
+    ;(
+      baseStyle as React.CSSProperties & { borderImageSource: string }
+    ).borderImageSource = styleConfig.borderImageSource
   }
 
   let finalStyle = baseStyle
