@@ -8,12 +8,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
-  allowedDevOrigins: ['http://localhost:3000'],
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
   },
-  optimizePackageImports: ['@heroicons/react'],
   async headers() {
     return [
       {

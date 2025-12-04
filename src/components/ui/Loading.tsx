@@ -7,7 +7,7 @@ import { useLayoutManager } from '@/hooks/Guider'
 
 // 引导页面样式配置接口
 interface StyleConfig {
-  fontFamily?: string
+  className?: string // Added className for font classes
   fontSize?: string
   lineHeight?: string
   color?: string
@@ -24,6 +24,9 @@ interface StyleConfig {
   flex?: string
   order?: number
   flexGrow?: number
+  textShadow?: string
+  border?: string
+  marginTop?: string
 }
 
 // 引导页面数据接口
@@ -36,6 +39,7 @@ interface GuidancePageData {
   styles?: {
     mainTitle?: StyleConfig
     subTitle?: StyleConfig
+    description?: StyleConfig
   }
 }
 
@@ -43,187 +47,264 @@ interface GuidancePageData {
 const guidancePages: GuidancePageData[] = [
   {
     id: 1,
-    icon: '/LoadingIcon/CionOne.png',
+    icon: '/LoadingIcon/Loading-1.png',
     title: 'Welcome to',
     subtitle: 'NovaExplorer',
     description: 'Collect energy and search for spaceship parts',
     styles: {
       mainTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
         lineHeight: '58px',
         color: '#FFFFFF',
-        width: '298px',
-        height: '29px',
+        height: '58px',
+        textShadow: '0px 0px 1px #BC13FE',
       },
       subTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '48px',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%), #FFFFFF',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
         backgroundClip: 'text',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-        width: '258px',
+        textFillColor: 'transparent',
         height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
   {
     id: 2,
-    icon: '/LoadingIcon/CionTwo.png',
+    icon: '/LoadingIcon/Loading-2.png',
     title: '',
     subtitle: 'Blue Star',
     description: 'Collect energy and search for spaceship parts',
     styles: {
       subTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '58px',
-        display: 'flex',
-        alignItems: 'center',
-        textAlign: 'center',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), #FFFFFF',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+        backgroundClip: 'text',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
         textFillColor: 'transparent',
-        width: '174px',
-        height: '58px',
-        flex: 'none',
-        order: 0,
-        flexGrow: 0,
+        height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
   {
     id: 3,
-    icon: '/LoadingIcon/CionThree.png',
+    icon: '/LoadingIcon/Loading-3.png',
     title: '',
     subtitle: 'Solar System',
     description: 'Roam the planets and explore the mysteries',
     styles: {
       subTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '58px',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%), #FFFFFF',
-        width: '246px',
-        height: '58px',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textFillColor: 'transparent',
+        height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
   {
     id: 4,
-    icon: '/LoadingIcon/CionFour.png',
+    icon: '/LoadingIcon/Loading-4.png',
     title: '',
     subtitle: 'Galaxy',
     description: 'Traverse the wormholes and challenge the unknown',
     styles: {
       subTitle: {
-        fontFamily: "'Jersey 25', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '54px',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%), #FFFFFF',
-        width: '143px',
-        height: '54px',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textFillColor: 'transparent',
+        height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
   {
     id: 5,
-    icon: '/LoadingIcon/CionFive.png',
+    icon: '/LoadingIcon/Loading-5.png',
     title: '',
     subtitle: 'Infinite Universe',
     description: 'Time-space Jump, Become a Legend',
     styles: {
       subTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '58px',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%), #FFFFFF',
-        width: '307px',
-        height: '58px',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textFillColor: 'transparent',
+        height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
   {
     id: 6,
-    icon: '/LoadingIcon/CionSix.png',
+    icon: '/LoadingIcon/Loading-6.png',
     title: 'Star—Universe',
     subtitle: 'UNI Heart NFT',
     description: 'your legend, eternally written in the cosmos',
     styles: {
       mainTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
         lineHeight: '58px',
         color: '#FFFFFF',
-        width: '298px',
-        height: '29px',
+        height: '58px',
+        textShadow: '0px 0px 1px #BC13FE',
       },
       subTitle: {
-        fontFamily: "'Jersey 10', monospace",
+        className: 'font-jersey-10',
         fontSize: '54px',
-        lineHeight: '48px',
+        lineHeight: '32px',
         background:
-          'linear-gradient(90deg, #1EDDD6 0%, #34E37A 19.8%, #47F04F 36.43%, #81E73B 52.69%, #BAE25B 75.48%, #E377DA 94.23%), linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%), #FFFFFF',
-        width: '255px',
+          'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textFillColor: 'transparent',
         height: '48px',
+        textShadow: '0px 0px 1px #BC13FE',
+      },
+      description: {
+        className: 'font-exo2',
+        fontSize: '16px',
+        lineHeight: '22px',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        height: 'auto',
+        marginTop: '10px',
       },
     },
   },
 ]
-{
-  /**
-   *加载获取用户数据
-   *
-   *
-   */
-}
 
 // 样式映射函数
 const getStyleForElement = (
   pageData: GuidancePageData,
-  elementType: 'mainTitle' | 'subTitle'
+  elementType: 'mainTitle' | 'subTitle' | 'description'
 ) => {
   const styleConfig = pageData.styles?.[elementType]
-  if (!styleConfig) return {}
+  if (!styleConfig) return { style: {}, className: '' }
 
+  // 构建基础样式对象，只包含已定义的样式属性
   const baseStyle: React.CSSProperties = {
-    fontFamily: styleConfig.fontFamily,
     fontSize: styleConfig.fontSize,
     lineHeight: styleConfig.lineHeight,
     display: 'flex',
     alignItems: 'center',
-    textAlign: 'center' as const,
+    textAlign:
+      (styleConfig.textAlign as React.CSSProperties['textAlign']) || 'center',
+    textShadow: styleConfig.textShadow,
+    height: styleConfig.height,
+    border: styleConfig.border,
+    marginTop: styleConfig.marginTop,
   }
+
+  // 只有当width属性存在时才添加到样式中
+  if (styleConfig.width) {
+    baseStyle.width = styleConfig.width
+  }
+
+  let finalStyle = baseStyle
 
   // 处理背景渐变样式
   if (styleConfig.background) {
-    return {
+    finalStyle = {
       ...baseStyle,
       background: styleConfig.background,
-      WebkitBackgroundClip: 'text',
-      WebkitTextFillColor: 'transparent',
-      backgroundClip: 'text',
+      WebkitBackgroundClip: styleConfig.WebkitBackgroundClip || 'text',
+      WebkitTextFillColor: styleConfig.WebkitTextFillColor || 'transparent',
+      backgroundClip: styleConfig.backgroundClip || 'text',
     }
-  }
-
-  // 处理纯色样式
-  if (styleConfig.color) {
-    return {
+  } else if (styleConfig.color) {
+    // 处理纯色样式
+    finalStyle = {
       ...baseStyle,
       color: styleConfig.color,
     }
   }
 
-  return baseStyle
+  return {
+    style: finalStyle,
+    className: styleConfig.className || '',
+  }
 }
 
 interface LoadingProps {
@@ -240,11 +321,8 @@ export default function Loading({ onComplete }: LoadingProps) {
   const mainIconRef = useRef<HTMLDivElement>(null)
   const titleAreaRef = useRef<HTMLDivElement>(null)
   const svgElementRef = useRef<SVGSVGElement>(null)
-  const touchStartXRef = useRef(0)
-  const touchStartYRef = useRef(0)
-  const touchStartTimeRef = useRef(0)
 
-  // 使用布局管理器 - 目前仅用于ref管理
+  // 使用布局管理器
   useLayoutManager({
     containerRef,
     mainIconRef,
@@ -252,18 +330,15 @@ export default function Loading({ onComplete }: LoadingProps) {
     svgElementRef,
   })
 
-  // 确保从id为1的数据开始加载引导页内容
-  // currentPage为1时显示第一个引导页数据（guidancePages[0]）
   const currentData = guidancePages[currentPage - 1]
 
   const handleNext = () => {
-    // currentPage从1开始，最大值为6（对应guidancePages.length）
     if (currentPage < guidancePages.length && !isTransitioning) {
       setIsTransitioning(true)
       setTimeout(() => {
         setCurrentPage(prev => prev + 1)
         setIsTransitioning(false)
-      }, 500) // 增加过渡时间以配合CSS动画
+      }, 500)
     } else if (currentPage === guidancePages.length) {
       onComplete?.()
     }
@@ -284,76 +359,39 @@ export default function Loading({ onComplete }: LoadingProps) {
   }
 
   const handleDotClick = (index: number) => {
-    // 不允许点击第一个进度条（index=0），因为它代表InitialLoading
-    // 只允许点击从第二个开始的进度条（index>=1）
+    // 允许点击任何引导页的dot (1-6)
     if (index >= 1 && index !== currentPage && !isTransitioning) {
       setIsTransitioning(true)
       setTimeout(() => {
         setCurrentPage(index)
         setIsTransitioning(false)
-      }, 500) // 增加过渡时间以配合CSS动画
-    }
-  }
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    const t = e.touches[0]
-    touchStartXRef.current = t.clientX
-    touchStartYRef.current = t.clientY
-    touchStartTimeRef.current = Date.now()
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    const t = e.changedTouches[0]
-    const dx = t.clientX - touchStartXRef.current
-    const dy = t.clientY - touchStartYRef.current
-    const dt = Date.now() - touchStartTimeRef.current
-    if (Math.abs(dx) > 40 && Math.abs(dy) < 60 && dt < 1000) {
-      if (dx < 0) handleNext()
-      else handlePrev()
+      }, 500)
     }
   }
 
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex flex-col items-center justify-center relative overflow-hidden"
+      className="min-h-screen flex flex-col relative overflow-hidden"
       data-layout-key="main-container"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      style={{ touchAction: 'pan-y' }}
+      style={{
+        background: 'linear-gradient(to top, #0F1226, #0C2957)',
+      }}
     >
-      {/* 背景装饰星星 */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(30)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full"
-            style={{
-              left: `${(i * 37) % 100}%`,
-              top: `${(i * 73) % 100}%`,
-            }}
-            animate={{
-              opacity: [0.3, 1, 0.3],
-              scale: [0.5, 1.2, 0.5],
-            }}
-            transition={{
-              duration: 2 + (i % 3),
-              repeat: Infinity,
-              delay: (i * 0.1) % 2,
-            }}
-          />
-        ))}
-      </div>
+      {/* 跳过 Skip */}
+      {/* <button
+        onClick={handleSkip}
+        className="absolute top-8 right-6 z-50 bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-full transition-colors font-jersey-10"
+      >
+        skip
+      </button> */}
 
-      {/* 主要内容容器 */}
-      <div className="relative z-10 w-full max-w-sm mx-auto px-6 flex flex-col items-center">
-        {/* 主图标区域 */}
+      {/* 上层图片 Section: Image */}
+      <div className="w-full relative" ref={mainIconRef}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
-            ref={mainIconRef}
-            className="relative mb-8"
-            data-layout-key="element-0"
+            className="relative w-[393px] flex items-center justify-center"
             initial={{ opacity: 0, x: 100, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -100, scale: 0.8 }}
@@ -362,319 +400,215 @@ export default function Loading({ onComplete }: LoadingProps) {
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
           >
-            {/* 主图标容器 - 只包含图标，确保横向居中 */}
-            <div className="relative w-80 h-64 flex items-center justify-center mx-auto ">
-              <motion.div
-                className="relative"
-                style={{ marginTop: '28px' }}
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              >
-                <Image
-                  src={currentData.icon}
-                  alt={currentData.title}
-                  width={320}
-                  height={240}
-                  className="object-contain drop-shadow-2xl"
-                  style={{
-                    width: 'auto',
-                    height: 'auto',
-                  }}
-                  priority
-                />
-              </motion.div>
-            </div>
-
-            {/* 底盘容器（用于左右箭头定位） */}
-            <div
-              className="relative flex justify-center mt-3 mb-4 h-10"
-              style={{ width: '361px' }}
-            >
-              <motion.button
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 opacity-80 hover:opacity-100 transition"
-                onClick={handlePrev}
-                disabled={currentPage === 1}
-                style={{ pointerEvents: currentPage === 1 ? 'none' : 'auto' }}
-                aria-label="Previous"
-              >
-                <Image
-                  src="/button/right.svg"
-                  alt="Previous"
-                  width={19}
-                  height={19}
-                  style={{ transform: 'scaleX(-1)' }}
-                />
-              </motion.button>
-
-              <motion.button
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 opacity-80 hover:opacity-100 transition"
-                onClick={handleNext}
-                aria-label="Next"
-              >
-                <Image
-                  src="/button/right.svg"
-                  alt="Next"
-                  width={19}
-                  height={19}
-                />
-              </motion.button>
-            </div>
-
             <Image
-              src="/button/footer.svg"
-              alt="Footer"
-              width={378}
-              height={40}
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2"
-              style={{ width: 'auto', height: 'auto' }}
+              src={currentData.icon}
+              alt={currentData.title}
+              width={393}
+              height={452}
+              className="object-contain drop-shadow-2xl"
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
               priority
             />
           </motion.div>
         </AnimatePresence>
+      </div>
 
-        {/* 标题区域 - 固定高度容器 */}
+      {/* 下层内容 Section: Content */}
+      <div
+        ref={titleAreaRef}
+        className="flex flex-col items-center justify-center w-[393px] h-[356px] p-[56px_44px] gap-[15px] mx-auto relative z-10 border-t border-[#CED4DD] rounded-[12px]"
+        style={{
+          background: 'linear-gradient(to top, #0F1226, #0C2957)',
+        }}
+      >
+        {/* 主要内容  */}
         <div
-          ref={titleAreaRef}
-          className="text-center mb-6 relative"
-          data-layout-key="element-1"
-          style={{ height: '140px' }}
+          className="flex flex-col items-center w-full"
+          style={{ height: '120px' }}
         >
           <AnimatePresence mode="wait">
             <motion.div
-              key={`title-${currentPage}`}
-              className="absolute inset-0 flex flex-col justify-center items-center"
+              key={`content-${currentPage}`}
+              className="flex flex-col items-center w-full"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
+              transition={{ duration: 0.4 }}
+              style={{ height: '106px' }} // 主标题(58px) + 副标题(48px)
             >
-              {/* 主标题和副标题组合容器 - 固定高度 */}
+              {/* 主标题容器  */}
               <div
-                className="flex flex-col justify-center items-center"
-                style={{ height: '80px', marginBottom: '12px' }}
+                style={{
+                  width: '100%',
+                  height: '58px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 'none',
+                  order: 0,
+                }}
               >
-                {/* 主标题 */}
-                {currentData.title && (
-                  <motion.h1
-                    style={getStyleForElement(currentData, 'mainTitle')}
-                    className="flex justify-center items-center leading-none mb-1 whitespace-nowrap"
-                  >
-                    {currentData.title}
-                  </motion.h1>
-                )}
-
-                {/* 副标题 */}
-                {currentData.subtitle && (
-                  <motion.h2
-                    style={getStyleForElement(currentData, 'subTitle')}
-                    className="flex justify-center items-center leading-none whitespace-nowrap"
-                  >
-                    {currentData.subtitle}
-                  </motion.h2>
-                )}
+                <h1
+                  style={getStyleForElement(currentData, 'mainTitle').style}
+                  className={
+                    getStyleForElement(currentData, 'mainTitle').className
+                  }
+                >
+                  {currentData.title}
+                </h1>
               </div>
 
-              {/* 描述文本容器 - 固定高度，支持换行 */}
+              {/* 副标题容器 */}
               <div
-                className="flex justify-center items-start px-4"
-                style={{ height: '48px', width: '285px' }}
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 'none',
+                  order: 1,
+                }}
               >
-                <motion.p
-                  className="text-gray-300 text-sm leading-relaxed text-center break-words"
-                  style={{
-                    maxWidth: '285px',
-                    wordWrap: 'break-word',
-                    overflowWrap: 'break-word',
-                    hyphens: 'auto',
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
+                <h2
+                  style={getStyleForElement(currentData, 'subTitle').style}
+                  className={
+                    getStyleForElement(currentData, 'subTitle').className
+                  }
                 >
-                  {currentData.description}
-                </motion.p>
+                  {currentData.subtitle || ''}
+                </h2>
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* 页面指示器 */}
-        <motion.div
-          className="flex justify-center items-center space-x-2.5 mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+        {/* 描述文本 */}
+        <div
           style={{
-            width: '106px',
-            height: '6px',
-            gap: '10px',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 'none',
+            order: 2,
+            minHeight: '44px',
           }}
         >
-          {/* 创建7个进度条：1个InitialLoading + 6个引导页 */}
-          {Array.from({ length: 7 }, (_, index) => {
-            // 第一个进度条代表InitialLoading，永远保持灰色圆点状态
-            if (index === 0) {
-              return (
-                <div
-                  key={index}
-                  className="rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    background: '#878787',
-                    flex: 'none',
-                    transform: 'scale(1)',
-                  }}
-                />
-              )
-            }
-            // 当前激活的进度条显示为长条样式
-            else if (index === currentPage) {
-              return (
-                <div
-                  key={index}
-                  className="rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: '26px',
-                    height: '6px',
-                    background:
-                      'linear-gradient(172.02deg, #EE3BA7 -21.97%, #B448FB 99.02%)',
-                    borderRadius: '20px',
-                    flex: 'none',
-                    transform: 'scale(1)',
-                    transformOrigin: 'center',
-                  }}
-                />
-              )
-            }
-            // 其他进度条为圆形样式
-            else {
-              return (
-                <motion.button
-                  key={index}
-                  className="rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: '6px',
-                    height: '6px',
-                    // 已经完成的页面显示为激活的粉色圆点，未完成的显示为灰色
-                    background: currentPage > index ? '#EE3BA7' : '#878787',
-                    flex: 'none',
-                    cursor: 'pointer',
-                    transform: 'scale(1)',
-                    transformOrigin: 'center',
-                  }}
-                  onClick={() => handleDotClick(index)}
-                  whileHover={{
-                    scale: 1.3,
-                    transition: { duration: 0.2, ease: 'easeOut' },
-                  }}
-                  whileTap={{
-                    scale: 0.8,
-                    transition: { duration: 0.1, ease: 'easeOut' },
-                  }}
-                  animate={{
-                    scale: currentPage > index ? 1.1 : 1,
-                  }}
-                  transition={{
-                    duration: 0.5,
-                    ease: 'easeOut',
-                  }}
-                />
-              )
-            }
-          })}
-        </motion.div>
+          <p
+            style={getStyleForElement(currentData, 'description').style}
+            className={getStyleForElement(currentData, 'description').className}
+          >
+            {currentData.description}
+          </p>
+        </div>
 
-        {/* 底部按钮区域 */}
-        <motion.div
-          className="flex justify-center w-full max-w-xs"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
+        {/* 分页器 */}
+        <div
+          className="flex flex-col gap-[15px] w-full items-center"
+          style={{
+            marginTop: '5px',
+            order: 3,
+          }}
         >
-          {/* id：6，显示Enter按钮 */}
-          {currentData.id === 6 ? (
+          {/* 点点 Dots */}
+          <div
+            className="flex flex-row items-center gap-[10px]"
+            style={{ width: '106px', height: '6px', flex: 'none' }}
+          >
+            {Array.from({ length: 6 }, (_, i) => {
+              const index = i + 1
+              const isActive = index === currentPage
+              return (
+                <motion.div
+                  key={index}
+                  onClick={() => handleDotClick(index)}
+                  className="cursor-pointer"
+                  style={{
+                    width: isActive ? '26px' : '6px',
+                    height: '6px',
+                    background: isActive
+                      ? 'linear-gradient(172.02deg, #00F0FF -21.97%, #0066FF 99.02%)'
+                      : '#FFFFFF',
+                    borderRadius: isActive ? '20px' : '50%',
+                    flex: 'none',
+                  }}
+                  layout
+                />
+              )
+            })}
+          </div>
+
+          {/*回退箭头 Button*/}
+          <div
+            style={{
+              width: '305px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px',
+              flex: 'none',
+            }}
+          >
+            {currentPage > 1 && (
+              <motion.button
+                onClick={handlePrev}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Image
+                  src="/button/left.svg"
+                  alt="Back"
+                  width={22}
+                  height={22}
+                  style={{ width: 'auto', height: '22px' }}
+                />
+              </motion.button>
+            )}
+
+            {/* Next Step Button */}
             <motion.button
-              className="text-white font-medium text-sm transition-all duration-300"
+              className="flex items-center justify-center relative"
               onClick={handleNext}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '4px 10px',
-                gap: '4px',
-                width: '141px',
-                height: '30px',
+                width: currentPage > 1 ? 'calc(100% - 40px)' : '100%',
+                height: '22px',
                 background:
-                  'linear-gradient(156.71deg, #6B0AE9 2.78%, #6410B1 99.22%)',
-                borderRadius: '8px',
-                flex: 'none',
-                order: 0,
-                flexGrow: 0,
+                  'linear-gradient(90deg, rgba(0, 240, 255, 0.8) 0%, rgba(0, 102, 255, 0.8) 100%)',
+                borderRadius: '5px',
                 border: 'none',
                 cursor: 'pointer',
               }}
             >
-              Enter
+              <span
+                className="font-jersey-10"
+                style={{
+                  fontSize: '14px',
+                  lineHeight: '22px',
+                  color: '#FFFFFF',
+                  textAlign: 'center',
+                }}
+              >
+                Next Step
+              </span>
             </motion.button>
-          ) : null}
-        </motion.div>
+          </div>
+        </div>
       </div>
-
-      {/* 装饰性粒子效果 */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 overflow-hidden pointer-events-none">
-        {Array.from({ length: 15 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full"
-            style={{
-              left: `${(i * 7) % 100}%`,
-              bottom: `${(i * 2) % 20}px`,
-            }}
-            animate={{
-              y: [-20, -80],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 2 + (i % 2),
-              repeat: Infinity,
-              delay: i * 0.3,
-              ease: 'easeOut',
-            }}
-          />
-        ))}
-      </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        @media (max-width: 640px) {
-          .text-4xl {
-            font-size: 2.5rem;
-          }
-        }
-      `}</style>
     </div>
   )
 }

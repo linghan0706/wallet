@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Jersey_10, Jersey_25 } from 'next/font/google'
+import { Inter, Jersey_10, Jersey_25, Roboto, Exo_2 } from 'next/font/google'
 import '@/styles/globals.css'
 import '@/styles/font.css'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
@@ -20,6 +20,15 @@ const jersey25 = Jersey_25({
   weight: '400',
   variable: '--font-jersey-25',
 })
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-roboto',
+})
+const exo2 = Exo_2({
+  subsets: ['latin'],
+  variable: '--font-exo-2',
+})
 
 export const metadata: Metadata = {
   title: 'Nova Explorer GAME',
@@ -34,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${inter.className} ${jersey10.variable} ${jersey25.variable}`}
+        className={`${inter.className} ${jersey10.variable} ${jersey25.variable} ${roboto.variable} ${exo2.variable}`}
       >
         <AntdRegistry>
           <ConfigProvider locale={zhCN}>

@@ -15,7 +15,7 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
     // 1000000s后加载
     const timer = setTimeout(() => {
       onLoadingComplete?.()
-    },60)
+    }, 6)
 
     // 模拟进度条动画
     const progressTimer = setInterval(() => {
@@ -23,7 +23,7 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
         if (prev >= 100) return 100
         return prev + 2
       })
-    }, 60)
+    }, 60000000)
 
     return () => {
       clearTimeout(timer)
@@ -32,132 +32,34 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
   }, [onLoadingComplete])
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden flex flex-col items-center justify-center">
-      {/* 像素风格背景星星 */}
-      <div className="absolute inset-0">
-        {Array.from({ length: 30 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute bg-white"
-            style={{
-              left: `${(i * 37) % 100}%`,
-              top: `${(i * 73) % 100}%`,
-              width: '2px',
-              height: '2px',
-              imageRendering: 'pixelated',
-            }}
-          />
-        ))}
-      </div>
-
+    <div
+      className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center"
+      style={{
+        backgroundImage: 'url(/LoadingIcon/InitialLoading-bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       {/* 主要内容区域 */}
-      <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto px-6">
-        {/* 中央行星容器 - 作为火箭轨道的中心点 */}
-        <div className="relative mb-8 w-40 h-40 flex items-center justify-center">
-          {/* 中央行星 */}
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            <Image
-              src="/LoadingIcon/IntiaLoadong.png"
-              alt="Nova Explorer Planet"
-              className="object-contain"
-              width={128}
-              height={128}
-              style={{ 
-                imageRendering: 'pixelated',
-                width: 'auto',
-                height: 'auto'
-              }}
-              priority
-            />
-          </div>
-
-          {/* 第一个火箭轨道容器 */}
-          <motion.div
-            className="absolute left-[16px] top-[10px] inset-0 w-[128px] h-[128px]"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              transformOrigin: 'center',
-            }}
-          >
-            {/* 第一个火箭 */}
-            <div
-              className="absolute"
-              style={{
-                top: '0px',
-                left: '50%',
-                marginLeft: '-20px',
-              }}
-            >
-              {/* 火箭主体 */}
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/LoadingIcon/Rocket.png"
-                  alt="Rocket"
-                  width={32}
-                  height={32}
-                  className="object-contain rotate-[-220deg] mt-[-3px]"
-                  style={{ 
-                    imageRendering: 'pixelated',
-                    transform: 'rotate(90deg)',
-                    width: 'auto',
-                    height: 'auto'
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 第二个火箭轨道容器 */}
-          <motion.div
-            className="absolute left-[16px] top-[10px] inset-0 w-[128px] h-[128px]"
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 12,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              transformOrigin: 'center',
-            }}
-          >
-            {/* 第二个火箭 */}
-            <div
-              className="absolute"
-              style={{
-                marginRight: '-12px',
-                bottom: '8px',
-                left: '50%',
-                marginLeft: '-12px',
-              }}
-            >
-              {/* 火箭主体 */}
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/LoadingIcon/Rocket.png"
-                  alt="Rocket"
-                  width={32}
-                  height={32}
-                  className="object-contain rotate-[-250deg] ml-[28px]"
-                  style={{ 
-                    imageRendering: 'pixelated',
-                    transform: 'rotate(-90deg)',
-                    width: 'auto',
-                    height: 'auto'
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
+      <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto px-6 mt-[412px]">
         {/* NovaExplorer 标题 */}
         <h1
-          className="text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-green-400 via-yellow-400 via-orange-400 to-pink-400 bg-clip-text text-transparent font-jersey-10"
+          className="mb-4 font-jersey-10"
+          style={
+            {
+              fontSize: '54px',
+              lineHeight: '32px',
+              fontWeight: 400,
+              textAlign: 'center',
+              background:
+                'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '0px 0px 1px #BC13FE',
+            } as React.CSSProperties
+          }
         >
           NovaExplorer
         </h1>
@@ -166,26 +68,28 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
         <div className="w-full max-w-xs mb-4">
           <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 rounded-full"
+              className="h-full bg-gradient-to-r from-[#00D3F3] via-purple-400 to-[#E377DA] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
             />
-          </div>
-          <div className="flex justify-between text-xs text-gray-400 mt-2">
-            <span>{Math.round(progress)}%</span>
-            <span>Loading</span>
           </div>
         </div>
 
         {/* 加载状态文本 */}
         <p
-          className="text-gray-300 text-lg"
-          style={{
-            fontFamily: "'Exo 2', sans-serif",
-          }}
+          className="font-jersey-10"
+          style={
+            {
+              fontSize: '18px',
+              lineHeight: '22px',
+              fontWeight: 400,
+              textAlign: 'center',
+              color: '#00F0FF',
+            } as React.CSSProperties
+          }
         >
-          Loading NovaExplorer...
+          Loading data..
         </p>
       </div>
 
@@ -210,7 +114,7 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
               duration: 3 + (i % 2),
               repeat: Infinity,
               delay: i * 0.3,
-              ease: "linear",
+              ease: 'linear',
             }}
           />
         ))}
@@ -224,10 +128,14 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
           image-rendering: pixelated;
           image-rendering: crisp-edges;
         }
-        
+
         @media (max-width: 640px) {
-          .text-4xl { font-size: 2rem; }
-          .text-lg { font-size: 1rem; }
+          .text-4xl {
+            font-size: 2rem;
+          }
+          .text-lg {
+            font-size: 1rem;
+          }
         }
       `}</style>
     </div>
