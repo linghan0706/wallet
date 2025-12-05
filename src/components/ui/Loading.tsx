@@ -360,26 +360,29 @@ export default function Loading({ onComplete }: LoadingProps) {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col relative overflow-hidden"
+      className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden"
       data-layout-key="main-container"
       style={{
         background: 'linear-gradient(to top, #0F1226, #0C2957)',
       }}
     >
       {/* 跳过 Skip */}
-      {/* <button
+      <button
         onClick={handleSkip}
         className="absolute top-8 right-6 z-50 bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-full transition-colors font-jersey-10"
       >
         skip
-      </button> */}
+      </button>
 
       {/* 上层图片 Section: Image */}
-      <div className="w-full relative" ref={mainIconRef}>
+      <div
+        className="w-full relative sm:h-auto md:h-auto lg:w-1/2 lg:flex lg:items-center lg:justify-center px-0"
+        ref={mainIconRef}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
-            className="relative w-[393px] flex items-center justify-center"
+            className="relative w-full sm:max-w-[360px] md:max-w-[420px] lg:max-w-[500px] flex items-center justify-center"
             initial={{ opacity: 0, x: 100, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -100, scale: 0.8 }}
@@ -393,11 +396,7 @@ export default function Loading({ onComplete }: LoadingProps) {
               alt={currentData.title}
               width={393}
               height={452}
-              className="object-contain drop-shadow-2xl"
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
+              className="object-contain drop-shadow-2xl w-full h-auto"
               priority
             />
           </motion.div>
@@ -407,7 +406,7 @@ export default function Loading({ onComplete }: LoadingProps) {
       {/* 下层内容 Section: Content */}
       <div
         ref={titleAreaRef}
-        className="flex flex-col items-center justify-center w-[393px] h-[356px] p-[56px_44px] gap-[15px] mx-auto relative z-10 border-t border-[#CED4DD] rounded-[12px]"
+        className="flex flex-col items-center justify-center w-full sm:w-[360px] md:w-[420px] lg:w-1/2 h-auto sm:h-auto md:h-auto lg:h-screen p-4 sm:p-6 md:p-7 lg:p-[80px_60px] gap-3 sm:gap-4 md:gap-5 lg:gap-5 mx-auto lg:mx-0 relative z-10 border-t lg:border-none border-[#CED4DD] rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-none lg:justify-center"
         style={{
           background: 'linear-gradient(to top, #0F1226, #0C2957)',
         }}
@@ -415,7 +414,7 @@ export default function Loading({ onComplete }: LoadingProps) {
         {/* 主要内容  */}
         <div
           className="flex flex-col items-center w-full"
-          style={{ height: '120px' }}
+          style={{ height: 'auto', minHeight: 'fit-content' }}
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -431,7 +430,8 @@ export default function Loading({ onComplete }: LoadingProps) {
               <div
                 style={{
                   width: '100%',
-                  height: '58px',
+                  height: 'auto',
+                  minHeight: '48px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -453,7 +453,8 @@ export default function Loading({ onComplete }: LoadingProps) {
               <div
                 style={{
                   width: '100%',
-                  height: '48px',
+                  height: 'auto',
+                  minHeight: '48px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -476,8 +477,8 @@ export default function Loading({ onComplete }: LoadingProps) {
 
         {/* 描述文本 */}
         <div
+          className="w-full lg:max-w-xs flex items-center justify-center"
           style={{
-            width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -504,8 +505,14 @@ export default function Loading({ onComplete }: LoadingProps) {
         >
           {/* 点点 Dots */}
           <div
-            className="flex flex-row items-center gap-[10px]"
-            style={{ width: '106px', height: '6px', flex: 'none' }}
+            className="flex flex-row items-center gap-2 sm:gap-2.5 md:gap-3 lg:gap-3"
+            style={{
+              width: 'auto',
+              minWidth: '100px',
+              height: '6px',
+              flex: 'none',
+              justifyContent: 'center',
+            }}
           >
             {Array.from({ length: 6 }, (_, i) => {
               const index = i + 1
@@ -514,7 +521,7 @@ export default function Loading({ onComplete }: LoadingProps) {
                 <motion.div
                   key={index}
                   onClick={() => handleDotClick(index)}
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-all"
                   style={{
                     width: isActive ? '26px' : '6px',
                     height: '6px',
@@ -532,12 +539,12 @@ export default function Loading({ onComplete }: LoadingProps) {
 
           {/*回退箭头 Button*/}
           <div
+            className="w-full sm:w-80 md:w-96 lg:min-w-96 px-3 sm:px-0"
             style={{
-              width: '305px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '10px',
+              gap: '8px',
               flex: 'none',
             }}
           >
@@ -546,6 +553,7 @@ export default function Loading({ onComplete }: LoadingProps) {
                 onClick={handlePrev}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                className="transition-transform active:scale-95"
                 style={{
                   background: 'none',
                   border: 'none',
@@ -554,6 +562,8 @@ export default function Loading({ onComplete }: LoadingProps) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  minWidth: '24px',
+                  minHeight: '24px',
                 }}
               >
                 <Image
@@ -568,13 +578,13 @@ export default function Loading({ onComplete }: LoadingProps) {
 
             {/* Next Step Button */}
             <motion.button
-              className="flex items-center justify-center relative"
+              className="flex items-center justify-center relative transition-all flex-1 sm:flex-initial"
               onClick={handleNext}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
                 width: currentPage > 1 ? 'calc(100% - 40px)' : '100%',
-                height: '22px',
+                minHeight: '22px',
                 background:
                   'linear-gradient(90deg, rgba(0, 240, 255, 0.8) 0%, rgba(0, 102, 255, 0.8) 100%)',
                 borderRadius: '5px',
@@ -583,7 +593,7 @@ export default function Loading({ onComplete }: LoadingProps) {
               }}
             >
               <span
-                className="font-jersey-10"
+                className="font-jersey-10 text-xs sm:text-sm md:text-base lg:text-base whitespace-nowrap"
                 style={{
                   fontSize: '14px',
                   lineHeight: '22px',

@@ -18,15 +18,15 @@ export default function UserHeader() {
     <header className="fixed top-[25px] left-1/2 -translate-x-1/2 z-50 w-[363px] h-12">
       {/* 主容器 */}
       <div
-        className="flex items-center justify-between gap-16 p-0 w-full h-full rounded-[12px]  border-solid backdrop-blur-[20px]  border-white/30 border-image-[linear-gradient(270deg,rgba(255,255,255,0.3)_5%,rgba(255,255,255,0.3)_30%)]  shadow-[0_0_10px_0_#BC13FECC] shadow-[0_1px_5px_0_#1EDDD6] "
+        className="flex items-center justify-between gap-16 p-0 w-full h-full rounded-[9px] border-solid backdrop-blur-[20px] shadow-[0px_1px_5px_#1EDDD6] shadow-[0px_0px_10px_rgba(188,19,254,0.8)]"
         style={{
-          borderImage:
-            'linear-gradient(270deg, rgba(255, 255, 255, 0.3) 5%, rgba(255, 255, 255, 0.3) 30%) 1',
-          WebkitBackdropFilter: 'blur(20px)',
+          background:
+            'linear-gradient(#141A2F, #141A2F), linear-gradient(rgba(20, 20, 35, 70%), rgba(20, 20, 35, 70%));',
+          mixBlendMode: 'plus-lighter',
         }}
       >
         {/* 用户信息区 */}
-        <div className="flex items-center shrink-0 gap-2.5 w-20 h-10">
+        <div className="flex items-center shrink-0 gap-2.5 w-20 h-10 ml-[20px]">
           {/* 用户头像 */}
           <Image
             src="/components/layout/NavIcon/HomeIcon.png"
@@ -37,13 +37,13 @@ export default function UserHeader() {
           />
 
           {/* 用户名 */}
-          <span className="text-white text-center shrink-0 jersey-font-lg">
+          <span className="text-white text-center shrink-0 font-jersey-10">
             Alen
           </span>
         </div>
 
         {/* 资产信息区 */}
-        <div className="flex items-center justify-center gap-1.5 shrink-0 h-[46px]">
+        <div className="flex items-center justify-center gap-1.5 shrink-0 h-[46px] mr-3.5">
           {/* Power资产 */}
           <div className="flex items-center justify-center gap-0.5 rounded-full p-2 shrink-0 w-[72px] h-[46px]">
             <Image src={powerIcon} alt="power" width={30} height={30} />

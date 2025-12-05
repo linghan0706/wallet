@@ -23,7 +23,7 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
         if (prev >= 100) return 100
         return prev + 2
       })
-    }, 60000000)
+    }, 6)
 
     return () => {
       clearTimeout(timer)

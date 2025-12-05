@@ -2,7 +2,6 @@
 import MotionDiv from '@/components/motion/MotionDiv'
 import { useCallback, useEffect, useState } from 'react'
 
-import backImage from '@/public/backImage.png'
 import Image from 'next/image'
 import { fetchTasksCenter, checkTaskProgress } from '@/utils/api/task/api'
 import type { Datum } from '@/types/tasks'
@@ -77,19 +76,8 @@ export default function TaskPage() {
       {/* 背景容器 */}
       <div
         className="fixed inset-0 bg-gradient-to-b from-[#5E32AC] via-[#3D1A78] to-[#1A0B2E] bg-cover bg-contain"
-        style={{ backgroundImage: `url(${backImage.src})` }}
-      >
-        {/* 椭圆径向渐变遮罩层 */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse at center, rgba(107,10,233,0.4) 0%, rgba(100,16,177,0.2) 40%, rgba(94,50,172,0.1) 80%)',
-            backdropFilter: 'blur(5px)',
-            WebkitBackdropFilter: 'blur(15px)',
-          }}
-        ></div>
-      </div>
+        style={{ backgroundImage: `url(/layout/back.png)` }}
+      ></div>
 
       {/* 头部标题区域*/}
       <div className="flex flex-col items-center pt-12 sm:pt-16 space-y-3 sm:space-y-4 relative z-10 px-4">

@@ -1,10 +1,8 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-
-import Image from 'next/image'
 
 interface NavItem {
   id: string
@@ -13,210 +11,115 @@ interface NavItem {
   icon: string
   isCenter?: boolean
 }
+//伪元素实现发光边框和内阴影效果
+const NAV_WRAPPER_CLASS =
+  "relative w-full max-w-[363px] mb-[14px] mx-auto h-[80px] flex items-center justify-center rounded-[25px] shadow-[0_12px_30px_rgba(5,5,16,0.65)] before:content-[''] before:absolute before:inset-0 before:rounded-[25px] before:opacity-80 before:bg-[linear-gradient(90deg,_#606070_0%,_#BC13FE_27%,_#00F0FF_45%,_#BC13FE_54%,_#B0B0C0_100%)] after:content-[''] after:absolute after:inset-[5px] after:rounded-[25px] after:bg-[radial-gradient(circle_at_20%_20%,_rgba(13,55,104,0.92)_0%,_rgba(13,55,104,0.8)_35%,_rgba(6,27,58,0.95)_100%)] after:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),_inset_0_-6px_18px_rgba(6,16,33,0.9)]"
+const NAV_CONTENT_CLASS =
+  'relative z-10 max-w-[363px] h-[80px] px-10 flex items-center justify-center mb-[14px]'
 
 const navItems: NavItem[] = [
   {
     id: 'task',
     label: '待办事项',
     path: '/task',
-    icon: '/components/layout/NavIcon/TaskIcon.png',
+    icon: '/layout/NavCion/task.png',
   },
   {
     id: 'store',
     label: '购物袋',
     path: '/store',
-    icon: '/components/layout/NavIcon/StoreIcon.png',
+    icon: '/layout/NavCion/store.png',
   },
   {
     id: 'base',
     label: '火箭',
     path: '/base',
-    icon: '/components/layout/NavIcon/RocketIcon.png',
+    icon: '/layout/NavCion/base.png',
     isCenter: true,
   },
   {
     id: 'backpack',
     label: '包裹',
     path: '/backpack',
-    icon: '/components/layout/NavIcon/Backpack.png',
+    icon: '/layout/NavCion/backpack.png',
   },
   {
     id: 'home',
     label: '个人中心',
     path: '/home',
-    icon: '/components/layout/NavIcon/HomeIcon.png',
+    icon: '/layout/NavCion/home.png',
   },
 ]
+
+const buildCircleClasses = (isActive: boolean) => {
+  const shadowClass = isActive
+    ? 'shadow-[0px_0px_11px_#B0B0C0,_inset_0px_0px_9px_#B0B0C0]'
+    : 'shadow-[0px_1px_1px_#FFFFFF,_0px_-1px_1px_#B0B0C0]'
+
+  return [
+    'box-border relative flex items-center justify-center rounded-full border border-white/25 transition-all duration-300 ease-in-out bg-[#0a1d3d]/90 w-[55px] h-[55px]',
+    shadowClass,
+  ].join(' ')
+}
+
+const buildCircleSurfaceStyle = (): CSSProperties => ({
+  backgroundColor: 'rgba(10, 29, 61, 0.95)',
+  backgroundImage:
+    'linear-gradient(0deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45))',
+})
+
+const buildIconMaskStyle = (
+  icon: string,
+  isActive: boolean
+): CSSProperties => ({
+  width: 55,
+  height: 55,
+  display: 'inline-block',
+  backgroundImage: `url(${icon})`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  backgroundSize: '55px 55px',
+  ...(isActive
+    ? {}
+    : {
+        filter: 'brightness(0.35) saturate(0.8)',
+      }),
+})
+
 export default function BottomNavigation() {
   const pathname = usePathname()
 
   return (
-    <div className="w-full h-[60px] flex items-center px-6 relative">
-      {/* SVG 背景 */}
-      <svg
-        className="absolute inset-0 w-full h-full z-0"
-        viewBox="0 0 393 60"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-      >
-        <foreignObject x="-4" y="-4" width="401" height="68">
-          <div
-            style={{
-              backdropFilter: 'blur(2px)',
-              clipPath: 'url(#bgblur_0_2824_15_clip_path)',
-              height: '100%',
-              width: '100%',
-            }}
-          />
-        </foreignObject>
-        <path
-          data-figma-bg-blur-radius="4"
-          d="M155.386 0C160.414 0.000211198 164 4.97163 164 10C164 28.2254 178.775 43 197 43C215.225 43 230 28.2254 230 10C230 4.97163 233.586 0.000221256 238.614 0H385C389.418 0 393 3.58172 393 8V52C393 56.4183 389.418 60 385 60H8C3.58172 60 0 56.4183 0 52V8C0 3.58172 3.58172 0 8 0H155.386Z"
-          fill="url(#paint0_linear_2824_15)"
-          fillOpacity="0.8"
-        />
-        <defs>
-          <clipPath id="bgblur_0_2824_15_clip_path" transform="translate(4 4)">
-            <path d="M155.386 0C160.414 0.000211198 164 4.97163 164 10C164 28.2254 178.775 43 197 43C215.225 43 230 28.2254 230 10C230 4.97163 233.586 0.000221256 238.614 0H385C389.418 0 393 3.58172 393 8V52C393 56.4183 389.418 60 385 60H8C3.58172 60 0 56.4183 0 52V8C0 3.58172 3.58172 0 8 0H155.386Z" />
-          </clipPath>
-          <linearGradient
-            id="paint0_linear_2824_15"
-            x1="384.79"
-            y1="50"
-            x2="94.2339"
-            y2="-139.69"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="#182253" />
-            <stop offset="1" stopColor="#2B1753" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div className="flex items-center justify-between h-full w-full relative z-10">
-        {navItems.map(item => {
-          const isActive =
-            pathname === item.path ||
-            (item.path === '/base' && pathname === '/')
+    <div className={NAV_WRAPPER_CLASS}>
+      <div className={NAV_CONTENT_CLASS}>
+        <nav className="flex items-center justify-center w-full gap-[9px] mt-3.5">
+          {navItems.map(item => {
+            const isActive =
+              pathname === item.path ||
+              (item.path === '/base' && pathname === '/')
 
-          return (
-            <Link
-              key={item.id}
-              href={item.path}
-              prefetch={false}
-              className={`relative flex items-center justify-center transition-all duration-300 ${
-                item.isCenter
-                  ? 'w-[49px] h-[49px] rounded-full -translate-y-5'
-                  : 'w-12 h-12'
-              }`}
-              style={
-                item.isCenter
-                  ? {
-                      background:
-                        'linear-gradient(275.69deg, #182253 3.41%, #2B1753 99.3%)',
-                    }
-                  : {}
-              }
-            >
-              <motion.div
-                className="absolute inset-0"
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-              />
-              {/* 图标容器 */}
-              <div
-                className={`relative flex items-center justify-center ${
-                  item.isCenter ? 'w-10 h-10' : 'w-10 h-10'
-                }`}
+            return (
+              <Link
+                key={item.id}
+                href={item.path}
+                prefetch={false}
+                aria-label={item.label}
+                className="flex items-center justify-center"
               >
-                <Image
-                  src={item.icon}
-                  alt={item.label}
-                  width={40}
-                  height={40}
-                  className={`
-                    transition-all duration-300 ease-in-out
-                    ${
-                      isActive
-                        ? 'brightness-100 saturate-100'
-                        : 'brightness-50 saturate-50 hover:brightness-75 hover:saturate-75'
-                    }
-                    ${item.isCenter ? 'filter drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' : ''}
-                  `}
-                  style={{
-                    width: 'auto',
-                    height: 'auto',
-                  }}
-                />
-
-                {/* 激活状态的光晕效果
-                 *采用径向渐变和模糊滤镜来实现
-                 */}
-                {isActive && !item.isCenter && (
-                  <motion.div
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      background:
-                        'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(29, 78, 216, 0.1) 100%)',
-                      filter: 'blur(6px)',
-                      zIndex: -1,
-                      transform: 'scale(1.2)',
-                    }}
-                    animate={{
-                      opacity: [0.6, 0.9, 0.6],
-                      scale: [1.1, 1.3, 1.1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
+                <span
+                  className={buildCircleClasses(isActive)}
+                  style={buildCircleSurfaceStyle()}
+                >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none"
+                    style={buildIconMaskStyle(item.icon, isActive)}
                   />
-                )}
-              </div>
-
-              {/* 中心火箭图标的蓝色光晕效果 */}
-              {item.isCenter && (
-                <>
-                  {/* 底部蓝色光晕渐变 */}
-                  <motion.div
-                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-8 rounded-full opacity-60"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.6) 0%, rgba(29, 78, 216, 0.4) 50%, transparent 100%)',
-                      filter: 'blur(8px)',
-                    }}
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.6, 0.8, 0.6],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                  {/* 圆形容器的呼吸效果 */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full border border-slate-500/30 "
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(59, 130, 246, 0.4)',
-                        '0 0 0 8px rgba(59, 130, 246, 0.1)',
-                        '0 0 0 0 rgba(59, 130, 246, 0.4)',
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                  />
-                </>
-              )}
-            </Link>
-          )
-        })}
+                </span>
+              </Link>
+            )
+          })}
+        </nav>
       </div>
     </div>
   )
