@@ -104,7 +104,7 @@ export default function TaskPage() {
             {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={`task-skeleton-${index}`}
-                className="h-[80px] sm:h-[88px] rounded-[14px] sm:rounded-[16px] border border-white/10 bg-white/5 animate-pulse"
+                className="h-[80px] w-[363px] rounded-[15px] bg-[rgba(0,0,0,0.1)] shadow-[inset_0px_0px_5px_rgba(0,0,0,0.2)] backdrop-blur-[1.5px]"
               />
             ))}
           </div>
@@ -166,28 +166,11 @@ export default function TaskPage() {
           return (
             <MotionDiv
               key={task.taskId}
-              className="relative w-full h-[80px] sm:h-[88px]"
+              className="relative w-full h-[80px] rounded-[15px] bg-[rgba(0,0,0,0.1)] shadow-[inset_0px_0px_5px_rgba(0,0,0,0.2)] backdrop-blur-[1.5px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.08 }}
             >
-              {/* 背景模糊*/}
-              <div
-                className="absolute inset-0 backdrop-blur-[25px] rounded-[14px] sm:rounded-[16px] border border-white/10"
-                style={{ backdropFilter: 'blur(25px)' }}
-              />
-
-              {/* 主背景  */}
-              <div
-                className="absolute inset-0 rounded-[14px] sm:rounded-[16px]"
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(34,26,76,0.9) 0%, rgba(34,26,76,0.7) 100%)',
-                  boxShadow:
-                    '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-                }}
-              />
-
               {/* 内容容器 */}
               <div className="relative w-full h-full flex items-center px-3 sm:px-4">
                 {/* 左侧图标和文本区域 */}
@@ -227,20 +210,22 @@ export default function TaskPage() {
                     </div>
 
                     {/* 奖励信息 */}
-                    <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="flex flex-row justify-between items-center p-0 gap-[6px] w-[62px] h-[25px]">
                       {/* 徽章图标 */}
                       {showRewardIcon ? (
-                        <Image
-                          src={primaryRewardIcon}
-                          alt="reward"
-                          width={26}
-                          height={26}
-                          className="flex-shrink-0"
-                          style={{ width: 'auto', height: 'auto' }}
-                        />
+                        <div className="w-[20px] h-[25px] m-auto">
+                          <Image
+                            src={primaryRewardIcon}
+                            alt="reward"
+                            width={20}
+                            height={25}
+                            className="flex-shrink-0"
+                            style={{ width: 'auto', height: 'auto' }}
+                          />
+                        </div>
                       ) : null}
                       {/* 奖励数值 */}
-                      <span className="text-white text-[14px] sm:text-[16px] leading-[22px] sm:leading-[20px] font-normal font-exo2 text-center">
+                      <span className="w-[40px] h-[25px] m-auto font-jersey-10 font-normal text-[14px] leading-[22px] text-white text-center flex-none order-1 flex-grow-0">
                         +{rewardDisplay}
                       </span>
                     </div>
@@ -252,12 +237,12 @@ export default function TaskPage() {
                   {/* 进度条 */}
                   {showProgress && (
                     <div className="flex flex-col items-center w-[65px] justify-end mb-[-17px]">
-                      <span className="text-white text-[11px] font-jersey-25 text-center leading-tight">
+                      <span className="font-jersey-10 font-normal text-[14px] leading-[20px] text-center text-white text-shadow-[1px_0px_0px_#6B0AE9]">
                         {currentProgressDisplay}/{totalRequirementDisplay}
                       </span>
                       <div className="w-full h-[7px] bg-gray-700/50 rounded-full overflow-hidden mb-1 border border-white/10">
                         <div
-                          className="h-full bg-gradient-to-r from-[#EE3BA7] to-[#B448FB] transition-all duration-200 rounded-full shadow-sm"
+                          className="h-full bg-gradient-to-r from-[#00D3F3] to-[#E377DA] transition-all duration-200 rounded-full shadow-sm"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
@@ -268,20 +253,33 @@ export default function TaskPage() {
                   <div className="flex-shrink-0">
                     <button
                       className={`
-                         px-3 sm:px-4 py-1.5 sm:py-2 rounded-[8px] w-[69px] height-[34px] sm:rounded-[12px] min-w-[70px] sm:min-w-[80px] h-[36px] sm:h-[40px]
+                         w-[48px] h-[48px] sm:w-[80px] sm:h-[40px]
+                         rounded-[8px] sm:rounded-[12px]
                          flex items-center justify-center
-                         text-white text-[16px] sm:text-[16px] leading-[22px] sm:leading-[20px] font-normal font-jersey-10
                          transition-all duration-300 transform
-                         ${
-                           isButtonDisabled
-                             ? 'bg-gray-600/60 cursor-not-allowed opacity-70'
-                             : 'bg-gradient-to-r from-[#6B0AE9] to-[#6410B1] hover:from-[#7B1AF9] hover:to-[#7420C1] hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl active:scale-95'
-                         }
                        `}
-                      disabled={isButtonDisabled}
                       onClick={() => handleTaskAction(task)}
                     >
-                      {buttonLabel}
+                      {task.status === 'completed' ? (
+                        <div className="relative w-6 h-6">
+                          <Image
+                            src="/currency/InStatus.png"
+                            alt="Completed"
+                            width={48}
+                            height={48}
+                            className="-rotate-45"
+                          />
+                        </div>
+                      ) : (
+                        <div className="relative w-6 h-6">
+                          <Image
+                            src="/currency/InCompleted.png"
+                            alt="Incomplete"
+                            width={48}
+                            height={48}
+                          />
+                        </div>
+                      )}
                     </button>
                   </div>
                 </div>

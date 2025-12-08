@@ -65,7 +65,7 @@ export default function StoresTransactionCard({
   const handleConfirm = () => onConfirm?.(active.name, quantity)
 
   return (
-    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[90vw] max-w-[520px] h-[60vh] max-h-[480px] text-white rounded-[12px] border border-white/10 bg-[url('/Popup/taskupback.svg')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[317px] h-[456.19px] text-white rounded-[12px] border border-white/10 bg-[url('/stores/storeupback.png')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
       {/* 兑换关闭 */}
       <button
         aria-label="Close"
@@ -81,12 +81,27 @@ export default function StoresTransactionCard({
       </h3>
 
       {/* 道具支付图标容器 */}
-      <div className="flex flex-col justify-center items-center p-0 w-[192px] h-[192px]">
-        <Image src={iconSrc} alt="item" width={192} height={192} priority />
+      <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconback.png')] bg-cover rounded-[12px] mt-[52px]">
+        <div className="w-[126px] h-[148px] box-border rounded-[12px]">
+          <Image src={iconSrc} alt="item" width={126} height={148} priority />
+        </div>
+        <div
+          className="w-[100px] h-[6px] rounded-[12px]"
+          style={{
+            background:
+              'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 0%, rgba(0, 240, 255, 0.25) 20%, rgba(26, 26, 64, 0.25) 75%, rgba(0, 102, 255, 0.25) 100%)',
+          }}
+        />
       </div>
 
       {/* 数量选择器 */}
-      <div className="flex items-center gap-3 mt-1">
+      <div
+        className="flex items-center gap-3 mt-1 w-[100px] h-[22px] border-[#00F0FFCC] border-[1px] rounded-[8px]"
+        style={{
+          background:
+            'linear-gradient(0deg, rgba(188, 19, 254, 0.2), rgba(188, 19, 254, 0.2)), rgba(0, 240, 255, 0.2)',
+        }}
+      >
         <button
           onClick={handleDec}
           aria-label="Decrease"
@@ -95,11 +110,11 @@ export default function StoresTransactionCard({
           <Image
             src="/currency/leftButton.svg"
             alt="Decrease"
-            width={14}
-            height={14}
+            width={6}
+            height={22}
           />
         </button>
-        <span className="font-roboto font-bold text-[18px]">{quantity}</span>
+        <span className="font-jersey-10 font-bold text-[16px]">{quantity}</span>
         <button
           onClick={handleInc}
           aria-label="Increase"
@@ -108,8 +123,8 @@ export default function StoresTransactionCard({
           <Image
             src="/currency/rightButton.svg"
             alt="Increase"
-            width={14}
-            height={14}
+            width={6}
+            height={22}
           />
         </button>
       </div>
@@ -136,7 +151,6 @@ export default function StoresTransactionCard({
             <button
               key={c.name}
               onClick={() => setActiveIndex(idx)}
-              aria-pressed={isActive}
               className={`group w-[91px] h-[64px] rounded-lg border border-white/10 flex flex-col justify-between items-start p-2 ${
                 isActive
                   ? `${activeBg} text-[#1A1A1A]`
@@ -171,8 +185,14 @@ export default function StoresTransactionCard({
 
       {/* 支付 */}
       <button
-        className="mt-auto w-[85%] h-[52px] rounded-[12px] bg-[linear-gradient(156.71deg,#7C3AED_2.78%,#6D28D9_99.22%)] text-white font-jersey-10 font-bold text-[18px] leading-[22px]"
+        className="mt-auto w-[285px] h-[42px] rounded-[8px] text-white font-jersey-10 font-normal text-[18px] leading-[22px]"
         onClick={handleConfirm}
+        style={{
+          background:
+            'linear-gradient(98.64deg, rgba(0, 240, 255, 0.8) 0%, rgba(188, 19, 254, 0.8) 99.34%)',
+          boxShadow:
+            '0px 1px 1px #BC13FE, 0px -1px 1px #00F0FF, inset 0px 1px 1px #BC13FE, inset 0px -1px 1px #00F0FF',
+        }}
       >
         Confirm the transaction
       </button>
