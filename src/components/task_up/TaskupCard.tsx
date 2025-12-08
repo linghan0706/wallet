@@ -90,7 +90,7 @@ export default function TaskupCard({
             alt="loading"
             width={100}
             height={100}
-            classiName="w-[100px] h-[100px] animate-spin"
+            className="w-[100px] h-[100px] animate-spin"
           ></Image>
         </div>
       )}
