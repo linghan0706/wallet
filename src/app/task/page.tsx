@@ -176,22 +176,16 @@ export default function TaskPage() {
                 {/* 左侧图标和文本区域 */}
                 <div className="flex items-center flex-1 min-w-0">
                   {/* 图标容器  */}
-                  <div className="w-[48px] h-[48px] sm:w-[48px] sm:h-[48px] flex items-center justify-center relative flex-shrink-0">
+                  <div className="w-[50px] h-[50px] sm:w-[50px] sm:h-[50px] flex items-center justify-center relative flex-shrink-0">
                     {/* 图标背景圆圈 */}
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, rgba(107,10,233,0.3) 0%, rgba(100,16,177,0.3) 100%)',
-                      }}
-                    />
+                    <div className="absolute inset-0" />
                     {/* 主任务图标 */}
                     {hasTaskIconImage ? (
                       <Image
                         src={taskIconPath}
                         alt={task.taskName}
-                        width={48}
-                        height={48}
+                        width={50}
+                        height={50}
                         className="relative z-10"
                         style={{ width: 'auto', height: 'auto' }}
                       />
