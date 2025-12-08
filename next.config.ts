@@ -8,6 +8,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
+  turbopack: {},
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
