@@ -100,7 +100,7 @@ const buildCircleSurfaceStyle = (isActive: boolean): CSSProperties =>
   isActive
     ? {
         backgroundImage:
-          'radial-gradient(40% 40% at 50% 50%, rgba(5, 5, 16, 0.5) 0%, rgba(0, 240, 255, 0.5) 75.52%, rgba(5, 5, 16, 0.5) 100%)',
+          'radial-gradient(50% 50% at 50% 50%, rgba(5, 5, 16, 0.5) 0%, rgba(0, 240, 255, 0.5) 75.52%, rgba(5, 5, 16, 0.5) 100%)',
         mixBlendMode: 'normal',
       }
     : {
