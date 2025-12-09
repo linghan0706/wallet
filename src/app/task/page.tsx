@@ -166,7 +166,12 @@ export default function TaskPage() {
           return (
             <MotionDiv
               key={task.taskId}
-              className="relative w-full h-[80px] rounded-[15px] bg-[rgba(0,0,0,0.1)] shadow-[inset_0px_0px_5px_rgba(0,0,0,0.2)] backdrop-blur-[1.5px]"
+              className="relative w-full h-[80px] rounded-[15px] backdrop-blur-[8.4px] border border-transparent"
+              style={{
+                borderImage:
+                  'linear-gradient(90deg, #00F0FF 0%, #FFFFFF 33%, #FFFFFF 66%, #BC13FE 100%) 1',
+                background: 'transparent',
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.08 }}
@@ -219,7 +224,7 @@ export default function TaskPage() {
                       ) : null}
                       {/* 奖励数值 */}
                       <span className="w-[40px] h-[25px] m-auto font-jersey-10 font-normal text-[14px] leading-[22px] text-white text-center flex-none order-1 flex-grow-0">
-                        +{rewardDisplay}
+                        .{rewardDisplay}
                       </span>
                     </div>
                   </div>
@@ -259,7 +264,7 @@ export default function TaskPage() {
                             alt="Completed"
                             width={48}
                             height={48}
-                            className="object-contain -rotate-45"
+                            className="object-contain "
                           />
                         </div>
                       ) : (
