@@ -224,7 +224,7 @@ export default function TaskPage() {
                       ) : null}
                       {/* 奖励数值 */}
                       <span className="w-[40px] h-[25px] m-auto font-jersey-10 font-normal text-[14px] leading-[22px] text-white text-center flex-none order-1 flex-grow-0">
-                        .{rewardDisplay}
+                        ·{rewardDisplay}
                       </span>
                     </div>
                   </div>
