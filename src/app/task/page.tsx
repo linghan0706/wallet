@@ -182,12 +182,15 @@ export default function TaskPage() {
                     {/* 主任务图标 */}
                     {hasTaskIconImage ? (
                       <Image
-                        src={taskIconPath}
+                        src={
+                          isCompleted
+                            ? '/currency/InStatus.png'
+                            : '/currency/InCompleted.png'
+                        }
                         alt={task.taskName}
                         width={50}
                         height={50}
-                        className="relative z-10"
-                        style={{ width: 'auto', height: 'auto' }}
+                        className="relative z-10 object-contain"
                       />
                     ) : (
                       <span className="text-[24px] sm:text-[28px] relative z-10">
