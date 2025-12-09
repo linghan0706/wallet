@@ -182,15 +182,11 @@ export default function TaskPage() {
                     {/* 主任务图标 */}
                     {hasTaskIconImage ? (
                       <Image
-                        src={
-                          isCompleted
-                            ? '/currency/InStatus.png'
-                            : '/currency/InCompleted.png'
-                        }
+                        src={taskIconPath}
                         alt={task.taskName}
                         width={50}
                         height={50}
-                        className="relative z-10 object-contain"
+                        className="relative z-10"
                       />
                     ) : (
                       <span className="text-[24px] sm:text-[28px] relative z-10">
@@ -246,7 +242,6 @@ export default function TaskPage() {
                     </div>
                   )}
 
-                  {/* Check 按钮  */}
                   <div className="flex-shrink-0">
                     <button
                       className={`
@@ -257,23 +252,24 @@ export default function TaskPage() {
                        `}
                       onClick={() => handleTaskAction(task)}
                     >
-                      {task.status === 'completed' ? (
-                        <div className="relative w-6 h-6">
+                      {isCompleted ? (
+                        <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
                             src="/currency/InStatus.png"
                             alt="Completed"
                             width={48}
                             height={48}
-                            className="-rotate-45"
+                            className="object-contain -rotate-45"
                           />
                         </div>
                       ) : (
-                        <div className="relative w-6 h-6">
+                        <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
                             src="/currency/InCompleted.png"
                             alt="Incomplete"
                             width={48}
                             height={48}
+                            className="object-contain"
                           />
                         </div>
                       )}
