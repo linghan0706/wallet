@@ -166,7 +166,7 @@ export default function TaskPage() {
           return (
             <MotionDiv
               key={task.taskId}
-              className="relative w-full h-[80px] rounded-[15px] backdrop-blur-[8.4px] border border-transparent"
+              className="relative w-full h-[80px] rounded-[8px] backdrop-blur-[8.4px] border  border-transparent"
               style={{
                 borderImage:
                   'linear-gradient(90deg, #00F0FF 0%, #FFFFFF 33%, #FFFFFF 66%, #BC13FE 100%) 1',
@@ -257,20 +257,20 @@ export default function TaskPage() {
                        `}
                       onClick={() => handleTaskAction(task)}
                     >
-                      {isCompleted ? (
+                      {!task.buttonEnabled ? (
                         <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
-                            src="/currency/InStatus.png"
+                            src="/currency/InCompleted.png"
                             alt="Completed"
                             width={48}
                             height={48}
-                            className="object-contain "
+                            className="object-contain"
                           />
                         </div>
                       ) : (
                         <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
-                            src="/currency/InCompleted.png"
+                            src="/currency/InStatus.png"
                             alt="Incomplete"
                             width={48}
                             height={48}
