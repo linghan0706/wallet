@@ -6,12 +6,6 @@ type TaskupType = 'Continue' | 'Retry' | '' | undefined
 
 {
   /*
-   * 缺失背景图层、状态图标、中心L加载图，需补充
-   */
-}
-
-{
-  /*
   * 任务进度json
 {
   id: number          //任务进度id，id：1完成，id：2：失败，id：3：任务进行扫描中
@@ -40,7 +34,21 @@ interface TaskupCardProps {
   loading?: boolean
   activeId?: number
 }
-
+{
+  /*
+  * 任务进度卡片组件
+  *图层需要分级显示
+  1.加载中loading
+  2.任务完成
+  3.任务失败
+  4.任务扫描中
+  传入参数：
+  items：任务进度json数组
+  loading：是否加载中
+  activeId：当前激活的任务进度id
+  默认显示第一个任务进度
+    */
+}
 const defaultItems: TaskupItem[] = [
   {
     id: 1,

@@ -87,8 +87,12 @@ export default function AutomaticCollectorGrid({
             validity={`Validity: ${item.validity_period ?? 3} Days`}
             dailyCap={`Daily Energy Cap +${item.ceiling ?? 50}%`}
             icon={item.icon}
-            onPurchase={(payload) => {
-              const p = payload ?? { id: item.title, icon: item.icon, title: item.title }
+            onPurchase={payload => {
+              const p = payload ?? {
+                id: item.title,
+                icon: item.icon,
+                title: item.title,
+              }
               if (onPurchase) onPurchase(p)
               else emitPurchase(p)
             }}

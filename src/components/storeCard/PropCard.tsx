@@ -8,49 +8,123 @@ interface PropCardProps {
   validity?: string
   dailyCap?: string
   icon?: string
-  onPurchase?: (payload?: { id?: string; icon?: string; title?: string }) => void
+  onPurchase?: (payload?: {
+    id?: string
+    icon?: string
+    title?: string
+  }) => void
 }
 
-export function PropCard({ title, validity = 'Validity: 3 Days', dailyCap = 'Daily Energy Cap +50%', icon, onPurchase }: PropCardProps) {
+export function PropCard({
+  title,
+  validity = 'Validity: 3 Days',
+  dailyCap = 'Daily Energy Cap +50%',
+  icon,
+  onPurchase,
+}: PropCardProps) {
+  const handleClick = () => {
+    onPurchase?.({
+      id: title,
+      icon,
+      title,
+    })
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative w-[158px] h-[208px] rounded-[12px]"
+      className="relative w-[157.53px] h-[166px] rounded-[12px] overflow-hidden cursor-pointer select-none"
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleClick()
+        }
+      }}
     >
+      {/* 渐变边框容器 */}
       <div
         className="absolute inset-0 rounded-[12px]"
         style={{
-          background: '#432A85',
-          border: '1px solid #6E6E6E'
+          borderRadius: '12px',
+          border: '1px solid transparent',
+          backgroundImage:
+            'linear-gradient(#1A1A40, #1A1A40), linear-gradient(136.39deg, #00F0FF 8.54%, rgba(255, 255, 255, 0) 30.01%, rgba(255, 255, 255, 0) 72.95%, #00F0FF 94.42%)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center justify-between h-full p-3 w-full">
-      <div className='w-[144px] h-[154px] flex flex-col items-center rounded-[12px]  bg-[linear-gradient(0deg,#221A4C,#221A4C),linear-gradient(156.71deg,#6B0AE9_2.78%,#6410B1_99.22%)]'>
-          <div className="w-16 h-17  flex items-center justify-center text-2xl overflow-hidden pt-3.5">
+      <div className="relative z-10 flex flex-col items-center justify-between h-full p-0 w-full">
+        {/* 顶部：道具标题 */}
+        <div className="flex flex-row justify-center items-center pt-[5px] w-[105.59px] h-[22px]">
+          <div
+            className="font-jersey-10 text-white text-[24px] leading-[22px] text-center whitespace-nowrap mt-0.5 overflow-hidden"
+            style={{ textShadow: '0px 0px 1px #BC13FE' }}
+          >
+            {title}
+          </div>
+        </div>
+
+        {/* 中间：道具图片 */}
+        <div
+          className="absolute w-[158px] h-[100px] flex items-center justify-center"
+          style={{
+            left: 'calc(50% - 158px/2 + 0.24px)',
+            top: 'calc(50% - 100px/2 - 2px)',
+          }}
+        >
+          {/* 背景图层 */}
+          <div
+            className="absolute inset-0 w-[158px] h-[100px]"
+            style={{
+              boxSizing: 'border-box',
+              background:
+                'linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 240, 255, 0.15) 75%, rgba(255, 255, 255, 0.176) 87.5%, rgba(255, 255, 255, 0.2) 100%), linear-gradient(180deg, rgba(188, 19, 254, 0.08) 0%, rgba(0, 102, 255, 0.32) 25%, rgba(0, 240, 255, 0.64) 50%, rgba(0, 102, 255, 0.32) 75%, rgba(188, 19, 254, 0.08) 100%)',
+              backgroundImage: 'url(/stores/propiconback.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
+
           {icon ? (
-            <Image src={icon} alt={title} width={64} height={64} />
+            <div className="relative z-10">
+              <Image
+                src={icon}
+                alt={title}
+                width={100}
+                height={100}
+                className="w-[100px] h-[100px] object-contain"
+              />
+            </div>
           ) : (
-            <span role="img" aria-label="gift">道具</span>
+            <div className="relative z-10">
+              <span role="img" aria-label="gift" className="text-4xl">
+                🎁
+              </span>
+            </div>
           )}
         </div>
 
-     
-        <div className="text-center propcard-text">
-          <div className="prop-title text-white font-jersey-10 text-[20px]  ">{title}</div>
-          <div className="prop-validity text-[#B2B2B2] font-exo2 text-[10px] leading-[14px]">{validity}</div>
-          <div className="prop-cap mt-2 text-[#B2B2B2] font-exo2 text-[10px] leading-[14px]">{dailyCap}</div>
-        </div>
-      </div>
-
-        <button
-          className="mt-2 w-[144px] h-[34px] rounded-[8px] bg-[linear-gradient(0deg,#221A4C,#221A4C),linear-gradient(156.71deg,#6B0AE9_2.78%,#6410B1_99.22%)]  text-white font-jersey-25 text-[16px] transition-all shadow-lg"
-          onClick={() => onPurchase?.({ id: title, icon, title })}
+        {/* 底部：道具信息 */}
+        <div
+          className="absolute bottom-0 w-full flex flex-col items-center pb-[10px]"
+          style={{ height: '14px', top: '140px' }}
         >
-          purchase
-        </button>
+          <div className="flex flex-row justify-center items-center gap-[6px] w-full">
+            <div className="font-jersey-10 text-[#00F0FF] text-[8px] leading-[14px] flex items-center justify-center text-center w-[56px] h-[14px] whitespace-nowrap overflow-hidden">
+              {validity}
+            </div>
+            <div className="font-jersey-10 text-[#00F0FF] text-[8px] leading-[14px] flex items-center justify-center text-center w-[70px] h-[14px]  whitespace-nowrap overflow-hidden">
+              {dailyCap}
+            </div>
+          </div>
+        </div>
       </div>
     </motion.div>
   )

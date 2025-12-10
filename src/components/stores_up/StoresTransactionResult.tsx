@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 
 type TransactionName = 'Payment successful' | 'Payment failed'
@@ -29,19 +30,44 @@ export default function StoresTransactionResult({
   error,
   onClose,
 }: StoresTransactionResultProps) {
+  const [currentIndex, setCurrentIndex] = useState(activeIndex)
+
   const isEmpty = !items || items.length === 0
   const safeIndex = Math.min(
-    Math.max(activeIndex, 0),
+    Math.max(currentIndex, 0),
     Math.max(items.length - 1, 0)
   )
   const current = isEmpty ? undefined : items[safeIndex]
+  const isSuccess = current?.name === 'Payment successful'
+  const bgImage = isSuccess
+    ? "url('/stores/StoreSuccessBack.png')"
+    : "url('/stores/StoreFailBack.png')"
+  const iconSrc = isSuccess
+    ? '/stores/result/succee.png'
+    : '/stores/result/fail.png'
+  const actionLabel = isSuccess ? 'Continue' : 'Retry'
+  const subtitle =
+    current?.title ||
+    (isSuccess ? 'Viewable in the backpack' : 'Chat With Support')
+
+  // 切换成功/失败状态
+  const toggleStatus = () => {
+    setCurrentIndex((prev: number) => (prev === 0 ? 1 : 0))
+  }
 
   return (
     <div
       role="dialog"
       aria-live="polite"
-      className="relative flex flex-col items-center justify-between p-4 sm:p-6 bg-[url('/stores/storeupback.png')] bg-cover bg-center rounded-[12px] w-[90vw] max-w-[520px] h-[60vh] max-h-[420px] border border-white/10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.35)]"
+      className="relative flex flex-col items-center justify-between p-4 sm:p-6 rounded-[12px] w-[317px] h-[360px] border border-white/10 text-white shadow-[0_8px_32px_rgba(0,0,0,0.35)] overflow-hidden"
+      style={{
+        backgroundImage: bgImage,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,0.45)_60%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
+
       {/* 关闭按钮 */}
       <button
         aria-label="Close"
@@ -54,7 +80,7 @@ export default function StoresTransactionResult({
       {/* 加载态 */}
       {loading && (
         <div className="flex flex-1 w-full h-full items-center justify-center">
-          <div className="w-[317px] h-[300px] sm:w-[360px] sm:h-[320px] rounded-[12px] border border-white/10 bg-white/10 animate-pulse" />
+          <div className="w-full h-full rounded-[12px] border border-white/10 bg-white/10 animate-pulse" />
         </div>
       )}
 
@@ -86,61 +112,62 @@ export default function StoresTransactionResult({
 
       {/* 正常展示 */}
       {!loading && !error && !isEmpty && current && (
-        <div className="flex flex-col items-center justify-center gap-4 sm:gap-5 w-full flex-1">
-          {/* 顶部标题 */}
-          <p className="mt-2 font-jersey-25 text-[22px] sm:text-[24px] leading-[26px] text-center">
-            {current.title}
-          </p>
+        <div className="flex flex-col items-center justify-between w-full h-full pt-8 pb-6 relative z-10">
+          {/* 添加切换按钮 */}
+          <button
+            onClick={toggleStatus}
+            className="absolute top-3 left-3 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+          >
+            Toggle Status
+          </button>
 
-          {/* 中间插图（静态演示图） */}
-          <Image
-            src="/stores/AutomaticCollector/super.svg"
-            alt="reward"
-            width={200}
-            height={200}
-            className="w-[160px] h-[160px] sm:w-[200px] sm:h-[200px]"
-          />
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconback.png')] bg-cover rounded-[12px]">
+              <div className="w-[126px] h-[148px] box-border rounded-[12px] flex items-center justify-center">
+                <Image
+                  src={iconSrc}
+                  alt={current.name}
+                  width={100}
+                  height={100}
+                  priority
+                />
+              </div>
+              <div
+                className="w-[100px] h-[6px] rounded-[12px]"
+                style={{
+                  background:
+                    'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 0%, rgba(0, 240, 255, 0.25) 20%, rgba(26, 26, 64, 0.25) 75%, rgba(0, 102, 255, 0.25) 100%)',
+                }}
+              />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="font-jersey-10 text-[22px] leading-[24px]">
+                {current.name}
+              </p>
+              <p className="font-jersey-15 text-[14px] leading-[18px] text-white/80">
+                {subtitle}
+              </p>
+            </div>
+          </div>
 
-          {/* 底部结果按钮样式 */}
-          {current.name === 'Payment successful' ? (
-            <div className="mt-2 w-[80%] sm:w-[70%] h-[48px] rounded-[12px] bg-[linear-gradient(156.71deg,#84D947_2.78%,#39A740_99.22%)] flex items-center justify-center gap-2">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="shrink-0"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm-1 15l-4-4 1.41-1.41L11 14.17l5.59-5.59L18 10l-7 7Z"
-                  fill="#fff"
-                />
-              </svg>
-              <span className="font-roboto font-medium text-[16px]">
-                Payment successful
-              </span>
-            </div>
-          ) : (
-            <div className="mt-2 w-[80%] sm:w-[70%] h-[48px] rounded-[12px] bg-[linear-gradient(156.71deg,#F43F4E_2.78%,#DF253C_99.22%)] flex items-center justify-center gap-2">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="shrink-0"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59Z"
-                  fill="#fff"
-                />
-              </svg>
-              <span className="font-roboto font-medium text-[16px]">
-                Payment failed
-              </span>
-            </div>
-          )}
+          <button
+            className="absolute w-[180px] h-[30px] rounded-[8px] font-jersey-10 text-[18px] leading-[22px] text-center text-white transition-transform duration-200 ease-out hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30"
+            style={{
+              left: 'calc(50% - 180px/2 + 1.5px)',
+              top: 'calc(50% - 30px/2 + 122px)',
+              background: isSuccess
+                ? 'linear-gradient(98.64deg, rgba(0, 240, 255, 0.8) 0%, rgba(25, 223, 153, 0.8) 24.84%, rgba(38, 214, 101, 0.8) 74.51%, rgba(44, 209, 76, 0.8) 86.92%, rgba(50, 205, 50, 0.8) 99.34%)'
+                : 'linear-gradient(98.64deg, rgba(0, 240, 255, 0.8) 0%, rgba(128, 120, 128, 0.8) 49.67%, rgba(191, 60, 64, 0.8) 74.51%, rgba(223, 30, 32, 0.8) 86.92%, rgba(255, 0, 0, 0.8) 99.34%)',
+              boxShadow: isSuccess
+                ? '0px 1px 1px #32CD32, 0px -1px 1px #00F0FF, inset 0px 1px 1px #32CD32, inset 0px -1px 1px #00F0FF'
+                : '0px 1px 1px #FF0000, 0px -1px 1px #00F0FF, inset 0px 1px 1px #FF0000, inset 0px -1px 1px #00F0FF',
+              textShadow: isSuccess
+                ? '1px 1px 3px #32CD32'
+                : '0px 1px 1px #FF0000',
+            }}
+          >
+            {actionLabel}
+          </button>
         </div>
       )}
     </div>

@@ -142,25 +142,25 @@ export default function StoreTabs() {
       <div className="flex items-center justify-between select-none w-full -mt-[3px]">
         <div
           onClick={() => setTab('raffle')}
-          className={`font-jersey-10 transition-opacity duration-200 ease-in-out font-[24px] uppercase leading-[22px] tracking-wide text-white ${
+          className={`font-jersey-10 transition-opacity duration-200 ease-in-out font-[24px] leading-[22px] tracking-wide text-[#DEF5FF] ${
             current === 'raffle' ? 'opacity-100' : 'opacity-70 hover:opacity-90'
           }`}
           style={{ textShadow: '0 0 4px #6B0AE9' }}
         >
-          <span className="ml-[24px] text-[22px] font-jersey-10 leading-[22px] whitespace-nowrap">
+          <span className="ml-[23px] text-[22px] font-jersey-10 leading-[22px] whitespace-nowrap">
             Raffle Ticket
           </span>
         </div>
         <div
           onClick={() => setTab('collector')}
-          className={`font-jersey-10 transition-opacity duration-200 ease-in-out font-[24px] uppercase leading-[22px] tracking-wide text-white ${
+          className={`font-jersey-10 transition-opacity duration-200 ease-in-out font-[24px] leading-[22px] tracking-wide ml-2 text-[#DEF5FF] ${
             current === 'collector'
               ? 'opacity-100'
               : 'opacity-70 hover:opacity-90'
           }`}
           style={{ textShadow: '0 0 4px #6B0AE9' }}
         >
-          <span className="ml-[40px] text-[20px] font-jersey-10 leading-[22px] whitespace-nowrap">
+          <span className="ml-[40px] text-[22px] font-jersey-10 leading-[22px] whitespace-nowrap">
             Automatic Collector
           </span>
         </div>

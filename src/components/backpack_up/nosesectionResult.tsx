@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 // 结果状态类型（严格类型）
@@ -36,12 +36,23 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
   title,
   description,
   imageSrc = '/backpack/StageProgress.svg',
-  onClose: _onClose,
+  onClose,
   onHelp,
   onConfirm,
   onContact,
   className,
 }) => {
+  const [internalOpen, setInternalOpen] = useState<boolean>(open)
+
+  useEffect(() => {
+    setInternalOpen(open)
+  }, [open])
+
+  const handleClose = () => {
+    if (onClose) onClose()
+    else setInternalOpen(false)
+  }
+
   const isSuccess = status === 'success'
   const computedTitle =
     title ?? (isSuccess ? 'Successfully Sold' : 'Sale Failed')
@@ -90,7 +101,7 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
     </svg>
   )
 
-  if (!open) return null
+  if (!internalOpen) return null
 
   return (
     <div
@@ -98,6 +109,7 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={computedTitle}
+      onClick={handleClose}
     >
       <section
         className={[
@@ -108,6 +120,7 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
           'bg-[#0F172B] overflow-hidden',
           className ?? '',
         ].join(' ')}
+        onClick={e => e.stopPropagation()}
       >
         {/* 背景层：星空卡面 */}
         <div
@@ -132,7 +145,7 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
             type="button"
             title="help"
             onClick={onHelp}
-            className="absolute right-[20px] top-3 w-[18px] h-[18px] rounded-[6px] flex items-center justify-center  text-white"
+            className="absolute right-[20px] top-3 w-[18px] h-[18px] rounded-[6px] flex items-center justify-center text-white"
           >
             <span className="text-[12px] leading-none">
               <Image
@@ -144,6 +157,14 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
                 priority
               />
             </span>
+          </button>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={handleClose}
+            className="absolute right-3 top-3 w-[22px] h-[22px] rounded-[6px] flex items-center justify-center bg-white/10 hover:bg-white/20 text-white"
+          >
+            ×
           </button>
         </div>
 
