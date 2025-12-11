@@ -189,7 +189,7 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
         <div className="relative z-10 flex-1 w-full flex items-center rounded-[12px] justify-center">
           {/* 渐变边框容器 */}
           <div
-            className="relative w-[200px] h-[100px] rounded-[12px] flex items-center justify-center backdrop-blur-[15px] bg-[rgba(5,5,16,0.3)] border border-white/10"
+            className="relative w-[200px] h-[100px] rounded-[12px] flex items-center justify-center backdrop-blur-[1px] bg-[rgba(5,5,16,0.3)] border border-white/10"
             style={{
               boxSizing: 'border-box',
             }}

@@ -5,7 +5,8 @@ import GiftProps from '@/components/backpack_up/GiftProps'
 import NoseSection from '@/components/backpack_up/nosesection'
 import NoseSectionResult from '@/components/backpack_up/nosesectionResult'
 import Question from '@/components/backpack_up/Question'
-import TostoreBuy from '@/components/backpack_up/TostoreBuy'
+import ConfirmAgain from '@/components/backpack_up/Confirm_again'
+import ItemDetailModal from '@/components/backpack_up/ItemDetailModal'
 
 const demoTitle = 'Nose Section'
 
@@ -46,13 +47,23 @@ export default function BackpackPopupPlayground() {
           onCancel={() => console.log('Gift cancel')}
         />
       ),
-      toStoreBuy: (
-        <TostoreBuy
-          onConfirm={() => console.log('To store confirm')}
-          onCancel={() => console.log('To store cancel')}
+
+      question: <Question />,
+      confirmAgain: (
+        <ConfirmAgain
+          itemName="Magic Potion"
+          onClose={() => console.log('Cancel confirmed')}
+          onConfirm={() => console.log('Use confirmed')}
         />
       ),
-      question: <Question />,
+      itemDetail: (
+        <ItemDetailModal
+          itemName="Magic Potion"
+          itemIcon="/backpack/StageProgress.svg"
+          onClose={() => console.log('Item detail closed')}
+          onConfirm={() => console.log('Item detail confirmed')}
+        />
+      ),
     }),
     []
   )
@@ -69,8 +80,9 @@ export default function BackpackPopupPlayground() {
           { id: 'noseResultSuccess', label: 'Result Success' },
           { id: 'noseResultFail', label: 'Result Fail' },
           { id: 'giftProps', label: 'Gift Props' },
-          { id: 'toStoreBuy', label: 'To Store Buy' },
           { id: 'question', label: 'Question' },
+          { id: 'confirmAgain', label: 'Confirm Again' },
+          { id: 'itemDetail', label: 'Item Detail' },
         ].map(btn => (
           <button
             key={btn.id}

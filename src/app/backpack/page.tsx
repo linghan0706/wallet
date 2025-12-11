@@ -10,7 +10,10 @@ import SelectCard, {
 import NoseSection from '@/components/backpack_up/nosesection'
 import GiftProps from '@/components/backpack_up/GiftProps'
 import NoseSectionResult from '@/components/backpack_up/nosesectionResult'
+import ItemDetailModal from '@/components/backpack_up/ItemDetailModal'
+import ConfirmAgain from '@/components/backpack_up/Confirm_again'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
+import { useItemFlowStore } from '@/stores/backpackItemFlowStore'
 import backImage from '@/public/backImage.png'
 
 export default function BackpackPage() {
@@ -96,6 +99,31 @@ export default function BackpackPage() {
   }, [])
   const { mode, item, result, gift, close, openGift, openResult, openDetails } =
     useBackpackModalStore()
+  const {
+    step,
+    currentItem,
+    actionType,
+    resultStatus,
+    resultDescription,
+    resetFlow,
+  } = useItemFlowStore()
+
+  // 处理确认操作
+  const handleConfirmAction = () => {
+    if (actionType === 'use') {
+      openResult({
+        status: 'use-success',
+        description: resultDescription || undefined,
+      })
+    } else if (actionType === 'sell') {
+      openResult({
+        status: 'sell-success',
+        description: resultDescription || undefined,
+      })
+    }
+    resetFlow()
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden pb-20 pt-10 sm:pt-14 mt-[20px]">
       <div
@@ -158,8 +186,8 @@ export default function BackpackPage() {
               {mode === 'details' && (
                 <NoseSection
                   onGive={() => openGift({})}
-                  onSell={() => openResult({ status: 'sell-success' })}
-                  onUse={() => openResult({ status: 'use-success' })}
+                  onSell={() => {}}
+                  onUse={() => {}}
                 />
               )}
               {mode === 'gift' && (
@@ -186,6 +214,49 @@ export default function BackpackPage() {
                   onConfirm={close}
                   onContact={close}
                   onClose={close}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 新的流程状态管理 */}
+        {step !== 'none' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={resetFlow} />
+            <div className="relative z-10">
+              {step === 'detail' && currentItem && (
+                <ItemDetailModal
+                  itemName={currentItem.name}
+                  itemIcon={
+                    currentItem.iconPath || '/backpack/StageProgress.svg'
+                  }
+                  onClose={resetFlow}
+                  onConfirm={() => useItemFlowStore.getState().goToConfirm()}
+                />
+              )}
+              {step === 'confirm' && currentItem && (
+                <ConfirmAgain
+                  itemName={currentItem.name}
+                  onClose={resetFlow}
+                  onConfirm={handleConfirmAction}
+                />
+              )}
+              {step === 'result' && resultStatus && (
+                <NoseSectionResult
+                  open
+                  status={resultStatus}
+                  title={currentItem?.name}
+                  description={resultDescription || undefined}
+                  imageSrc={
+                    currentItem?.iconPath || '/backpack/StageProgress.svg'
+                  }
+                  onConfirm={close}
+                  onContact={close}
+                  onClose={() => {
+                    close()
+                    resetFlow()
+                  }}
                 />
               )}
             </div>

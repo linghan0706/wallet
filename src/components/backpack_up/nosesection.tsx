@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import Image from 'next/image'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
+import { useItemFlowStore } from '@/stores/backpackItemFlowStore'
 import Question from './Question'
 
 type NoseSectionProps = {
@@ -20,6 +21,7 @@ const NoseSection: React.FC<NoseSectionProps> = ({
   onUse,
 }) => {
   const { item } = useBackpackModalStore()
+  const { openDetail } = useItemFlowStore()
   const title = item?.name ?? 'Item'
   const imageSrc = item?.iconPath ?? '/backpack/StageProgress.svg'
   const [activeAction, setActiveAction] = useState<'give' | 'sell' | 'use'>(
@@ -81,7 +83,7 @@ const NoseSection: React.FC<NoseSectionProps> = ({
         <div className="relative z-10 flex-1 w-full flex items-center justify-center">
           <div className="relative w-[150px] h-[150px]">
             <div className="absolute w-[128px] h-[150px] left-[11px] top-0 rounded-[12px] overflow-hidden">
-              {/* Gradient border, masked so inner remains transparent */}
+              {/* 渐变边框，使用遮罩使内部保持透明 */}
               <div
                 className="pointer-events-none absolute inset-0 rounded-[12px]"
                 style={{
@@ -97,7 +99,7 @@ const NoseSection: React.FC<NoseSectionProps> = ({
                 aria-hidden
               />
 
-              {/* Actual content layer (matches StoresTransactionCard structure) */}
+              {/* 实际内容层（与 StoresTransactionCard 结构匹配） */}
               <div className="relative h-full w-full flex flex-col items-center justify-center bg-[url('/stores/bg_item_Value\\ \\(Multi\\).png')] bg-cover bg-center rounded-[12px]">
                 <div className="w-[126px] h-[148px] box-border rounded-[12px]">
                   <Image
@@ -109,14 +111,16 @@ const NoseSection: React.FC<NoseSectionProps> = ({
                     priority
                   />
                 </div>
-                <div
-                  className="w-[100px] h-[6px] rounded-[12px]"
-                  style={{
-                    background:
-                      'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 0%, rgba(0, 240, 255, 0.25) 20%, rgba(26, 26, 64, 0.25) 75%, rgba(0, 102, 255, 0.25) 100%)',
-                  }}
-                  aria-hidden
-                />
+                {/* 资产底部光影效果 */}
+                <div className="w-[100px] h-[6px] rounded-[12px]">
+                  <Image
+                    src="/backpack/FooterShaw.png"
+                    alt="资产底部光影"
+                    width={100}
+                    height={6}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -141,6 +145,9 @@ const NoseSection: React.FC<NoseSectionProps> = ({
           <button
             type="button"
             onClick={() => {
+              if (item) {
+                openDetail(item, 'sell')
+              }
               setActiveAction('sell')
               onSell?.()
             }}
@@ -157,6 +164,9 @@ const NoseSection: React.FC<NoseSectionProps> = ({
           <button
             type="button"
             onClick={() => {
+              if (item) {
+                openDetail(item, 'use')
+              }
               setActiveAction('use')
               onUse?.()
             }}
