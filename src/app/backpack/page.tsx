@@ -158,8 +158,8 @@ export default function BackpackPage() {
               {mode === 'details' && (
                 <NoseSection
                   onGive={() => openGift({})}
-                  onSell={() => openResult({ status: 'success' })}
-                  onUse={() => openResult({ status: 'success' })}
+                  onSell={() => openResult({ status: 'sell-success' })}
+                  onUse={() => openResult({ status: 'use-success' })}
                 />
               )}
               {mode === 'gift' && (
@@ -168,7 +168,7 @@ export default function BackpackPage() {
                   onCancel={() => (item ? openDetails(item) : close())}
                   onConfirm={({ username, amount }) => {
                     openResult({
-                      status: 'success',
+                      status: 'use-success',
                       description: `${username} X${amount}`,
                     })
                   }}
@@ -177,7 +177,9 @@ export default function BackpackPage() {
               {mode === 'result' && result && (
                 <NoseSectionResult
                   open
-                  status={result.status}
+                  status={
+                    result.status as import('@/components/backpack_up/nosesectionResult').ResultStatus
+                  }
                   title={result.title}
                   description={result.description}
                   imageSrc={result.imageSrc}

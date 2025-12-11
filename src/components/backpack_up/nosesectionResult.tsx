@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 
 // 结果状态类型（严格类型）
-export type ResultStatus = 'success' | 'failed'
+export type ResultStatus = 'use-success' | 'sell-success' | 'fail'
 
 // 组件入参（严格类型定义）
 export interface NoseSectionResultProps {
@@ -30,6 +30,7 @@ export interface NoseSectionResultProps {
   className?: string
 }
 
+/** 背包- nosesction 结果弹层 */
 const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
   open = true,
   status,
@@ -53,53 +54,97 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
     else setInternalOpen(false)
   }
 
-  const isSuccess = status === 'success'
-  const computedTitle =
-    title ?? (isSuccess ? 'Successfully Sold' : 'Sale Failed')
+  const isSuccess = status === 'use-success' || status === 'sell-success'
+
+  // 根据状态确定背景图片
+  const getBackgroundImage = () => {
+    switch (status) {
+      case 'use-success':
+        return '/backpack/result/success.png'
+      case 'sell-success':
+        return '/backpack/result/success.png'
+      case 'fail':
+        return '/backpack/result/fail.png'
+      default:
+        return '/backpack/result/success.png'
+    }
+  }
+
+  // 根据状态获取配置信息
+  const getStatusConfig = () => {
+    switch (status) {
+      case 'use-success':
+        return {
+          type_text: 'Used',
+          result_text: 'Successfully!',
+          description_text: 'EFFECTS ACTIVATED',
+          result_shadow: '1px 1px 3px #32CD32',
+          description_shadow: '1px 1px 3px #32CD32',
+          result_top: '135px',
+          description_top: '165px',
+          result_font_size: '24px',
+          description_font_size: '12px',
+          result_height: '44px',
+          description_height: '22px',
+        }
+      case 'sell-success':
+        return {
+          type_text: 'Sell',
+          result_text: 'Successfully!',
+          description_text: 'Viewable in the backpack',
+          result_shadow: '1px 1px 3px #32CD32',
+          description_shadow: '1px 1px 3px #32CD32',
+          result_top: '135px',
+          description_top: '165px',
+          result_font_size: '24px',
+          description_font_size: '12px',
+          result_height: '44px',
+          description_height: '22px',
+        }
+      case 'fail':
+        return {
+          type_text:
+            status === 'fail'
+              ? title?.includes('Sell')
+                ? 'Sell'
+                : 'Used'
+              : '',
+          result_text: 'Fail!',
+          description_text: 'Chat With Support',
+          result_shadow: '0px 1px 1px #FF0000',
+          description_shadow: '0px 1px 1px #FF0000',
+          result_top: '165px',
+          description_top: '190px',
+          result_font_size: '24px',
+          description_font_size: '10px',
+          result_height: '22px',
+          description_height: '22px',
+        }
+      default:
+        return {
+          type_text: 'Used',
+          result_text: 'Successfully!',
+          description_text: 'EFFECTS ACTIVATED',
+          result_shadow: '1px 1px 3px #32CD32',
+          description_shadow: '1px 1px 3px #32CD32',
+          result_top: '135px',
+          description_top: '165px',
+          result_font_size: '24px',
+          description_font_size: '12px',
+          result_height: '44px',
+          description_height: '22px',
+        }
+    }
+  }
+
+  const backgroundImage = getBackgroundImage()
+  const statusConfig = getStatusConfig()
 
   // 成功/失败按钮样式与文案
   const actionLabel = isSuccess ? 'Confirm' : 'contact customer service'
   const actionGradient = isSuccess
     ? 'bg-[linear-gradient(156.71deg,#84D947_2.78%,#39A740_99.22%)]'
     : 'bg-[linear-gradient(156.71deg,#F43F4E_2.78%,#DF253C_99.22%)]'
-
-  // 图标（不依赖外部资源，确保像素一致与可控）
-  const IconCircleCheck = (
-    <svg
-      aria-hidden
-      width={18}
-      height={18}
-      viewBox="0 0 18 18"
-      className="flex-none"
-    >
-      <circle cx="9" cy="9" r="8" stroke="white" strokeWidth="2" fill="none" />
-      <path
-        d="M5 9.5 L7.5 12 L13 6.5"
-        stroke="white"
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-
-  const IconCircleClose = (
-    <svg
-      aria-hidden
-      width={18}
-      height={18}
-      viewBox="0 0 18 18"
-      className="flex-none"
-    >
-      <circle cx="9" cy="9" r="8" stroke="white" strokeWidth="2" fill="none" />
-      <path
-        d="M6 6 L12 12 M12 6 L6 12"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
 
   if (!internalOpen) return null
 
@@ -108,12 +153,11 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
       className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50"
       role="dialog"
       aria-modal="true"
-      aria-label={computedTitle}
       onClick={handleClose}
     >
       <section
         className={[
-          'relative w-full max-w-[317px] h-[300px] rounded-[12px]',
+          'relative w-full max-w-[317px] h-[360px] rounded-[12px]',
           'shadow-[0_8px_24px_rgba(0,0,0,0.35)]',
           'border border-white/10',
           'flex flex-col items-center',
@@ -127,74 +171,111 @@ const NoseSectionResult: React.FC<NoseSectionResultProps> = ({
           aria-hidden
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/Popup/taskupback.svg)',
+            backgroundImage: `url(${backgroundImage})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         />
 
-        {/* 顶部标题与操作按钮 */}
+        {/* 顶部标题 */}
         <div className="relative z-10 w-full flex items-center justify-center pt-4 pb-2">
-          <h2 className="font-jersey-10 text-white text-[22px] leading-[22px]">
-            {computedTitle}
+          <h2 className="font-jersey-10 text-white text-[20px] leading-[22px] text-show-[]">
+            Nose Section
           </h2>
-
-          {/* 问号帮助按钮 */}
-          <button
-            type="button"
-            title="help"
-            onClick={onHelp}
-            className="absolute right-[20px] top-3 w-[18px] h-[18px] rounded-[6px] flex items-center justify-center text-white"
-          >
-            <span className="text-[12px] leading-none">
-              <Image
-                src="/backpack/question/question.png"
-                alt="Help"
-                width={10}
-                height={10}
-                className="w-[10px] h-[10px] object-contain"
-                priority
-              />
-            </span>
-          </button>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={handleClose}
-            className="absolute right-3 top-3 w-[22px] h-[22px] rounded-[6px] flex items-center justify-center bg-white/10 hover:bg-white/20 text-white"
-          >
-            ×
-          </button>
         </div>
 
-        {/* 中心展示图（爆闪飞船） */}
-        <div className="relative z-10 flex-1 w-full flex items-center justify-center">
-          <Image
-            src={imageSrc}
-            alt="Nose section result"
-            width={160}
-            height={160}
-            className="object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)]"
-            priority
-          />
+        {/* 状态返回 */}
+        <div className="relative z-10 flex-1 w-full flex items-center rounded-[12px] justify-center">
+          {/* 渐变边框容器 */}
+          <div
+            className="relative w-[200px] h-[100px] rounded-[12px] flex items-center justify-center backdrop-blur-[15px] bg-[rgba(5,5,16,0.3)] border border-white/10"
+            style={{
+              boxSizing: 'border-box',
+            }}
+          >
+            {/* 渐变边框遮罩：让渐变只留在边框区域 */}
+            <div
+              className="absolute inset-0 rounded-[12px] pointer-events-none"
+              style={{
+                padding: '5px',
+                background:
+                  'linear-gradient(136.39deg, #00F0FF 8.54%, rgba(255, 255, 255, 0) 30.01%, rgba(255, 255, 255, 0) 72.95%, #BC13FE 94.42%)',
+                WebkitMask:
+                  'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+                boxSizing: 'border-box',
+              }}
+            />
+
+            {/* 内容容器 */}
+            <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-3">
+              {/* 结果文字 */}
+              <div
+                className="font-jersey-10 text-white text-center flex flex-col items-center"
+                style={{
+                  fontSize: statusConfig.result_font_size,
+                  lineHeight: '22px',
+                  textShadow: statusConfig.result_shadow,
+                  fontFamily: "'Jersey 10'",
+                  fontStyle: 'normal',
+                  fontWeight: 400,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '100%',
+                }}
+              >
+                {statusConfig.type_text && (
+                  <span>{statusConfig.type_text}</span>
+                )}
+                <span>{statusConfig.result_text}</span>
+              </div>
+
+              {/* 描述文字 */}
+              <div
+                className="font-jersey-10 text-white text-center"
+                style={{
+                  fontSize: statusConfig.description_font_size,
+                  lineHeight: '22px',
+                  textShadow: statusConfig.description_shadow,
+                  fontFamily: "'Jersey 10'",
+                  fontStyle: 'normal',
+                  fontWeight: 400,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  maxWidth: '100%',
+                  marginTop: '4px',
+                }}
+              >
+                {statusConfig.description_text}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 底部主操作按钮 */}
-        <div className="relative z-10 w-full px-4 pb-4">
+        <div className="relative z-10 w-full px-4 pb-4 flex justify-center">
           <button
             type="button"
             onClick={isSuccess ? onConfirm : onContact}
-            className={[
-              'w-full h-[36px] rounded-[12px]',
-              'flex items-center justify-center gap-2 text-white',
-              'font-jersey-10 text-[18px] leading-[22px]',
-              actionGradient,
-              'shadow-[0_4px_12px_rgba(0,0,0,0.25)]',
-            ].join(' ')}
+            className={`relative w-[180px] h-[30px] rounded-[4px] flex items-center justify-center text-white font-jersey-10 text-[18px] leading-[22px] overflow-hidden
+              ${
+                isSuccess
+                  ? 'bg-[linear-gradient(98.64deg,rgba(0,240,255,0.8)_0%,rgba(25,223,153,0.8)_24.84%,rgba(38,214,101,0.8)_74.51%,rgba(44,209,76,0.8)_86.92%,rgba(50,205,50,0.8)_99.34%)] shadow-[0px_1px_1px_#32CD32,0px_-1px_1px_#00F0FF,inset_0px_1px_1px_#32CD32,inset_0px_-1px_1px_#00F0FF]'
+                  : 'bg-[linear-gradient(98.64deg,rgba(0,240,255,0.8)_0%,rgba(128,120,128,0.8)_49.67%,rgba(191,60,64,0.8)_74.51%,rgba(223,30,32,0.8)_86.92%,rgba(255,0,0,0.8)_99.34%)] shadow-[0px_1px_1px_#B0B0C0,0px_-1px_1px_#00F0FF,inset_0px_1px_1px_#B0B0C0,inset_0px_-1px_1px_#00F0FF]'
+              }`}
           >
-            {isSuccess ? IconCircleCheck : IconCircleClose}
-            {actionLabel}
+            <span
+              className="absolute w-[55px] h-[22px] left-[calc(50%-55px/2)] top-[calc(50%-22px/2)] text-center text-white font-jersey-10 text-[18px] leading-[22px]"
+              style={{
+                textShadow: isSuccess
+                  ? '1px 1px 3px #32CD32'
+                  : '0px 1px 1px #FF0000',
+              }}
+            >
+              {isSuccess ? 'Continue' : 'Retry'}
+            </span>
           </button>
 
           {description && (

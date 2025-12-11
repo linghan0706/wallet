@@ -11,7 +11,7 @@ import type { BackpackItem } from '@/components/backpackCard/SelectCard'
 
 export type ModalMode = 'none' | 'details' | 'gift' | 'result'
 /** 操作结果 */
-export type ResultStatus = 'success' | 'failed'
+export type ResultStatus = 'use-success' | 'sell-success' | 'fail'
 
 /** 结果弹窗结构 */
 interface ResultPayload {
@@ -77,7 +77,11 @@ export const useBackpackModalStore = create<BackpackModalState>((set, get) => ({
     const image = current.item?.iconPath
     const titleDefault =
       payload.title ??
-      (payload.status === 'success' ? `${name} Successfully` : `${name} Failed`)
+      (payload.status === 'use-success'
+        ? `${name} Successfully`
+        : payload.status === 'sell-success'
+          ? `${name} Successfully`
+          : `${name} Failed`)
     const filled: ResultPayload = {
       status: payload.status,
       title: titleDefault,

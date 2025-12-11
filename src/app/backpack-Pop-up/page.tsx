@@ -24,7 +24,7 @@ export default function BackpackPopupPlayground() {
       ),
       noseResultSuccess: (
         <NoseSectionResult
-          status="success"
+          status="use-success"
           title="Payment Successful"
           description="Viewable in the backpack"
           onConfirm={() => console.log('Confirm success')}
@@ -32,7 +32,7 @@ export default function BackpackPopupPlayground() {
       ),
       noseResultFail: (
         <NoseSectionResult
-          status="failed"
+          status="fail"
           title="Payment Fail"
           description="Chat With Support"
           onContact={() => console.log('Contact support')}
