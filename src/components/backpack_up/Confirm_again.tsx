@@ -2,15 +2,31 @@ import React from 'react'
 
 interface ConfirmAgainProps {
   itemName: string
+  itemType?: 'use' | 'sell' // 新增类型参数，默认为'use'
+  powerValue?: string | number // 新增power值参数，用于sell场景
   onClose: () => void
   onConfirm: () => void
 }
 
 const ConfirmAgain: React.FC<ConfirmAgainProps> = ({
   itemName,
+  itemType = 'use',
+  powerValue,
   onClose,
   onConfirm,
 }) => {
+  // 根据itemType确定显示的文本
+  const getTitleText = () => {
+    return itemType === 'sell' ? 'Confirm Sell' : 'Confirm Use'
+  }
+
+  const getDescriptionText = () => {
+    if (itemType === 'sell') {
+      return `Sell the ${itemName} to get ${powerValue || 'XXX'} Power`
+    }
+    return `Use the ${itemName} to activate effects?`
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div
@@ -38,13 +54,13 @@ const ConfirmAgain: React.FC<ConfirmAgainProps> = ({
           <div className="flex flex-col items-center">
             <div className="w-[67px] h-[22px] mb-2">
               <span className="w-full h-full text-white text-center block font-['Jersey_10'] font-normal text-base leading-[22px]">
-                Confirm Use
+                {getTitleText()}
               </span>
             </div>
 
             <div className="w-full h-[22px]">
               <span className="w-full h-full text-[#B0B0C0] text-center block font-['Jersey_10'] font-normal text-sm leading-[22px]">
-                Use the {itemName} to activate effects?
+                {getDescriptionText()}
               </span>
             </div>
           </div>
