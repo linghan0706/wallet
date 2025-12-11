@@ -9,6 +9,7 @@ interface ItemDetailModalProps {
   itemIcon: string // 物品图标路径
   onClose: () => void // 关闭弹窗回调函数
   onConfirm: () => void // 确认操作回调函数
+  actionType?: 'use' | 'sell' // 当前操作类型
 }
 
 // 背包物品详情弹窗组件
@@ -17,9 +18,25 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   itemIcon,
   onClose,
   onConfirm,
+  actionType = 'use',
 }) => {
   const [showQuestion, setShowQuestion] = useState(false)
+  const [sellAmount, setSellAmount] = useState(99999)
   const helpButtonRef = useRef<HTMLButtonElement>(null)
+  const isSell = actionType === 'sell'
+  const minSellAmount = 1
+  const maxSellAmount = 99999
+
+  const handleDecrease = () => {
+    setSellAmount(prev => Math.max(minSellAmount, prev - 1))
+  }
+
+  const handleIncrease = () => {
+    setSellAmount(prev => Math.min(maxSellAmount, prev + 1))
+  }
+
+  const handleSetMin = () => setSellAmount(minSellAmount)
+  const handleSetMax = () => setSellAmount(maxSellAmount)
 
   return (
     // 弹窗容器 - 居中显示
@@ -117,9 +134,98 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
           {/* 效果说明区域 */}
           <div className="absolute w-[285px] h-[120px] left-[15px] top-[245px] box-border rounded-[4px] bg-[rgba(5,5,16,0.5)]">
-            <div className="absolute w-[48px] h-[22px] left-[27px] top-[5px] text-white text-center font-['Jersey_10'] font-normal text-[16px] leading-[22px] text-shadow-[0px_0px_1px_#BC13FE]">
-              Use item
-            </div>
+            {isSell ? (
+              <>
+                <div className="absolute left-[20px] top-[6px] text-[#BC13FE] text-center font-['Jersey_10'] text-[16px] leading-[22px]">
+                  Sell item
+                </div>
+                <div className="absolute left-[64px] top-[26px] flex flex-row items-center gap-[7px] w-[157px] h-[22px]">
+                  <button
+                    type="button"
+                    onClick={handleSetMin}
+                    className="w-[19px] h-[22px] text-center  font-['Jersey_10'] text-[16px] leading-[22px] text-[#00F0FF] flex-none order-0 flex-grow-0"
+                  >
+                    min
+                  </button>
+                  <div
+                    className="box-border flex flex-row items-center justify-between w-[100px] h-[22px] px-[5px] rounded-[8px]"
+                    style={{
+                      background:
+                        'linear-gradient(0deg, rgba(0, 240, 255, 0.2), rgba(0, 240, 255, 0.2)), linear-gradient(0deg, rgba(188, 19, 254, 0.2), rgba(188, 19, 254, 0.2))',
+                      border: '1px solid',
+                      borderImageSource:
+                        'linear-gradient(0deg, rgba(0, 240, 255, 0.8), rgba(0, 240, 255, 0.8)), linear-gradient(0deg, rgba(5, 5, 16, 0.2), rgba(5, 5, 16, 0.2))',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={handleDecrease}
+                      title="Decrease amount"
+                      className="w-[6px] h-[22px] mx-auto text-center font-['Jersey_10'] text-[16px] leading-[22px] text-[rgba(255,255,255,0.5)]  flex-none order-0 flex-grow-0"
+                    >
+                      <Image
+                        src="/currency/leftButton.svg"
+                        alt="Decrease"
+                        width={6}
+                        height={22}
+                      />
+                    </button>
+                    <div className="w-[37px] h-[22px] mx-auto text-center font-['Jersey_10'] text-[16px] leading-[22px] text-white flex-none order-1 flex-grow-0">
+                      {sellAmount.toLocaleString('en-US')}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleIncrease}
+                      title="Increase amount"
+                      className="w-[6px] h-[22px] mx-auto text-center font-['Jersey_10'] text-[16px] leading-[22px] text-[rgba(255,255,255,0.5)]   flex-none order-2 flex-grow-0"
+                    >
+                      <Image
+                        src="/currency/rightButton.svg"
+                        alt="Increase"
+                        width={6}
+                        height={22}
+                      />
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSetMax}
+                    className="w-[24px] h-[22px] text-center  font-['Jersey_10'] text-[16px] leading-[22px] text-[#BC13FE] flex-none order-2 flex-grow-0"
+                  >
+                    max
+                  </button>
+                </div>
+                <div className="absolute flex flex-row items-center justify-center gap-[10px] w-[83px] h-[64px] left-[100px] top-[52px]">
+                  <div className="flex flex-col items-center justify-center gap-[4px] w-[83px] h-[64px] px-[8px] py-[4px] bg-[#00F0FF] rounded-[8px]">
+                    <div className="w-[41px] h-[14px] text-center font-['Jersey_10'] text-[18px] leading-[14px] text-[rgba(5,5,16,0.8)]">
+                      Power
+                    </div>
+                    <div className="flex flex-row items-center justify-between gap-[4px] w-[67px] h-[34px] px-[10px] rounded-[8px] bg-[#043440]">
+                      <div className="w-[16px] h-[16px] flex items-center justify-center">
+                        <Image
+                          src="/currency/power.png"
+                          alt="Power"
+                          width={16}
+                          height={16}
+                        />
+                      </div>
+                      <div className="w-[33px] h-[14px] flex items-center justify-center text-center font-['Jersey_10'] text-[14px] leading-[14px] text-[#00F0FF]">
+                        {sellAmount.toLocaleString('en-US')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="absolute w-[48px] h-[22px] left-[27px] top-[5px] text-white text-center font-['Jersey_10'] font-normal text-[16px] leading-[22px] text-shadow-[0px_0px_1px_#BC13FE]">
+                  Use item
+                </div>
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center font-['Jersey_10'] text-[18px] leading-[24px]">
+                  {`Used ${itemName}.`}
+                </div>
+              </>
+            )}
           </div>
 
           {/* 按钮容器 */}

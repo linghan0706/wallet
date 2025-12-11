@@ -231,6 +231,7 @@ export default function BackpackPage() {
                   itemIcon={
                     currentItem.iconPath || '/backpack/StageProgress.svg'
                   }
+                  actionType={actionType || 'use'}
                   onClose={resetFlow}
                   onConfirm={() => useItemFlowStore.getState().goToConfirm()}
                 />

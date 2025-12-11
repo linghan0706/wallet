@@ -60,6 +60,7 @@ export default function BackpackPopupPlayground() {
         <ItemDetailModal
           itemName="Magic Potion"
           itemIcon="/backpack/StageProgress.svg"
+          actionType="sell"
           onClose={() => console.log('Item detail closed')}
           onConfirm={() => console.log('Item detail confirmed')}
         />
