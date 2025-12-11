@@ -136,7 +136,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           <div className="absolute w-[285px] h-[120px] left-[15px] top-[245px] box-border rounded-[4px] bg-[rgba(5,5,16,0.5)]">
             {isSell ? (
               <>
-                <div className="absolute left-[20px] top-[6px] text-[#BC13FE] text-center font-['Jersey_10'] text-[16px] leading-[22px]">
+                <div className="absolute left-[20px] top-[6px] text-white text-center font-['Jersey_10'] font-normal text-[16px] leading-[22px] text-shadow-[0px_0px_1px_#BC13FE]">
                   Sell item
                 </div>
                 <div className="absolute left-[64px] top-[26px] flex flex-row items-center gap-[7px] w-[157px] h-[22px]">
