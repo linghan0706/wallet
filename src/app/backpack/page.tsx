@@ -239,6 +239,8 @@ export default function BackpackPage() {
               {step === 'confirm' && currentItem && (
                 <ConfirmAgain
                   itemName={currentItem.name}
+                  itemType={actionType || 'use'}
+                  powerValue={99999} // 这里应该从实际数据中获取power值
                   onClose={resetFlow}
                   onConfirm={handleConfirmAction}
                 />

@@ -52,8 +52,18 @@ export default function BackpackPopupPlayground() {
       confirmAgain: (
         <ConfirmAgain
           itemName="Magic Potion"
+          itemType="use"
           onClose={() => console.log('Cancel confirmed')}
           onConfirm={() => console.log('Use confirmed')}
+        />
+      ),
+      confirmAgainSell: (
+        <ConfirmAgain
+          itemName="Magic Potion"
+          itemType="sell"
+          powerValue={99999}
+          onClose={() => console.log('Cancel confirmed')}
+          onConfirm={() => console.log('Sell confirmed')}
         />
       ),
       itemDetail: (
@@ -82,7 +92,8 @@ export default function BackpackPopupPlayground() {
           { id: 'noseResultFail', label: 'Result Fail' },
           { id: 'giftProps', label: 'Gift Props' },
           { id: 'question', label: 'Question' },
-          { id: 'confirmAgain', label: 'Confirm Again' },
+          { id: 'confirmAgain', label: 'Confirm Again (Use)' },
+          { id: 'confirmAgainSell', label: 'Confirm Again (Sell)' },
           { id: 'itemDetail', label: 'Item Detail' },
         ].map(btn => (
           <button
