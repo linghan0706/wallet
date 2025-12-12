@@ -190,16 +190,19 @@ export default function BackpackPage() {
                   onUse={() => {}}
                 />
               )}
-              {mode === 'gift' && (
+              {mode === 'gift' && item && (
                 <GiftProps
                   visible
-                  onCancel={() => (item ? openDetails(item) : close())}
+                  itemName={item.name}
+                  itemIcon={item.iconPath || '/backpack/StageProgress.svg'}
+                  onCancel={() => openDetails(item)}
                   onConfirm={({ username, amount }) => {
                     openResult({
                       status: 'use-success',
                       description: `${username} X${amount}`,
                     })
                   }}
+                  onClose={close}
                 />
               )}
               {mode === 'result' && result && (

@@ -4,6 +4,7 @@ interface ConfirmAgainProps {
   itemName: string
   itemType?: 'use' | 'sell' // 新增类型参数，默认为'use'
   powerValue?: string | number // 新增power值参数，用于sell场景
+  itemCount?: number // 物品数量，用于计算sell场景下的power值
   onClose: () => void
   onConfirm: () => void
 }
@@ -12,9 +13,13 @@ const ConfirmAgain: React.FC<ConfirmAgainProps> = ({
   itemName,
   itemType = 'use',
   powerValue,
+  itemCount = 1,
   onClose,
   onConfirm,
 }) => {
+  // 默认单价，实际应用中应该从配置或API获取
+  const unitPrice = 1000
+
   // 根据itemType确定显示的文本
   const getTitleText = () => {
     return itemType === 'sell' ? 'Confirm Sell' : 'Confirm Use'
@@ -22,7 +27,9 @@ const ConfirmAgain: React.FC<ConfirmAgainProps> = ({
 
   const getDescriptionText = () => {
     if (itemType === 'sell') {
-      return `Sell the ${itemName} to get ${powerValue || 'XXX'} Power`
+      // 如果传入了powerValue，则直接使用；否则根据数量和单价计算
+      const calculatedPower = powerValue || itemCount * unitPrice
+      return `Sell the ${itemName} to get ${calculatedPower.toLocaleString()} Power`
     }
     return `Use the ${itemName} to activate effects?`
   }
