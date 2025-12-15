@@ -15,6 +15,52 @@ interface PropCardProps {
   }) => void
 }
 
+interface TextSegments {
+  prefix: string
+  value?: string
+  suffix?: string
+}
+
+const splitTextSegments = (text: string): TextSegments => {
+  const match = text.match(/^(.*?)([+-]?\d+(?:\.\d+)?)(.*)$/)
+
+  if (!match) return { prefix: text.trim() }
+
+  const [, prefix, value, suffix] = match
+  // 格式化标签内容
+  return {
+    prefix: prefix.trim().replace(/:$/, ''),
+    value: value.trim(),
+    suffix: suffix.trim(),
+  }
+}
+
+const InfoBadge = ({ text }: { text: string }) => {
+  const { prefix, value, suffix } = splitTextSegments(text)
+
+  return (
+    <div className="flex h-[14px] items-center justify-center px-[6px] whitespace-nowrap no-underline gap-[1px]">
+      {prefix && (
+        <span className="font-jersey-10 text-[10px] leading-[14px] text-[#00F0FF] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+          {prefix}
+        </span>
+      )}
+
+      {value && (
+        <span className="flex items-center font-jersey-10 text-[15px] leading-[14px] text-[#BC13FE] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff,0px_0px_3px_#FFFFFF]">
+          {value}
+        </span>
+      )}
+
+      {suffix && (
+        <span className="font-jersey-10 text-[10px] leading-[14px] text-[#B7B7B7] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+          {suffix}
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function PropCard({
   title,
   validity = 'Validity: 3 Days',
@@ -64,7 +110,7 @@ export function PropCard({
         <div className="flex flex-row justify-center items-center pt-[5px] w-[105.59px] h-[22px]">
           <div
             className="font-jersey-10 text-white text-[24px] leading-[22px] text-center whitespace-nowrap mt-0.5 overflow-hidden"
-            style={{ textShadow: '0px 0px 1px #BC13FE' }}
+            style={{}}
           >
             {title}
           </div>
@@ -117,12 +163,8 @@ export function PropCard({
           style={{ height: '14px', top: '140px' }}
         >
           <div className="flex flex-row justify-center items-center gap-[6px] w-full">
-            <div className="font-jersey-10 text-[#00F0FF] text-[8px] leading-[14px] flex items-center justify-center text-center w-[56px] h-[14px] whitespace-nowrap overflow-hidden">
-              {validity}
-            </div>
-            <div className="font-jersey-10 text-[#00F0FF] text-[8px] leading-[14px] flex items-center justify-center text-center w-[70px] h-[14px]  whitespace-nowrap overflow-hidden">
-              {dailyCap}
-            </div>
+            <InfoBadge text={validity} />
+            <InfoBadge text={dailyCap} />
           </div>
         </div>
       </div>

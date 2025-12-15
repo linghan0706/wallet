@@ -149,8 +149,8 @@ export default function BackpackPage() {
           transition={{ duration: 0.5 }}
         >
           <h1
-            className="font-jersey-10 font-normal text-[36px] text-white mx-auto"
-            style={{ width: '120px', height: '23px', lineHeight: '23px' }}
+            className="font-jersey-10 font-normal text-[48px] text-white mx-auto text-shadow-[0px 0px 10px rgba(0, 240, 255, 0.6)]"
+            style={{ width: '160px', height: '22px', lineHeight: '22px' }}
           >
             Backpack
           </h1>
