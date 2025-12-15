@@ -39,21 +39,21 @@ const InfoBadge = ({ text }: { text: string }) => {
   const { prefix, value, suffix } = splitTextSegments(text)
 
   return (
-    <div className="flex h-[14px] items-center justify-center px-[6px] whitespace-nowrap no-underline gap-[1px]">
+    <div className="flex h-[14px] items-center justify-center px-[4px] whitespace-nowrap no-underline gap-[1px] text-center">
       {prefix && (
-        <span className="font-jersey-10 text-[10px] leading-[14px] text-[#00F0FF] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+        <span className="inline-flex h-full items-center font-jersey-10 text-[10px] leading-[14px] text-[#00F0FF] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
           {prefix}
         </span>
       )}
 
       {value && (
-        <span className="flex items-center font-jersey-10 text-[15px] leading-[14px] text-[#BC13FE] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff,0px_0px_3px_#FFFFFF]">
+        <span className="inline-flex h-full items-center font-jersey-10 text-[15px] leading-[14px] text-[#BC13FE] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff,0px_0px_3px_#FFFFFF]">
           {value}
         </span>
       )}
 
       {suffix && (
-        <span className="font-jersey-10 text-[10px] leading-[14px] text-[#B7B7B7] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+        <span className="inline-flex h-full items-center font-jersey-10 text-[10px] leading-[14px] text-[#B7B7B7] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
           {suffix}
         </span>
       )}
@@ -159,10 +159,10 @@ export function PropCard({
 
         {/* 底部：道具信息 */}
         <div
-          className="absolute bottom-0 w-full flex flex-col items-center pb-[10px]"
+          className="absolute bottom-0 w-full flex flex-col items-center pb-[10px] mt-0.5"
           style={{ height: '14px', top: '140px' }}
         >
-          <div className="flex flex-row justify-center items-center gap-[6px] w-full">
+          <div className="flex flex-row justify-center items-center  w-full">
             <InfoBadge text={validity} />
             <InfoBadge text={dailyCap} />
           </div>
