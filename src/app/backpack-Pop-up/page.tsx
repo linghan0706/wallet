@@ -41,10 +41,13 @@ export default function BackpackPopupPlayground() {
       ),
       giftProps: (
         <GiftProps
+          itemName="Magic Potion"
+          itemIcon="/backpack/StageProgress.svg"
           defaultUsername="@exampleuser"
           defaultAmount={2}
           onConfirm={payload => console.log('Gift confirm', payload)}
           onCancel={() => console.log('Gift cancel')}
+          onClose={() => setShowPane(false)}
         />
       ),
 
