@@ -9,10 +9,12 @@ export default function AssetRedemption() {
       <div className="relative h-[220px] w-[363px]  overflow-hidden rounded-[8px] border border-cyan-500/20 bg-[rgba(26,26,64,0.45)] px-6 pb-5 pt-4 shadow-[0_0_38px_rgba(0,0,0,0.45)]">
         <div className="absolute" />
         <div className="relative flex h-full flex-col items-center">
-          <p className="mt-1 font-jersey-10 text-[24px] leading-[22px] text-white/80 [text-shadow:0_0_1px_#BC13FE]">
+          <p className="font-jersey-15 text-[16px] sm:text-[16px] leading-[22px] sm:leading-[20px] text-center text-[#B2B2B2] font-normal">
+            redeem props and resources
+          </p>
+          <p className="mt-2 font-jersey-10 text-[24px] leading-[22px] text-white/80 [text-shadow:0_0_1px_#BC13FE]">
             asset redemption
           </p>
-
           <div className="relative mt-4 grid w-[288px] grid-cols-[112px_60px_112px] items-start gap-2">
             {/* 连接线 */}
             <div className="pointer-events-none absolute left-[149px] top-[33px] h-[32px] w-[130px] -translate-x-1/2">

@@ -85,7 +85,7 @@ export function PropCard({
               boxSizing: 'border-box',
               background:
                 'linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 240, 255, 0.15) 75%, rgba(255, 255, 255, 0.176) 87.5%, rgba(255, 255, 255, 0.2) 100%), linear-gradient(180deg, rgba(188, 19, 254, 0.08) 0%, rgba(0, 102, 255, 0.32) 25%, rgba(0, 240, 255, 0.64) 50%, rgba(0, 102, 255, 0.32) 75%, rgba(188, 19, 254, 0.08) 100%)',
-              backgroundImage: 'url(/stores/propiconback.png)',
+              backgroundImage: 'url(/stores/payiconback.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

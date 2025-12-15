@@ -44,6 +44,14 @@ interface GuidancePageData {
   }
 }
 
+const baseDescriptionStyle: StyleConfig = {
+  className: 'font-jersey-10',
+  fontSize: '18px',
+  lineHeight: '22px',
+  color: '#D3D3D3',
+  textAlign: 'center',
+}
+
 // 引导页面数据
 const guidancePages: GuidancePageData[] = [
   {
@@ -51,7 +59,7 @@ const guidancePages: GuidancePageData[] = [
     icon: '/LoadingIcon/Loading-1.png',
     title: 'Welcome to',
     subtitle: 'NovaExplorer',
-    description: 'Collect energy and search for spaceship parts',
+    description: '',
     styles: {
       mainTitle: {
         className:
@@ -72,16 +80,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
   {
@@ -100,16 +99,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
   {
@@ -128,16 +118,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
   {
@@ -156,16 +137,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
   {
@@ -184,16 +156,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
   {
@@ -222,16 +185,7 @@ const guidancePages: GuidancePageData[] = [
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
-      description: {
-        className: 'font-exo2',
-        fontSize: '16px',
-        lineHeight: '22px',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        width: '100%',
-        height: 'auto',
-        marginTop: '10px',
-      },
+      description: { ...baseDescriptionStyle, marginTop: '10px' },
     },
   },
 ]
@@ -301,7 +255,7 @@ interface LoadingProps {
 
 export default function Loading({ onComplete }: LoadingProps) {
   // 初始化为1，这样第二个进度条（index=1）会在进入时点亮
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(6)
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   // 布局管理器的ref引用
@@ -319,6 +273,7 @@ export default function Loading({ onComplete }: LoadingProps) {
   })
 
   const currentData = guidancePages[currentPage - 1]
+  const hasDescription = Boolean(currentData.description?.trim())
 
   const handleNext = () => {
     if (currentPage < guidancePages.length && !isTransitioning) {
@@ -419,12 +374,14 @@ export default function Loading({ onComplete }: LoadingProps) {
           <AnimatePresence mode="wait">
             <motion.div
               key={`content-${currentPage}`}
-              className="flex flex-col items-center w-full"
+              className={`flex flex-col items-center w-full ${
+                hasDescription ? 'gap-1.5' : 'gap-3'
+              }`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              style={{ height: '106px' }} // 主标题(58px) + 副标题(48px)
+              style={{ minHeight: '106px' }} // 主标题(58px) + 副标题(48px)
             >
               {/* 主标题容器  */}
               <div
@@ -601,7 +558,7 @@ export default function Loading({ onComplete }: LoadingProps) {
                   textAlign: 'center',
                 }}
               >
-                Next Step
+                {currentPage === guidancePages.length ? 'Launch' : 'Next Step'}
               </span>
             </motion.button>
           </div>

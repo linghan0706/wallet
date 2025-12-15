@@ -278,7 +278,7 @@ export default function StorePage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden pb-20 pt-10 sm:pt-14 mt-[20px]">
+    <div className="min-h-screen relative overflow-hidden pb-20 pt-10 sm:pt-14 mt-[24px]">
       <div
         className="fixed inset-0 bg-gradient-to-b from-[#5E32AC] via-[#3D1A78] to-[#1A0B2E] bg-cover bg-contain"
         style={{ backgroundImage: `url(/layout/back.png)` }}
@@ -287,11 +287,8 @@ export default function StorePage() {
       <div className="relative z-10 px-4">
         <div className="flex flex-col items-center pt-3 sm:pt-6 space-y-2 sm:space-y-3">
           <h1 className="font-jersey-10 text-[48px]  leading-[22px] text-white font-normal tracking-wide text-center text-shadow:0px_0px_10px_rgba(0,240,255,0.6)">
-            store
+            Store
           </h1>
-          <p className="font-jersey-15 text-[16px] sm:text-[16px] leading-[22px] sm:leading-[20px] text-center text-[#B2B2B2] font-normal">
-            redeem props and resources
-          </p>
         </div>
         {/* 资产兑换 */}
         <motion.div
