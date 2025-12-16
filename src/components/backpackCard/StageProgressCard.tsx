@@ -1,302 +1,238 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import Image from 'next/image'
+﻿import React, { useMemo, useState } from 'react'
+import {
+  BlueStarStage,
+  GalaxyStage,
+  InfiniteUniverseStage,
+  SolarSystemStage,
+  TopStage,
+} from './stageProgress'
 
-type PartBoxCoord = { x: number; y: number }
-
-function clampToContainer(
-  left: number,
-  top: number,
-  w: number,
-  h: number,
-  cw: number,
-  ch: number
-): { left: number; top: number } {
-  const clampedLeft = Math.max(0, Math.min(cw - w, Math.round(left)))
-  const clampedTop = Math.max(0, Math.min(ch - h, Math.round(top)))
-  return { left: clampedLeft, top: clampedTop }
-}
-
-/** Runtime validation helpers */
-function isFiniteNumber(n: unknown): n is number {
-  return typeof n === 'number' && Number.isFinite(n)
-}
-
-function validateCoordinates(
-  coords: PartBoxCoord[],
-  cw: number,
-  ch: number
-): PartBoxCoord[] {
-  return coords.map(p => {
-    const x = isFiniteNumber(p.x) ? p.x : 0
-    const y = isFiniteNumber(p.y) ? p.y : 0
-    return {
-      x: Math.max(0, Math.min(cw, Math.round(x))),
-      y: Math.max(0, Math.min(ch, Math.round(y))),
-    }
-  })
-}
-
-function toLeftTop(
-  coords: PartBoxCoord[]
-): Array<{ left: number; top: number }> {
-  return coords.map(c => ({ left: c.x, top: c.y }))
-}
-
-export type StageProgressCardProps = {
-  title?: string
-  imageSrc?: string
+type StageProgressCardProps = {
   className?: string
-  children?: React.ReactNode
-  /** 顶部右侧徽章文本（Frame 429） */
-  badgeText?: string
-  /** 是否显示顶部右侧徽章 */
-  showBadge?: boolean
-  /** 零件盒子数据：用于环绕飞机主体均匀分布 */
-  parts?: Array<{ label: string; iconSrc?: string; installed?: boolean }>
-  /** 零件盒子尺寸（默认：112×112） */
-  partBoxSize?: { width: number; height: number }
-  /** 起始角度（度），默认 -90 从顶部开始，随后均匀分布 */
-  startAngleDeg?: number
-  /** 飞机外扩的环形间距（避免与飞机相交），默认 12 */
-  ringPadding?: number
-  /** 是否显示角落锁定 */
-  showCornerLocks?: boolean
-  /** 锁定位置数组 */
-  lockedPositions?: Array<{ left: number; top: number }>
-  /** 测试 ID */
-  'data-testid'?: string
+  /** 当前阶段 key，可用于外部渲染详情 */
+  activeStage?: keyof typeof stageKeyMap
+  /** 自定义阶段详情内容（放在进度条下方） */
+  content?: React.ReactNode
 }
 
-// Stable default parts to avoid new array creation each render
-const DEFAULT_PARTS: Array<{
-  label: string
-  iconSrc?: string
-  installed?: boolean
-}> = [
-  { label: 'Horizontal\nStabilizer' },
-  { label: 'Vertical\nStabilizer' },
-  { label: 'Landing\nGear' },
-]
-
-// 零件盒子图标元数据
-type PartItemMeta = { iconSrc: string; label: string }
-const PART_ITEM_META: Record<number, PartItemMeta> = {
-  // Known asset present in public/backpack/Part/verticalstabilizer.svg
-  1: {
-    iconSrc: '/backpack/part/vertical_stabilizer.svg',
-    label: 'Vertical Stabilizer',
-  },
-}
-
-function getPartItemMeta(
-  id: number | undefined,
-  fallback: { iconSrc?: string; label?: string }
-): { iconSrc?: string; label: string } {
-  if (!id)
-    return { iconSrc: fallback.iconSrc, label: fallback.label ?? 'Unknown' }
-  const meta = PART_ITEM_META[id]
-  if (meta) return meta
-  return { iconSrc: fallback.iconSrc, label: fallback.label ?? 'Unknown' }
+const stageKeyMap = {
+  blueStar: 'blue star',
+  solarSystem: 'solar system',
+  galaxy: 'galaxy',
+  infiniteUniverse: 'infinite universe',
+  top: 'top',
 }
 
 const StageProgressCard: React.FC<StageProgressCardProps> = ({
-  title = 'Stage Progress',
-  imageSrc = '/backpack/StageProgress.svg',
   className,
-  children,
-  badgeText = 'Blue Star',
-  showBadge = true,
-  parts = DEFAULT_PARTS,
-  partBoxSize: _partBoxSize = { width: 112, height: 112 },
-  startAngleDeg: _startAngleDeg = -90,
-  ringPadding: _ringPadding = 12,
-  showCornerLocks: _showCornerLocks,
-  lockedPositions: _lockedPositions,
-  'data-testid': dataTestId,
+  activeStage = 'blueStar',
+  content,
 }) => {
-  // 通过容器宽度实现横向响应式缩放，使绝对定位在不同屏幕下保持比例
-  const cardRef = useRef<HTMLDivElement | null>(null)
-  const [cardWidth, setCardWidth] = useState<number>(336)
-  const [cardHeight, setCardHeight] = useState<number>(345)
-  useEffect(() => {
-    const el = cardRef.current
-    if (!el) return
-    const update = () => {
-      setCardWidth(el.clientWidth || 361)
-      setCardHeight(el.clientHeight || 413)
-    }
-    update()
-    // 监听容器尺寸变化
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  // 零件盒子坐标（绝对定位），按每个盒子尺寸独立计算
-  const PartCoordinate = useMemo(
+  const [testMode, setTestMode] = useState(false)
+  const [testIndex, setTestIndex] = useState(0)
+  const stageComponentMap = useMemo(
+    () => ({
+      blueStar: BlueStarStage,
+      solarSystem: SolarSystemStage,
+      galaxy: GalaxyStage,
+      infiniteUniverse: InfiniteUniverseStage,
+      top: TopStage,
+    }),
+    []
+  )
+  const ActiveStageComponent = stageComponentMap[activeStage]
+  const testComponents = useMemo(
     () => [
-      { id: 1, x: 200, y: 10, active: true },
-      { id: 2, x: 200, y: 280, active: false },
-      { id: 3, x: 0, y: 0, active: false },
+      { key: 'blueStar', label: 'Blue Star', Component: BlueStarStage },
+      {
+        key: 'solarSystem',
+        label: 'Solar System',
+        Component: SolarSystemStage,
+      },
+      { key: 'galaxy', label: 'Galaxy', Component: GalaxyStage },
+      {
+        key: 'infiniteUniverse',
+        label: 'Infinite Universe',
+        Component: InfiniteUniverseStage,
+      },
+      { key: 'top', label: 'Top', Component: TopStage },
     ],
     []
   )
+  const currentTest = testComponents[testIndex]
 
-  const partRenderData = useMemo(() => {
-    // 改为仅由 PartCoordinate 数组驱动数量与定位，并进行运行时校验
-    const cw = cardWidth
-    const ch = cardHeight
-    const coords = PartCoordinate.map(c => ({ x: c.x, y: c.y }))
-    const safeCoords = validateCoordinates(coords, cw, ch)
-    return toLeftTop(safeCoords)
-  }, [cardWidth, cardHeight, PartCoordinate])
+  {
+    /**
+     *元数据定义
+     */
+  }
+  const stages = [
+    {
+      key: 'blueStar' as const,
+      label: stageKeyMap.blueStar,
+      icon: '/backpack/stage_progress/total/Blue_star.png',
+      textShadow: '1px 1px 3px #00F0FF',
+    },
+    {
+      key: 'solarSystem' as const,
+      label: stageKeyMap.solarSystem,
+      icon: '/backpack/stage_progress/total/Solar_system.png',
+      textShadow: '1px 1px 3px #FF8C00',
+    },
+    {
+      key: 'galaxy' as const,
+      label: stageKeyMap.galaxy,
+      icon: '/backpack/stage_progress/total/Galaxy.png',
+      textShadow: '1px 1px 3px #BC13FE',
+    },
+    {
+      key: 'infiniteUniverse' as const,
+      label: stageKeyMap.infiniteUniverse,
+      icon: '/backpack/stage_progress/total/Infinite_universe.png',
+      textShadow: '1px 1px 3px #7000FF',
+    },
+    {
+      key: 'top' as const,
+      label: stageKeyMap.top,
+      icon: '/backpack/stage_progress/total/Top.png',
+      textShadow: '1px 1px 3px #7000FF',
+    },
+  ] as const
+
+  const connectors = [
+    {
+      gradient: 'linear-gradient(90deg, #00F0FF 0%, #00F0FF 45%, #FF8C00 100%)',
+      shadow: '#00F0FF',
+    },
+    {
+      gradient: 'linear-gradient(90deg, #FF8C00 0%, #DE507F 45%, #BC13FE 100%)',
+      shadow: '#FF8C00',
+    },
+    {
+      gradient: 'linear-gradient(90deg, #BC13FE 0%, #960AFF 60%, #7000FF 100%)',
+      shadow: '#960AFF',
+    },
+    {
+      gradient: 'linear-gradient(90deg, #7000FF 0%, #3878FF 55%, #00F0FF 100%)',
+      shadow: '#3878FF',
+    },
+  ] as const
+
   return (
     <section
       className={[
-        'flex flex-col items-center justify-center text-center',
-        'w-full max-w-[361px] h-[413px]',
-        'py-4 px-3 gap-[10px] rounded-[12px]',
-        'shadow-[0_8px_24px_rgba(0,0,0,0.35)]',
-        'bg-[#191A3F]',
-        'border border-[#6B0AE9]',
+        'relative w-[353px] h-[370px] mx-auto flex flex-col items-center justify-start gap-[10px]',
         className ?? '',
       ].join(' ')}
-      aria-label={title}
-      data-testid={dataTestId}
+      aria-label="Stage progress"
     >
-      {/* 顶部左右布局：左侧标题 + 右侧徽章 */}
-      <div className="w-full flex items-center justify-between box-border">
-        <div className="w-[132px] h-[20px] font-jersey-10 font-normal text-[24px] leading-[20px] text-center text-white">
-          {title}
-        </div>
-        {showBadge && (
-          <div className="box-border flex flex-col justify-center items-center px-[8px] py-[6px] w-[75px] h-[26px] bg-[#5C17A6] rounded-[8px] flex-none order-1 font-exo2 font-medium text-[13px] leading-[14px] text-center text-white items-end">
-            {badgeText}
-          </div>
-        )}
-      </div>
+      {/* 顶部标题 */}
+      <header className="w-full flex flex-col items-center pt-[12px]">
+        <h2
+          className="font-jersey-10 text-[24px] leading-[22px] text-white/80 text-center"
+          style={{ textShadow: '0px 0px 1px #BC13FE' }}
+        >
+          Stage Progress
+        </h2>
+      </header>
 
-      {/* 主体拼图容器 */}
-      <div
-        ref={cardRef}
-        className="relative flex-1 flex items-center justify-center box-border w-[336px] h-[345px] rounded-[12px] border-3 b border-[#6B0AE9]"
-      >
-        {/* 飞机主体 */}
-        <Image
-          src={imageSrc}
-          alt="Stage progress"
-          width={220}
-          height={226}
-          priority
-          className="w-[220px] h-[226px] rounded-[12px] object-contain"
-        />
-
-        {/* 零件盒子 */}
-        {partRenderData.map((pos, idx) => {
-          const item = parts[idx]
-          const installed = !!PartCoordinate[idx]?.active
-          if (installed) {
-            const meta = getPartItemMeta(PartCoordinate[idx]?.id, {
-              iconSrc: item?.iconSrc,
-              label: item?.label,
-            })
-            // 已存放零件：采用 installed 样式
-            return (
-              <div
-                key={`part-${PartCoordinate[idx]?.id ?? idx}`}
-                className="absolute box-border bg-[#1A242D] border border-[#A34CFF] shadow-[0px_4px_10.1px_8px_rgba(81,42,255,0.25),_inset_12px_12px_41.2px_rgba(102,13,197,0.25)] rounded-none rounded-tr-[8px] rounded-bl-[8px] flex items-center justify-center w-[48px] h-[65px] md:w-[50px] md:h-[69px]"
-                style={{ left: `${pos.left}px`, top: `${pos.top}px` }}
-                data-testid={`part-box-installed-${PartCoordinate[idx]?.id ?? idx}`}
-              >
-                <div className="flex flex-col items-center p-0 gap-[2px] w-[40px] h-[53px]">
-                  <div className="flex flex-row items-center p-0 w-[27px] h-[27px]">
-                    {meta?.iconSrc ? (
-                      <Image
-                        src={meta.iconSrc!}
-                        alt={meta.label}
-                        width={27}
-                        height={27}
-                        className="w-[27px] h-[27px] object-contain"
+      {/* 阶段进度条 */}
+      <div className="w-full flex flex-col items-center">
+        <div className="self-stretch h-14 relative">
+          <div
+            className="absolute inset-0 rounded-[8px] pointer-events-none"
+            style={{
+              padding: '1px',
+              background:
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 10%, #1CB4FF 25%, #2A96FF 38%, #3187FF 44%, #3878FF 52%, #7000FF 72%, rgba(255,255,255,0) 100%)',
+              WebkitMask:
+                'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+              boxSizing: 'border-box',
+            }}
+            aria-hidden
+          />
+          <div className="relative z-10 w-full h-full rounded-[8px]">
+            <div className="absolute left-[10px] top-[5px] w-[320px] inline-flex justify-between items-center">
+              {stages.map((stage, idx) => (
+                <React.Fragment key={stage.label}>
+                  <div className="w-10 inline-flex flex-col justify-center items-center">
+                    <div className="w-[30px] h-[30px]">
+                      <img
+                        src={stage.icon}
+                        alt={stage.label}
+                        className="w-full h-full object-contain select-none"
+                        loading="lazy"
                       />
-                    ) : null}
+                    </div>
+                    <div
+                      className="text-center text-white text-[10px] font-normal font-jersey-10 leading-[10px] w-full"
+                      style={{ textShadow: stage.textShadow }}
+                    >
+                      {stage.label}
+                    </div>
                   </div>
-                  <div className="w-[40px] h-[24px] font-jersey-10 font-normal text-[10px] leading-[12px] text-center text-white flex-none order-1 self-stretch grow-0 whitespace-pre-line">
-                    {meta?.label}
-                  </div>
-                </div>
-              </div>
-            )
-          }
-          // 未存放：采用当前 Locked 样式
-          return (
-            <div
-              key={`part-${PartCoordinate[idx]?.id ?? idx}`}
-              className="group400-outer absolute w-[48px] h-[48px] md:w-[50px] md:h-[50px] bg-[rgba(26,36,45,0.6)] shadow-[0px_4px_10.1px_8px_rgba(81,42,255,0.25),_inset_12px_12px_41.2px_rgba(102,13,197,0.25)] rounded-none rounded-tr-[8px] rounded-bl-[8px] flex flex-col items-center justify-start"
-              style={{ left: `${pos.left}px`, top: `${pos.top}px` }}
-              data-testid={`part-box-locked-${PartCoordinate[idx]?.id ?? idx}`}
-            >
-              {/* Vertical layout: icon top + text bottom; strict pixel sizes per spec */}
-              {/* Icon area: 21x23 with #57378E background to match design tone */}
-              <div
-                className="locked-icon-area mt-[6px] w-[21px] h-[23px] rounded-[3px] flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <Image
-                  src="/backpack/lock/locked.svg"
-                  alt="Locked icon"
-                  width={21}
-                  height={23}
-                  className="w-[21px] h-[23px] object-contain"
-                />
-              </div>
-
-              {/* Text area: 29x12, Jersey 10, centered, color #57378E */}
-              <div
-                className="locked-text-area font-jersey-10 font-normal text-[12px] leading-[12px] text-[#57378E] w-[29px] h-[12px] mt-[4px] flex items-center justify-center text-center"
-                aria-label="Locked"
-              >
-                Locked
-              </div>
-              <svg
-                className="absolute inset-0 pointer-events-none"
-                width="100%"
-                height="100%"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <filter
-                    id="lockGlow"
-                    x="-50%"
-                    y="-50%"
-                    width="200%"
-                    height="200%"
-                  >
-                    <feGaussianBlur stdDeviation="1.2" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-                <path
-                  d="M0.5 0.5 H 39.5 A 8 8 0 0 1 47.5 8.5 V 47.5 H 8.5 A 8 8 0 0 1 0.5 39.5 V 0.5 Z"
-                  fill="none"
-                  stroke="#A34CFF"
-                  strokeWidth="2.6"
-                  strokeLinecap="round"
-                  strokeDasharray="18 12"
-                  filter="url(#lockGlow)"
-                />
-              </svg>
+                  {idx < connectors.length && (
+                    <div
+                      className="flex-1 h-[6px] rounded-[3px]"
+                      style={{
+                        background: connectors[idx].gradient,
+                        boxShadow: `0px 0px 6px ${connectors[idx].shadow}`,
+                      }}
+                      aria-hidden
+                    />
+                  )}
+                </React.Fragment>
+              ))}
             </div>
-          )
-        })}
+          </div>
+        </div>
       </div>
 
-      {children}
+      {/* 阶段详情区 */}
+      <div className="relative flex-1 w-full flex items-center justify-center">
+        <div className="absolute top-2 right-2 z-20 flex items-center gap-2 text-xs">
+          <button
+            type="button"
+            onClick={() => setTestMode(prev => !prev)}
+            className="px-2 py-[6px] rounded-md border border-cyan-400/60 bg-[rgba(0,240,255,0.08)] text-white shadow-[0_0_8px_rgba(0,240,255,0.35)] hover:shadow-[0_0_12px_rgba(0,240,255,0.5)] transition-shadow"
+          >
+            {testMode ? '关闭子组件测试' : '开启子组件测试'}
+          </button>
+          {testMode && (
+            <button
+              type="button"
+              onClick={() =>
+                setTestIndex(prev => (prev + 1) % testComponents.length)
+              }
+              className="px-2 py-[6px] rounded-md border border-cyan-400/60 bg-[rgba(0,240,255,0.08)] text-white shadow-[0_0_8px_rgba(0,240,255,0.35)] hover:shadow-[0_0_12px_rgba(0,240,255,0.5)] transition-shadow"
+              title={`on：${currentTest.label}`}
+            >
+              切换子组件：{currentTest.label}
+            </button>
+          )}
+        </div>
+
+        <div className="w-full flex items-center justify-center">
+          {testMode && currentTest?.Component ? (
+            <div className="w-full flex items-center justify-center">
+              <currentTest.Component />
+            </div>
+          ) : content ? (
+            content
+          ) : ActiveStageComponent ? (
+            <div className="w-full flex items-center justify-center">
+              <ActiveStageComponent />
+            </div>
+          ) : (
+            <div className="text-[#90A1B9] text-sm text-center px-4">
+              {`Displaying content for ${stageKeyMap[activeStage]}. Provide a stage detail component via 'content' prop to render here.`}
+            </div>
+          )}
+        </div>
+      </div>
     </section>
   )
 }
-
 export default StageProgressCard

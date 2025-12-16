@@ -1,0 +1,5 @@
+export { default as BlueStarStage } from './BlueStarStage'
+export { default as GalaxyStage } from './GalaxyStage'
+export { default as InfiniteUniverseStage } from './InfiniteUniverseStage'
+export { default as SolarSystemStage } from './SolarSystemStage'
+export { default as TopStage } from './TopStage'
