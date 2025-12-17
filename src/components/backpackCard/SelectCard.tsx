@@ -218,6 +218,32 @@ const SelectCard: React.FC<SelectCardProps> = ({
     })
   }, [items, value, sortKey, sortOrder])
 
+  const baseButtonClass =
+    'w-[60px] h-[30px] inline-flex items-center justify-center font-jersey-10 font-normal text-[16px] leading-[16px] text-center transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+
+  const getButtonStateClass = (
+    category: BackpackCategory | string,
+    selected: boolean
+  ) => {
+    if (selected) {
+      if (category === 'all') {
+        return 'bg-[#BC13FE] text-white border border-white shadow-[0_2px_6px_rgba(0,0,0,0.25)] scale-100'
+      }
+      if (category === 'stage') {
+        return 'bg-[#00F0FF] text-white border border-white shadow-[0_2px_6px_rgba(0,0,0,0.25)] scale-100'
+      }
+      return 'bg-[#B0B0C0] text-white border border-white shadow-[0_2px_6px_rgba(0,0,0,0.25)] scale-100'
+    }
+
+    if (category === 'all') {
+      return 'bg-transparent text-[#BC13FE] border border-[#BC13FE]'
+    }
+    if (category === 'stage') {
+      return 'bg-transparent text-[#00F0FF] border border-[#00F0FF]'
+    }
+    return 'bg-transparent text-[#B0B0C0] border border-[#B0B0C0]'
+  }
+
   return (
     <>
       {/* 分类筛选选项卡区域 */}
@@ -247,14 +273,8 @@ const SelectCard: React.FC<SelectCardProps> = ({
                 onClick={() => onChange?.(opt.value)}
                 data-testid={`select-option-${opt.value}`}
                 className={[
-                  'w-[60px] h-[30px] inline-flex items-center justify-center font-jersey-10 font-normal text-[16px] leading-[16px] text-center',
-                  'transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)]',
-                  'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
-                  selected
-                    ? 'bg-[#00F0FF] text-white border border-white shadow-[0_2px_6px_rgba(0,0,0,0.25)] scale-100'
-                    : opt.value === 'all'
-                      ? 'bg-transparent text-[#BC13FE] border border-[#BC13FE]'
-                      : 'bg-transparent text-[#B0B0C0] border border-[#B0B0C0]',
+                  baseButtonClass,
+                  getButtonStateClass(opt.value, selected),
                 ].join(' ')}
                 style={{
                   willChange: 'transform, opacity',
