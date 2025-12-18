@@ -2,6 +2,19 @@ import React from 'react'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
 
 // 背包物品分类类型定义
+// /* Heading/Oxanium */
+// font-family: 'Oxanium';
+// font-style: normal;
+// font-weight: 300;
+// font-size: 10px;
+// line-height: 12px;
+// /* identical to box height */
+// text-align: center;
+// letter-spacing: 0.04em;
+// text-transform: uppercase;
+//
+// color: #BC13FE;
+
 export type BackpackCategory = 'all' | 'stage' | 'collector' | 'other'
 
 // 选择选项类型定义
@@ -155,8 +168,11 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, selected, onToggle }) => {
           }}
         >
           <span
-            className="text-center text-white text-[10px] font-normal font-jersey-10 leading-[16px]"
-            style={{ textShadow: '0px 0px 1px #BC13FE' }}
+            className="text-center text-white text-[10px] font-light font-oxanium leading-[12px]"
+            style={{
+              textShadow: '0px 0px 1px #BC13FE',
+              letterSpacing: '0.04em',
+            }}
             data-testid="select-card-quantity"
             aria-label={`Quantity ${item.quantity}`}
           >
@@ -172,12 +188,13 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, selected, onToggle }) => {
           }}
         >
           <span
-            className="text-white text-[8px] font-normal font-jersey-10 leading-[10px] inline-block w-full"
+            className="text-white text-[10px] font-light font-oxanium leading-[12px] inline-block w-full"
             style={{
               textShadow: '0px 0px 1px #BC13FE',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              letterSpacing: '0.04em',
             }}
           >
             {item.name}
@@ -219,7 +236,9 @@ const SelectCard: React.FC<SelectCardProps> = ({
   }, [items, value, sortKey, sortOrder])
 
   const baseButtonClass =
-    'w-[60px] h-[30px] inline-flex items-center justify-center font-jersey-10 font-normal text-[16px] leading-[16px] text-center transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+    'w-[60px] h-[30px] inline-flex items-center justify-center font-oxanium font-light text-[10px] leading-[12px] text-center uppercase transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+
+  // 应用字体样式：Oxanium字体，字号10px，行高12px，字重300，字母间距0.04em，全大写，居中对齐，颜色为#BC13FE
 
   const getButtonStateClass = (
     category: BackpackCategory | string,
@@ -279,6 +298,7 @@ const SelectCard: React.FC<SelectCardProps> = ({
                 style={{
                   willChange: 'transform, opacity',
                   touchAction: 'manipulation',
+                  letterSpacing: '0.04em',
                 }}
               >
                 {opt.label}

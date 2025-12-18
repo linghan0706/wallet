@@ -133,20 +133,25 @@ export default function BackpackPage() {
       {/* 顶部标题 */}
       <div className="relative z-10 px-4 pt-6 max-w-[420px] mx-auto">
         <MotionDiv
-          className="text-center"
+          className="flex flex-col justify-between items-center w-[360px] h-[52px]"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <h1
-            className="font-jersey-10 font-normal text-[48px] text-white mx-auto text-shadow-[0px 0px 10px rgba(0, 240, 255, 0.6)]"
-            style={{ width: '160px', height: '22px', lineHeight: '22px' }}
+            className="font-orbitron font-bold text-[32px] leading-[40px] tracking-[0.06em] uppercase text-white text-shadow-[0px_0px_10px_rgba(0,_240,_255,_0.6)]"
+            style={{
+              fontWeight: 900,
+            }}
           >
             Backpack
           </h1>
           <p
-            className="font-exo2 font-medium text-[16px] mx-auto"
-            style={{ height: '23px', lineHeight: '23px', color: '#90A1B9' }}
+            className="font-oxanium font-light text-[10px] leading-[12px] text-center tracking-[0.04em] uppercase"
+            style={{
+              fontWeight: 300,
+              color: '#B0B0C0',
+            }}
           >
             Check your props and collections
           </p>

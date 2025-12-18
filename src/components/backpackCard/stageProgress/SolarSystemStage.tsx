@@ -520,7 +520,7 @@ const SolarSystemStage: React.FC<SolarSystemStageProps> = ({
             width: '140px',
             height: '32px',
             left: 'calc(50% - 140px / 2 + 4.5px)',
-            top: `${BUTTON_TOP - 4}px`,
+            top: '220px',
             background: 'transparent',
             border: 'none',
             padding: 0,

@@ -129,8 +129,11 @@ const StageProgressCard: React.FC<StageProgressCardProps> = ({
       {/* 顶部标题 */}
       <header className="w-full flex flex-col items-center pt-[12px]">
         <h2
-          className="font-jersey-10 text-[24px] leading-[22px] text-white/80 text-center"
-          style={{ textShadow: '0px 0px 1px #BC13FE' }}
+          className="font-oxanium font-bold text-[10px] leading-[12px] tracking-[0.04em] uppercase text-white/80 text-center"
+          style={{
+            textShadow: '0px 0px 1px #BC13FE',
+            fontWeight: 700,
+          }}
         >
           Stage Progress
         </h2>
@@ -167,8 +170,11 @@ const StageProgressCard: React.FC<StageProgressCardProps> = ({
                       />
                     </div>
                     <div
-                      className="text-center text-white text-[10px] font-normal font-jersey-10 leading-[10px] w-full"
-                      style={{ textShadow: stage.textShadow }}
+                      className="text-center text-white text-[8px] font-bold font-ibm-plex-mono leading-[10px] w-full"
+                      style={{
+                        textShadow: '1px 1px 3px #FF8C00',
+                        fontWeight: 700,
+                      }}
                     >
                       {stage.label}
                     </div>

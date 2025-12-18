@@ -6,6 +6,9 @@ import {
   Jersey_25,
   Roboto,
   Exo_2,
+  Orbitron,
+  Oxanium,
+  IBM_Plex_Mono,
 } from 'next/font/google'
 import '@/styles/globals.css'
 import '@/styles/font.css'
@@ -42,6 +45,24 @@ const exo2 = Exo_2({
   variable: '--font-exo-2',
 })
 
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+  weight: '900',
+})
+
+const oxanium = Oxanium({
+  subsets: ['latin'],
+  variable: '--font-oxanium',
+  weight: '300',
+})
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  variable: '--font-ibm-plex-mono',
+  weight: '700',
+})
+
 export const metadata: Metadata = {
   title: 'Nova Explorer GAME',
   description: 'Nova星际游戏',
@@ -55,7 +76,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${inter.className} ${jersey10.variable} ${jersey15.variable} ${jersey25.variable} ${roboto.variable} ${exo2.variable}`}
+        className={`${inter.className} ${jersey10.variable} ${jersey15.variable} ${jersey25.variable} ${roboto.variable} ${exo2.variable} ${orbitron.variable} ${oxanium.variable} ${ibmPlexMono.variable}`}
       >
         <AntdRegistry>
           <ConfigProvider locale={zhCN}>
