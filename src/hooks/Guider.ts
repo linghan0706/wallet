@@ -1,12 +1,12 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { 
-  LayoutBounds, 
+import {
+  LayoutBounds,
   TRANSITION_CONFIG,
   calculateAvoidancePosition,
   getResponsiveSpacing,
-  validateLayout
+  validateLayout,
 } from '@/utils/GuideUtils'
 
 interface UseLayoutManagerProps {
@@ -29,7 +29,7 @@ export function useLayoutManager({
   containerRef,
   mainIconRef,
   titleAreaRef,
-  svgElementRef
+  svgElementRef,
 }: UseLayoutManagerProps) {
   const [layoutState, setLayoutState] = useState<LayoutState>({
     containerBounds: { x: 0, y: 0, width: 0, height: 0 },
@@ -37,25 +37,28 @@ export function useLayoutManager({
     titleAreaBounds: { x: 0, y: 0, width: 0, height: 0 },
     svgElementBounds: { x: 0, y: 0, width: 0, height: 0 },
     hasCollisions: false,
-    adjustedPositions: new Map()
+    adjustedPositions: new Map(),
   })
 
   const [screenWidth, setScreenWidth] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const isTransitioningRef = useRef(false)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
 
-  // 获取元素边界信息
-  const getBounds = useCallback((element: HTMLElement | SVGSVGElement | null): LayoutBounds => {
-    if (!element) return { x: 0, y: 0, width: 0, height: 0 }
-    
-    const rect = element.getBoundingClientRect()
-    return {
-      x: rect.left,
-      y: rect.top,
-      width: rect.width,
-      height: rect.height
-    }
-  }, [])
+  //获取元素边界信息
+  const getBounds = useCallback(
+    (element: HTMLElement | SVGSVGElement | null): LayoutBounds => {
+      if (!element) return { x: 0, y: 0, width: 0, height: 0 }
+
+      const rect = element.getBoundingClientRect()
+      return {
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height,
+      }
+    },
+    []
+  )
 
   // 更新布局状态
   const updateLayoutState = useCallback(() => {
@@ -75,7 +78,7 @@ export function useLayoutManager({
     const elements = [mainIconBounds, titleAreaBounds, svgElementBounds].filter(
       bounds => bounds.width > 0 && bounds.height > 0
     )
-    
+
     const validation = validateLayout(elements)
     const minDistance = getResponsiveSpacing(screenWidth)
 
@@ -87,9 +90,10 @@ export function useLayoutManager({
       validation.conflicts.forEach(conflict => {
         const element1 = elements[conflict.element1]
         const element2 = elements[conflict.element2]
-        
+
         // 优先保持主图标位置不变，调整其他元素
-        if (conflict.element1 === 0) { // 主图标是第一个元素
+        if (conflict.element1 === 0) {
+          // 主图标是第一个元素
           const adjustedPos = calculateAvoidancePosition(
             element2,
             element1,
@@ -115,22 +119,32 @@ export function useLayoutManager({
       titleAreaBounds,
       svgElementBounds,
       hasCollisions: !validation.isValid,
-      adjustedPositions
+      adjustedPositions,
     })
-  }, [containerRef, mainIconRef, titleAreaRef, svgElementRef, getBounds, screenWidth])
+  }, [
+    containerRef,
+    mainIconRef,
+    titleAreaRef,
+    svgElementRef,
+    getBounds,
+    screenWidth,
+  ])
 
   // 应用布局调整
   const applyLayoutAdjustments = useCallback(async () => {
-    if (layoutState.adjustedPositions.size === 0) return
+    if (layoutState.adjustedPositions.size === 0 || isTransitioningRef.current)
+      return
 
-    setIsTransitioning(true)
+    isTransitioningRef.current = true
 
-    // 应用平滑过渡动画
+    //应用平滑过渡动画
     const promises: Promise<void>[] = []
 
     layoutState.adjustedPositions.forEach((bounds, elementKey) => {
-      const promise = new Promise<void>((resolve) => {
-        const element = document.querySelector(`[data-layout-key="${elementKey}"]`) as HTMLElement
+      const promise = new Promise<void>(resolve => {
+        const element = document.querySelector(
+          `[data-layout-key="${elementKey}"]`
+        ) as HTMLElement
         if (!element) {
           resolve()
           return
@@ -149,13 +163,13 @@ export function useLayoutManager({
     })
 
     await Promise.all(promises)
-    setIsTransitioning(false)
+    isTransitioningRef.current = false
   }, [layoutState.adjustedPositions])
 
   // 重置布局
   const resetLayout = useCallback(() => {
     const elements = document.querySelectorAll('[data-layout-key]')
-    elements.forEach((element) => {
+    elements.forEach(element => {
       const htmlElement = element as HTMLElement
       htmlElement.style.transition = `transform ${TRANSITION_CONFIG.duration}ms ${TRANSITION_CONFIG.easing}`
       htmlElement.style.transform = 'translate(0px, 0px)'
@@ -165,9 +179,9 @@ export function useLayoutManager({
       setLayoutState(prev => ({
         ...prev,
         adjustedPositions: new Map(),
-        hasCollisions: false
+        hasCollisions: false,
       }))
-      setIsTransitioning(false)
+      isTransitioningRef.current = false
     }, TRANSITION_CONFIG.duration)
   }, [])
 
@@ -194,7 +208,7 @@ export function useLayoutManager({
       containerRef.current,
       mainIconRef.current,
       titleAreaRef.current,
-      svgElementRef.current
+      svgElementRef.current,
     ].filter(Boolean)
 
     elementsToObserve.forEach(element => {
@@ -208,22 +222,27 @@ export function useLayoutManager({
         resizeObserverRef.current.disconnect()
       }
     }
-  }, [containerRef, mainIconRef, titleAreaRef, svgElementRef, updateLayoutState])
+  }, [
+    containerRef,
+    mainIconRef,
+    titleAreaRef,
+    svgElementRef,
+    updateLayoutState,
+  ])
 
   // 当检测到碰撞时自动应用调整
   useEffect(() => {
-    if (layoutState.hasCollisions && !isTransitioning) {
+    if (layoutState.hasCollisions && !isTransitioningRef.current) {
       applyLayoutAdjustments()
     }
-  }, [layoutState.hasCollisions, isTransitioning, applyLayoutAdjustments])
+  }, [layoutState.hasCollisions, applyLayoutAdjustments])
 
   return {
     layoutState,
-    isTransitioning,
     screenWidth,
     minSafeDistance: getResponsiveSpacing(screenWidth),
     applyLayoutAdjustments,
     resetLayout,
-    updateLayoutState
+    updateLayoutState,
   }
 }

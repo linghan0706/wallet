@@ -106,7 +106,7 @@ export default function TaskupCard({
       {!loading && (
         <div
           key={activeItem.id}
-          className="mb-2 w-[300px] h-[300px] rounded-[12px] overflow-hidden bg-[url('/Popup/taskupback.svg')] bg-cover bg-center bg-[#0F172B] border border-white/10 flex flex-col justify-center items-center gap-2 text-white"
+          className="mb-2 w-[300px] h-[300px] rounded-[12px] overflow-hidden bg-[url('/Popup/taskupbackground.svg')] bg-cover bg-center bg-[#0F172B] border border-white/10 flex flex-col justify-center items-center gap-2 text-white"
           role="listitem"
         >
           <Image

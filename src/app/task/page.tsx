@@ -76,7 +76,7 @@ export default function TaskPage() {
       {/* 背景容器 */}
       <div
         className="fixed inset-0 bg-gradient-to-b from-[#5E32AC] via-[#3D1A78] to-[#1A0B2E] bg-cover bg-contain"
-        style={{ backgroundImage: `url(/layout/back.png)` }}
+        style={{ backgroundImage: `url(/layout/background.png)` }}
       ></div>
 
       {/* 头部标题区域*/}

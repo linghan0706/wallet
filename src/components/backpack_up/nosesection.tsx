@@ -49,7 +49,7 @@ const NoseSection: React.FC<NoseSectionProps> = ({
           aria-hidden
           className="absolute inset-0 rounded-[12px]"
           style={{
-            backgroundImage: 'url(/stores/storeupback.png)',
+            backgroundImage: 'url(/stores/storeupbackground.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',

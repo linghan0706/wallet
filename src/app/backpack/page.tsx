@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import MotionDiv from '@/components/motion/MotionDiv'
 import StageProgressCard from '@/components/backpackCard/StageProgressCard'
 import SelectCard, {
@@ -33,7 +33,7 @@ export default function BackpackPage() {
   {
     /**背包道具 */
   }
-  const buildMockItems = (): BackpackItem[] => {
+  const buildMockItems = useCallback((): BackpackItem[] => {
     return [
       {
         name: 'Nose Section',
@@ -78,9 +78,9 @@ export default function BackpackPage() {
         category: 'other',
       },
     ]
-  }
+  }, [])
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -91,11 +91,11 @@ export default function BackpackPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [buildMockItems])
 
   useEffect(() => {
     loadItems()
-  }, [])
+  }, [loadItems])
   const { mode, item, result, gift, close, openGift, openResult, openDetails } =
     useBackpackModalStore()
   const {
@@ -127,7 +127,7 @@ export default function BackpackPage() {
     <div className="min-h-screen relative overflow-hidden pb-20 pt-10 sm:pt-14 mt-[20px]">
       <div
         className="fixed inset-0 bg-gradient-to-b from-[#5E32AC] via-[#3D1A78] to-[#1A0B2E] bg-cover bg-contain"
-        style={{ backgroundImage: `url(/layout/back.png)` }}
+        style={{ backgroundImage: `url(/layout/background.png)` }}
       ></div>
 
       {/* 顶部标题 */}

@@ -3,7 +3,6 @@
 // 这里只提供示例代码和说明
 
 // 方式一示例（需要类型检查）
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function vibrateLight() {
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.HapticFeedback?.impactOccurred('light')
@@ -11,7 +10,6 @@ function vibrateLight() {
 }
 
 // 方式二示例（推荐，更安全）
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function vibrateLights() {
   if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
     window.Telegram.WebApp.HapticFeedback?.impactOccurred('light')

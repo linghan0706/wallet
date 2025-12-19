@@ -1,7 +1,7 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 type CurrencyName = 'USDC' | 'Ton' | 'Stars'
 
@@ -37,7 +37,7 @@ export default function StoresTransactionCard({
   //   icon: item.icon,
   // }))
 
-  // 数量对应金额映射，根据名称派生；保持 item 结构严格为 name + icon 对
+  //数量对应金额映射，根据名称派生；保持 item 结构严格为 name + icon 对
   const amountMap: Record<CurrencyName, number> = {
     Stars: 60,
     Ton: 0.2,
@@ -46,14 +46,7 @@ export default function StoresTransactionCard({
 
   const [activeIndex, setActiveIndex] = useState<number>(initialIndex)
   const [quantity, setQuantity] = useState<number>(initialQuantity)
-  const [iconSrc, setIconSrc] = useState<string>(
-    initialIconSrc || '/stores/AutomaticCollector/super.svg'
-  )
-
-  // 同步传入的图标到状态
-  useEffect(() => {
-    if (initialIconSrc) setIconSrc(initialIconSrc)
-  }, [initialIconSrc])
+  const iconSrc = initialIconSrc || '/stores/AutomaticCollector/super.svg'
 
   const active = useMemo(
     () => items[Math.min(Math.max(activeIndex, 0), items.length - 1)],
@@ -65,23 +58,23 @@ export default function StoresTransactionCard({
   const handleConfirm = () => onConfirm?.(active.name, quantity)
 
   return (
-    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[317px] h-[456.19px] text-white rounded-[12px] border border-white/10 bg-[url('/stores/storeupback.png')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
-      {/* 兑换关闭 */}
+    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[317px] h-[456.19px] text-white rounded-[12px] border border-white/10 bg-[url('/stores/storeupbackground.png')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+      {/* 关闭按钮 */}
       <button
         aria-label="Close"
         onClick={onClose}
         className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm text-white text-xl"
       >
-        ×
+        📴
       </button>
 
-      {/* 道具支付标题 */}
+      {/* 支付标题 */}
       <h3 className="font-jersey-10 font-['Jersey_10'] font-normal text-xl leading-[22px] text-center text-white">
         Please select a payment method
       </h3>
 
-      {/* 道具支付图标容器 */}
-      <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconback.png')] bg-cover rounded-[12px] mt-[52px]">
+      {/* 道具支付图标容器*/}
+      <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconbackground.png')] bg-cover rounded-[12px] mt-[52px]">
         <div className="w-[126px] h-[148px] box-border rounded-[12px]">
           <Image src={iconSrc} alt="item" width={126} height={148} priority />
         </div>
@@ -94,7 +87,7 @@ export default function StoresTransactionCard({
         />
       </div>
 
-      {/* 数量选择器 */}
+      {/* 数量选择器*/}
       <div
         className="flex items-center gap-3 mt-1 w-[100px] h-[22px] border-[#00F0FFCC] border-[1px] rounded-[8px]"
         style={{
@@ -129,7 +122,7 @@ export default function StoresTransactionCard({
         </button>
       </div>
 
-      {/* 道具支付方式选项 */}
+      {/* 支付方式 */}
       <div className="flex flex-row items-stretch justify-center gap-4 w-full px-2">
         {items.map((c, idx) => {
           const isActive = idx === activeIndex

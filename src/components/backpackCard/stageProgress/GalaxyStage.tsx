@@ -25,7 +25,7 @@ type GalaxyPart = {
 }
 
 const LOCK_ICON = '/backpack/part/lock/lock.png'
-const GALAXY_BG = '/backpack/part/galaxy/backimage/back.png'
+const GALAXY_BG = '/backpack/part/galaxy/backimage/background.png'
 const GALAXY_PORTAL_ACTIVE = '/backpack/part/galaxy/backimage/active.png'
 const GALAXY_PORTAL_INACTIVE = '/backpack/part/galaxy/backimage/inactive.png'
 

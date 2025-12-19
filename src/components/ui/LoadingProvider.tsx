@@ -1,6 +1,6 @@
-'use client'
+﻿'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import InitialLoading from './InitialLoading'
 import Loading from './Loading'
 
@@ -9,15 +9,14 @@ interface LoadingProviderProps {
 }
 
 export function LoadingProvider({ children }: LoadingProviderProps) {
-  const [loadingStage, setLoadingStage] = useState<'initial' | 'guidance' | 'complete'>('initial')
-
-  // 检查是否已经完成过引导流程
-  useEffect(() => {
-    const hasCompletedGuidance = localStorage.getItem('nova-explorer-guidance-completed')
-    if (hasCompletedGuidance === 'true') {
-      setLoadingStage('complete')
-    }
-  }, [])
+  const [loadingStage, setLoadingStage] = useState<
+    'initial' | 'guidance' | 'complete'
+  >(() => {
+    if (typeof window === 'undefined') return 'initial'
+    return localStorage.getItem('nova-explorer-guidance-completed') === 'true'
+      ? 'complete'
+      : 'initial'
+  })
 
   const handleInitialLoadingComplete = () => {
     setLoadingStage('guidance')

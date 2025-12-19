@@ -40,8 +40,8 @@ export default function StoresTransactionResult({
   const current = isEmpty ? undefined : items[safeIndex]
   const isSuccess = current?.name === 'Payment successful'
   const bgImage = isSuccess
-    ? "url('/stores/StoreSuccessBack.png')"
-    : "url('/stores/StoreFailBack.png')"
+    ? "url('/stores/StoreSuccessBackground.png')"
+    : "url('/stores/StoreFailBackground.png')"
   const iconSrc = isSuccess
     ? '/stores/result/succee.png'
     : '/stores/result/fail.png'
@@ -122,7 +122,7 @@ export default function StoresTransactionResult({
           </button>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconback.png')] bg-cover rounded-[12px]">
+            <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconbackground.png')] bg-cover rounded-[12px]">
               <div className="w-[126px] h-[148px] box-border rounded-[12px] flex items-center justify-center">
                 <Image
                   src={iconSrc}

@@ -281,7 +281,7 @@ export default function StorePage() {
     <div className="min-h-screen relative overflow-hidden pb-20 pt-10 sm:pt-14 mt-[24px]">
       <div
         className="fixed inset-0 bg-gradient-to-b from-[#5E32AC] via-[#3D1A78] to-[#1A0B2E] bg-cover bg-contain"
-        style={{ backgroundImage: `url(/layout/back.png)` }}
+        style={{ backgroundImage: `url(/layout/background.png)` }}
       ></div>
 
       <div className="relative z-10 px-4">
