@@ -11,6 +11,21 @@ import type { ResultStatus } from '@/components/backpack_up/nosesectionResult'
 
 type FlowStep = 'none' | 'detail' | 'confirm' | 'result'
 
+/**
+ * 处理图标路径，确保格式正确（去掉 public 前缀）
+ */
+const normalizeIconPath = (path: string | undefined): string => {
+  if (!path) return ''
+  let p = path
+  const idx = p.toLowerCase().lastIndexOf('public')
+  if (idx !== -1) {
+    p = p.slice(idx + 'public'.length)
+  }
+  p = p.replace(/\\/g, '/')
+  if (!p.startsWith('/')) p = `/${p}`
+  return p
+}
+
 interface ItemFlowState {
   /** 当前流程步骤 */
   step: FlowStep
@@ -50,7 +65,10 @@ export const useItemFlowStore = create<ItemFlowState>(set => ({
   openDetail: (item, action) =>
     set({
       step: 'detail',
-      currentItem: item,
+      currentItem: {
+        ...item,
+        iconPath: normalizeIconPath(item.iconPath),
+      },
       actionType: action,
       resultStatus: null,
       resultDescription: null,
