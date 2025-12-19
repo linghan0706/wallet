@@ -63,9 +63,9 @@ export default function StoresTransactionCard({
       <button
         aria-label="Close"
         onClick={onClose}
-        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm text-white text-xl"
+        className="absolute top-2 right-2 w-8 h-8  flex items-center justify-center"
       >
-        📴
+        <Image src="/layout/close.png" alt="Close" width={8.75} height={8.75} />
       </button>
 
       {/* 支付标题 */}

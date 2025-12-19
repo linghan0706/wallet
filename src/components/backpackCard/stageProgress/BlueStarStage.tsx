@@ -92,7 +92,6 @@ const partIconBase: React.CSSProperties = {
 const partLabelBase: React.CSSProperties = {
   width: '100%',
   height: '10px',
-  fontFamily: 'Jersey 10',
   fontStyle: 'normal',
   fontWeight: 400,
   fontSize: '8px',
@@ -253,7 +252,10 @@ const BlueStarStage: React.FC<BlueStarStageProps> = ({
                   isActive ? getActiveIconStyle(part.icon) : lockedIconStyle
                 }
               />
-              <div style={isActive ? activeLabelStyle : lockedLabelStyle}>
+              <div
+                className="font-jersey-10"
+                style={isActive ? activeLabelStyle : lockedLabelStyle}
+              >
                 {part.label}
               </div>
             </div>

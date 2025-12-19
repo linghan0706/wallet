@@ -1,20 +1,7 @@
 import React from 'react'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
 
-// 背包物品分类类型定义
-// /* Heading/Oxanium */
-// font-family: 'Oxanium';
-// font-style: normal;
-// font-weight: 300;
-// font-size: 10px;
-// line-height: 12px;
-// /* identical to box height */
-// text-align: center;
-// letter-spacing: 0.04em;
-// text-transform: uppercase;
-//
-// color: #BC13FE;
-
+// 背包分类类型定义
 export type BackpackCategory = 'all' | 'stage' | 'collector' | 'other'
 
 // 选择选项类型定义
@@ -153,7 +140,7 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, selected, onToggle }) => {
             <img
               src={srcPath}
               alt={item.name}
-              className="w-[48px] h-[48px] object-contain drop-shadow-[0_0_8px_rgba(0,240,255,0.25)]"
+              className="w-[48px] h-[48px] object-contain "
               loading="lazy"
             />
           )}
@@ -237,8 +224,6 @@ const SelectCard: React.FC<SelectCardProps> = ({
 
   const baseButtonClass =
     'w-[60px] h-[30px] inline-flex items-center justify-center font-oxanium font-light text-[10px] leading-[12px] text-center uppercase transition-all duration-300 ease-[cubic-bezier(.22,.61,.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
-
-  // 应用字体样式：Oxanium字体，字号10px，行高12px，字重300，字母间距0.04em，全大写，居中对齐，颜色为#BC13FE
 
   const getButtonStateClass = (
     category: BackpackCategory | string,

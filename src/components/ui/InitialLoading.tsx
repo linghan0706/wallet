@@ -2,7 +2,15 @@
 
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import {
+  retrieveLaunchParams,
+  retrieveRawInitData,
+} from '@telegram-apps/sdk-react'
+import {
+  getInitData,
+  isTelegramEnvironment,
+} from '@/telegramWebApp/telegrambot'
+import { telegramLogin } from '@/utils/api'
 
 interface InitialLoadingProps {
   onLoadingComplete?: () => void
@@ -10,26 +18,100 @@ interface InitialLoadingProps {
 
 const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
   const [progress, setProgress] = useState(0)
+  // 控制是否跳过加载动画的变量（但仍要完成登录）
+  const [skipLoading, setSkipLoading] = useState(true)
 
   useEffect(() => {
-    // 1000000s后加载
-    const timer = setTimeout(() => {
-      onLoadingComplete?.()
-    }, 6)
+    // 执行登录逻辑
+    const performLogin = async () => {
+      try {
+        const data = getInitData()
+        console.log('Got Telegram InitData:', data)
 
-    // 模拟进度条动画
-    const progressTimer = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) return 100
-        return prev + 2
-      })
-    }, 6)
+        if (isTelegramEnvironment()) {
+          try {
+            const lp = retrieveLaunchParams()
+            console.log('SDK LaunchParams:', lp)
+          } catch (e) {
+            console.warn('Failed to read LaunchParams (ignored):', e)
+          }
 
-    return () => {
-      clearTimeout(timer)
-      clearInterval(progressTimer)
+          let rawInit: string | null = null
+          try {
+            rawInit = retrieveRawInitData() || null
+            console.log('SDK raw initData:', rawInit)
+          } catch (e) {
+            console.warn('Failed to read raw initData (ignored):', e)
+          }
+
+          if (rawInit) {
+            try {
+              const res = await telegramLogin()
+              console.log('Telegram login result:', res)
+              if (res.success) {
+                console.log('Login successful, user data:', res.data)
+              } else {
+                console.log('Login failed:', res.message)
+              }
+            } catch (err) {
+              console.error('Telegram login error:', err)
+            }
+          } else {
+            console.warn('No raw initData found, skipping login request.')
+          }
+        } else {
+          console.warn(
+            'Not in Telegram environment, skipping SDK parameter reading and login.'
+          )
+        }
+      } catch (error) {
+        console.error('Error during login process:', error)
+      } finally {
+        // 无论登录成功与否，都进入主页面
+        // 如果设置了跳过加载，则直接完成，否则等待进度条完成
+        if (skipLoading) {
+          onLoadingComplete?.()
+        }
+      }
     }
-  }, [onLoadingComplete])
+
+    // 启动登录过程
+    performLogin()
+
+    // 如果不跳过加载，正常执行进度条动画
+    if (!skipLoading) {
+      // 模拟进度条动画
+      const progressTimer = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            // 进度条完成后调用完成回调
+            clearInterval(progressTimer)
+            onLoadingComplete?.()
+            return 100
+          }
+          return prev + 2
+        })
+      }, 6)
+
+      return () => {
+        clearInterval(progressTimer)
+      }
+    } else {
+      // 如果跳过加载，设置一个很短的延迟后直接完成
+      const timer = setTimeout(() => {
+        onLoadingComplete?.()
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [onLoadingComplete, skipLoading])
+
+  // 如果设置了跳过加载，不渲染加载界面
+  if (skipLoading) {
+    return null
+  }
 
   return (
     <div

@@ -76,9 +76,9 @@ const navItems: NavItem[] = [
     icon: '/layout/NavCion/backpack.png',
   },
   {
-    id: 'home',
+    id: 'profile',
     label: '个人中心',
-    path: '/home',
+    path: '/profile',
     icon: '/layout/NavCion/home.png',
   },
 ]
