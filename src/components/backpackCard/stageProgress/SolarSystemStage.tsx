@@ -418,10 +418,9 @@ const SolarSystemStage: React.FC<SolarSystemStageProps> = ({
               cy={routingConfig.mainWalkwayY}
               r={isActive ? 4 : 3}
               fill={isActive ? ACTIVE_COLOR : INACTIVE_COLOR}
-              stroke={isActive ? '#8AFFFF' : INACTIVE_STROKE}
-              strokeWidth={isActive ? 1.2 : 1}
+              stroke={isActive ? 'none' : INACTIVE_STROKE}
+              strokeWidth={isActive ? 0 : 1}
               opacity={isActive ? 0.95 : 0.65}
-              filter={isActive ? 'url(#route-glow-active)' : undefined}
             />
           )
         })}

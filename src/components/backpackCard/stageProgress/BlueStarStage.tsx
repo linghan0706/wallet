@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 
 type PartId =
   | 'propulsionSystem'
@@ -25,57 +25,67 @@ type BlueStarStageProps = {
 const LOCK_ICON = '/backpack/part/lock/lock.png'
 const SUBJECT_ICON = '/backpack/part/blue_star/subject.png'
 
-const circle = { x: 180, y: 146, r: 90 }
+const SUBJECT_SIZE = 160
+const SUBJECT_TOP = 56
+const SUBJECT_CENTER_X = 180
+const circle = {
+  x: SUBJECT_CENTER_X,
+  y: SUBJECT_TOP + SUBJECT_SIZE / 2,
+  r: SUBJECT_SIZE / 2,
+}
+
+const CONNECTOR_OFFSET = 0
+const UNDERLINE_WIDTH = 40
+const UNDERLINE_GAP = 8
 
 const parts: Part[] = [
   {
     id: 'propulsionSystem',
     label: 'Propulsion System',
     icon: '/backpack/part/blue_star/propulsion_system.png',
-    box: { x: 8, y: 8, w: 48, h: 58 },
+    box: { x: 20, y: 5, w: 48, h: 58 },
   },
   {
     id: 'noseSection',
     label: 'Nose Section',
     icon: '/backpack/part/blue_star/nose_section.png',
-    box: { x: 10, y: 136, w: 48, h: 58 },
+    box: { x: 10, y: 120, w: 48, h: 58 },
   },
   {
     id: 'landingGear',
     label: 'Landing Gear',
     icon: '/backpack/part/blue_star/landing_gear.png',
-    box: { x: 78, y: 214, w: 48, h: 58 },
+    box: { x: 50, y: 195, w: 48, h: 58 },
   },
   {
     id: 'horizontalStabilizer',
     label: 'Horizontal Stabilizer',
     icon: '/backpack/part/blue_star/horizontal_stabilizer.png',
-    box: { x: 262, y: 222, w: 48, h: 58 },
+    box: { x: 292, y: 190, w: 48, h: 58 },
   },
   {
     id: 'verticalStabilizer',
     label: 'Vertical Stabilizer',
     icon: '/backpack/part/blue_star/vertical_stabilizer.png',
-    box: { x: 284, y: 136, w: 48, h: 58 },
+    box: { x: 294, y: 116, w: 48, h: 58 },
   },
   {
     id: 'wings',
     label: 'Wings',
     icon: '/backpack/part/blue_star/wings.png',
-    box: { x: 262, y: 32, w: 48, h: 58 },
+    box: { x: 300, y: 40, w: 48, h: 58 },
   },
   {
     id: 'mainBody',
     label: 'Main Body',
     icon: '/backpack/part/blue_star/main_body.png',
-    box: { x: 198, y: 4, w: 48, h: 58 },
+    box: { x: 237, y: 0, w: 48, h: 58 },
   },
 ]
 
-// 默认部分未激活：仅保留少量已解锁用于展示锁定态
+// Default inactive parts: keep a couple unlocked for preview.
 const defaultActiveParts: PartId[] = ['propulsionSystem', 'noseSection']
 
-// 基础样式：道具图标方块
 const partIconBase: React.CSSProperties = {
   width: '48px',
   height: '48px',
@@ -88,20 +98,14 @@ const partIconBase: React.CSSProperties = {
   backgroundSize: 'cover',
 }
 
-// 基础样式：道具文字
 const partLabelBase: React.CSSProperties = {
-  width: '100%',
-  height: '10px',
   fontStyle: 'normal',
   fontWeight: 400,
   fontSize: '8px',
   lineHeight: '10px',
   textAlign: 'center',
   color: '#FFFFFF',
-  flex: 'none',
-  order: 1,
-  alignSelf: 'stretch',
-  flexGrow: 0,
+  whiteSpace: 'nowrap',
 }
 
 const getActiveIconStyle = (icon: string): React.CSSProperties => ({
@@ -128,39 +132,41 @@ const lockedLabelStyle: React.CSSProperties = {
   textShadow: '0px 1px 1px rgba(0, 0, 0, 0.35)',
 }
 
-// 计算连线路径：从文字底部下方出发 -> 水平延伸（与文字底部平行） -> 拐点 -> 圆形边缘终点
 const getConnectorPath = (box: Part['box']) => {
-  // 文字底部Y坐标（盒子最底部）+ 向下偏移
-  const labelBottomY = box.y + box.h
   const boxCenterX = box.x + box.w / 2
-  const dirToCircle = { x: circle.x - boxCenterX, y: circle.y - labelBottomY }
-  const goingRight = dirToCircle.x >= 0
+  const labelBottomY = box.y + box.h + UNDERLINE_GAP
 
-  // 起点：文字底部中心下方
-  const verticalOffset = 10
-  const start = { x: boxCenterX, y: labelBottomY + verticalOffset }
+  const isLeft = boxCenterX < circle.x
 
-  // 拐点：从起点水平延伸一段（与文字底部平行）
-  const horizontalOffset = goingRight ? 22 : -22
-  const bend = { x: start.x + horizontalOffset, y: start.y }
-
-  // 终点：从拐点指向圆心，落在圆形边框上
-  const toCircleFromBend = { x: circle.x - bend.x, y: circle.y - bend.y }
-  const dist = Math.hypot(toCircleFromBend.x, toCircleFromBend.y) || 1
-  const scale = dist > circle.r ? (dist - circle.r) / dist : 0
-  const end = {
-    x: bend.x + toCircleFromBend.x * scale,
-    y: bend.y + toCircleFromBend.y * scale,
+  const underlineStart = {
+    x: boxCenterX - UNDERLINE_WIDTH / 2,
+    y: labelBottomY,
+  }
+  const underlineEnd = {
+    x: boxCenterX + UNDERLINE_WIDTH / 2,
+    y: labelBottomY,
   }
 
-  return { start, bend, end }
+  const lineStart = isLeft ? underlineEnd : underlineStart
+
+  const dx = circle.x - lineStart.x
+  const dy = circle.y - lineStart.y
+  const dist = Math.hypot(dx, dy) || 1
+  const endRadius = circle.r + CONNECTOR_OFFSET
+
+  const lineEnd = {
+    x: circle.x - (dx / dist) * endRadius,
+    y: circle.y - (dy / dist) * endRadius,
+  }
+
+  return { underlineStart, underlineEnd, lineStart, lineEnd }
 }
 
 const BlueStarStage: React.FC<BlueStarStageProps> = ({
   activeParts = defaultActiveParts,
   className,
 }) => {
-  // 当前激活集合；全部激活后中心图标点亮
+  // 褰撳墠婵€娲婚泦鍚堬紱鍏ㄩ儴婵€娲诲悗涓績鍥炬爣鐐逛寒
   const activeSet = React.useMemo(() => new Set(activeParts), [activeParts])
   const allActive = React.useMemo(
     () => parts.every(part => activeSet.has(part.id)),
@@ -182,24 +188,39 @@ const BlueStarStage: React.FC<BlueStarStageProps> = ({
         preserveAspectRatio="none"
       >
         {parts.map(part => {
-          const { start, bend, end } = getConnectorPath(part.box)
+          const { underlineStart, underlineEnd, lineStart, lineEnd } =
+            getConnectorPath(part.box)
           const isActive = activeSet.has(part.id)
+          const strokeColor = isActive ? '#00F0FF' : '#B0B0C0'
+          const strokeOp = isActive ? 0.8 : 0.7
+          const strokeW = isActive ? 1.5 : 1
           return (
             <g key={`${part.id}-connector`}>
-              <polyline
-                points={`${start.x},${start.y} ${bend.x},${bend.y} ${end.x},${end.y}`}
-                fill="none"
-                stroke={isActive ? '#00F0FF' : '#B0B0C0'}
-                strokeOpacity={isActive ? 0.8 : 0.7}
-                strokeWidth={isActive ? 1.5 : 1}
+              <line
+                x1={underlineStart.x}
+                y1={underlineStart.y}
+                x2={underlineEnd.x}
+                y2={underlineEnd.y}
+                stroke={strokeColor}
+                strokeOpacity={strokeOp}
+                strokeWidth={strokeW}
                 strokeLinecap="round"
-                strokeLinejoin="round"
+              />
+              <line
+                x1={lineStart.x}
+                y1={lineStart.y}
+                x2={lineEnd.x}
+                y2={lineEnd.y}
+                stroke={strokeColor}
+                strokeOpacity={strokeOp}
+                strokeWidth={strokeW}
+                strokeLinecap="round"
               />
               <circle
-                cx={end.x}
-                cy={end.y}
+                cx={lineEnd.x}
+                cy={lineEnd.y}
                 r={isActive ? 3 : 2.5}
-                fill={isActive ? '#00F0FF' : '#B0B0C0'}
+                fill={strokeColor}
                 fillOpacity={isActive ? 0.9 : 0.8}
               />
             </g>
@@ -209,13 +230,14 @@ const BlueStarStage: React.FC<BlueStarStageProps> = ({
 
       <div className="relative z-10 w-full h-full">
         <div
-          className="absolute left-1/2 top-[56px] -translate-x-1/2 rounded-full border"
+          className="absolute left-1/2 -translate-x-1/2 rounded-full border"
           style={{
             boxShadow: allActive
               ? '0 0 8px rgba(0, 240, 255, 0.35)'
               : 'inset 0px 1px 1px #B0B0C0',
-            width: '160px',
-            height: '160px',
+            width: `${SUBJECT_SIZE}px`,
+            height: `${SUBJECT_SIZE}px`,
+            top: `${SUBJECT_TOP}px`,
             borderColor: allActive ? 'rgba(0, 240, 255, 0.7)' : '#B0B0C0',
             filter: allActive
               ? 'drop-shadow(0px 0px 6px rgba(0, 240, 255, 0.35))'
@@ -225,7 +247,7 @@ const BlueStarStage: React.FC<BlueStarStageProps> = ({
           <img
             src={SUBJECT_ICON}
             alt="Blue Star spaceship"
-            className="w-[160px] h-full object-contain select-none"
+            className="w-full h-full object-contain select-none"
             loading="lazy"
             style={{
               opacity: allActive ? 1 : 0.75,
