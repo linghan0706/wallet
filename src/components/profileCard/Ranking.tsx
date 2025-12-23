@@ -496,7 +496,7 @@ export default function Ranking() {
               backgroundImage: `url('/profile/ranking/background.png')`,
             }}
           >
-            <div className="relative z-10 pt-8 px-4 space-y-3 max-h-[383px] overflow-y-auto scrollbar-hide">
+            <div className="relative z-10 pt-8 px-4 space-y-3 h-full flex flex-col">
               {/* 顶部标签 */}
               <div className="flex justify-center">
                 <div
@@ -532,8 +532,9 @@ export default function Ranking() {
               <div className="relative flex items-center justify-center">
                 <div className="h-[24px] w-[260px] bg-[url('/profile/ranking/top3/ranking_header.png')] bg-cover bg-no-repeat"></div>
               </div>
-              {/* 排行榜列表 */}
-              <div className="space-y-2">
+
+              {/* 可滚动的排行榜列表区域 */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2 pb-2">
                 {powerRankingListData.map(user => (
                   <RankingItem
                     key={user.rank}
@@ -546,13 +547,15 @@ export default function Ranking() {
                 ))}
               </div>
 
-              {/* 当前用户 */}
-              <CurrentUserItem
-                rank={currentUserData.rank}
-                name={currentUserData.name}
-                power={currentUserData.power}
-                avatar={currentUserData.avatar}
-              />
+              {/* 当前用户 - 固定在底部 */}
+              <div className="flex-shrink-0">
+                <CurrentUserItem
+                  rank={currentUserData.rank}
+                  name={currentUserData.name}
+                  power={currentUserData.power}
+                  avatar={currentUserData.avatar}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -567,7 +570,7 @@ export default function Ranking() {
               backgroundImage: `url('/profile/ranking/background.png')`,
             }}
           >
-            <div className="relative z-10 pt-8 px-4 space-y-3 max-h-[383px] overflow-y-auto scrollbar-hide">
+            <div className="relative z-10 pt-8 px-4 space-y-3 h-full flex flex-col">
               {/* 顶部标签 */}
               <div className="flex justify-center">
                 <div
@@ -610,8 +613,9 @@ export default function Ranking() {
               <div className="relative flex items-center justify-center">
                 <div className="h-[24px] w-[260px] bg-[url('/profile/ranking/top3/ranking_header.png')] bg-cover bg-no-repeat"></div>
               </div>
-              {/* 排行榜列表 */}
-              <div className="space-y-2">
+
+              {/* 可滚动的排行榜列表区域 */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2 pb-2">
                 {novaRankingListData.map(user => (
                   <RankingItem
                     key={user.rank}
@@ -624,13 +628,15 @@ export default function Ranking() {
                 ))}
               </div>
 
-              {/* 当前用户 */}
-              <CurrentUserItem
-                rank={currentUserData.rank}
-                name={currentUserData.name}
-                nova={Math.floor(currentUserData.power / 10)} // 简单转换
-                avatar={currentUserData.avatar}
-              />
+              {/* 当前用户 - 固定在底部 */}
+              <div className="flex-shrink-0">
+                <CurrentUserItem
+                  rank={currentUserData.rank}
+                  name={currentUserData.name}
+                  nova={Math.floor(currentUserData.power / 10)} // 简单转换
+                  avatar={currentUserData.avatar}
+                />
+              </div>
             </div>
           </div>
         </div>

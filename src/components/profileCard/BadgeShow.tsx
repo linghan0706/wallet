@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function BadgeShow() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [visitedPages, setVisitedPages] = useState(new Set<number>())
   const startX = useRef(0)
   const endX = useRef(0)
 
@@ -84,6 +85,16 @@ export default function BadgeShow() {
   // 获取总页数
   const totalPages = Math.ceil(filteredBadges.length / 2)
 
+  // 当筛选器变化时，重置已访问页面
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentIndex(0)
+      setVisitedPages(new Set([0])) // 默认访问第一页
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [activeFilter])
+
   // 获取当前页的徽章
   const getCurrentBadges = () => {
     const startIndex = currentIndex * 2
@@ -100,6 +111,7 @@ export default function BadgeShow() {
   const handleIndicatorClick = (index: number) => {
     if (index >= 0 && index < totalPages) {
       setCurrentIndex(index)
+      setVisitedPages(prev => new Set(prev).add(index))
     }
   }
 
@@ -125,12 +137,16 @@ export default function BadgeShow() {
       if (swipeDistance > 0) {
         // 向左滑动，下一页
         if (currentIndex < totalPages - 1) {
-          setCurrentIndex(prev => prev + 1)
+          const newIndex = currentIndex + 1
+          setCurrentIndex(newIndex)
+          setVisitedPages(prev => new Set(prev).add(newIndex))
         }
       } else {
         // 向右滑动，上一页
         if (currentIndex > 0) {
-          setCurrentIndex(prev => prev - 1)
+          const newIndex = currentIndex - 1
+          setCurrentIndex(newIndex)
+          setVisitedPages(prev => new Set(prev).add(newIndex))
         }
       }
     }
@@ -152,12 +168,16 @@ export default function BadgeShow() {
       if (swipeDistance > 0) {
         // 向左滑动，下一页
         if (currentIndex < totalPages - 1) {
-          setCurrentIndex(prev => prev + 1)
+          const newIndex = currentIndex + 1
+          setCurrentIndex(newIndex)
+          setVisitedPages(prev => new Set(prev).add(newIndex))
         }
       } else {
         // 向右滑动，上一页
         if (currentIndex > 0) {
-          setCurrentIndex(prev => prev - 1)
+          const newIndex = currentIndex - 1
+          setCurrentIndex(newIndex)
+          setVisitedPages(prev => new Set(prev).add(newIndex))
         }
       }
     }
@@ -287,28 +307,19 @@ export default function BadgeShow() {
 
       {/* 指示器 */}
       <div className="absolute left-1/2 bottom-[12px] flex -translate-x-1/2 gap-[10px]">
-        <span
-          className="h-[8px] w-[8px] bg-[#BC13FE] cursor-pointer"
-          onClick={() => handleIndicatorClick(0)}
-        />
-        <span
-          className={`h-[8px] w-[8px] cursor-pointer ${
-            currentIndex === 1 ? 'bg-[#00F0FF]' : 'bg-[#B0B0C0]'
-          }`}
-          onClick={() => handleIndicatorClick(1)}
-        />
-        <span
-          className={`h-[8px] w-[8px] cursor-pointer ${
-            currentIndex === 2 ? 'bg-[#00F0FF]' : 'bg-[#B0B0C0]'
-          }`}
-          onClick={() => handleIndicatorClick(2)}
-        />
-        <span
-          className={`h-[8px] w-[8px] cursor-pointer ${
-            currentIndex === 3 ? 'bg-[#00F0FF]' : 'bg-[#B0B0C0]'
-          }`}
-          onClick={() => handleIndicatorClick(3)}
-        />
+        {Array.from({ length: totalPages }, (_, index) => (
+          <span
+            key={index}
+            className={`h-[8px] w-[8px] cursor-pointer ${
+              currentIndex === index
+                ? 'bg-[#00F0FF]' // 当前激活为青色
+                : visitedPages.has(index)
+                  ? 'bg-[#BC13FE]' // 已访问为紫色
+                  : 'bg-[#B0B0C0]' // 未访问为灰色
+            }`}
+            onClick={() => handleIndicatorClick(index)}
+          />
+        ))}
       </div>
     </div>
   )
