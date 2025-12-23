@@ -1,6 +1,6 @@
-export default function Ranking() {
+export default function InviteLink() {
   return (
-    <div className="w-[363px] h-[100px] bg-[url(/profile/ranking/background.png)] bg-cover bg-no-repeat mt-4 relative">
+    <div className="w-[363px] h-[100px] bg-[url(/profile/invite/background.png)] bg-cover bg-no-repeat mt-4 relative">
       <div className="absolute pl-2">
         <span
           className="font-oxanium font-bold text-[10px] leading-[12px] text-center tracking-[0.04em] uppercase text-white"
@@ -22,9 +22,9 @@ export default function Ranking() {
 
       {/* 邀请链接容器 */}
       <div className="w-[280px] h-[30px] pt-10 ml-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between h-[32px]  bg-[url('/profile/ranking/invite_link.svg')] bg-cover bg-no-repeat">
           {/* 链接框 */}
-          <div className="  flex items-center justify-center">
+          <div className="w-[280px] h-[30px] flex items-center justify-center">
             {/* 链接文本 */}
             <div
               className="font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-center text-[#B0B0C0]"
@@ -43,9 +43,9 @@ export default function Ranking() {
           </div>
 
           {/* 分享按钮 */}
-          <button className="w-[60px] h-[30px] bg-transparent cursor-pointer flex items-center justify-center ml-2">
+          <button className="w-[60px] h-[30px] bg-transparent cursor-pointer flex items-center justify-center">
             <div
-              className="font-oxanium font-bold text-[14px] leading-[18px] tracking-[0.04em] uppercase text-[#00F0FF]"
+              className="font-oxanium font-bold text-[14px] leading-[18px] tracking-[0.04em] uppercase text-[#00F0FF] ml-[-5px] mt-[2px]"
               style={{
                 fontFamily: "'Oxanium', sans-serif",
                 fontStyle: 'normal',

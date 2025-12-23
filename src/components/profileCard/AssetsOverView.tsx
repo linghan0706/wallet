@@ -26,8 +26,13 @@ const AssetCard = ({
         priority
       />
       <div
-        className="absolute top-[44px] font-oxanium font-bold text-[10px] leading-[12px] text-center tracking-[0.04em] relative z-10"
-        style={{ color: valueColor }}
+        className="absolute top-[45px] font-oxanium font-bold text-[10px] leading-[12px] text-center tracking-[0.04em] relative z-10"
+        style={{
+          background: `linear-gradient(to bottom, ${valueColor} 0%, ${valueColor} 50%, #FFFFFF 50%, #FFFFFF 100%)`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
       >
         {label}
       </div>
@@ -35,7 +40,9 @@ const AssetCard = ({
       {/* 资产数值 */}
       <div
         className="font-oxanium font-bold text-[14px] leading-[18px] text-center tracking-[0.04em] uppercase relative z-10 mb-1"
-        style={{ color: valueColor }}
+        style={{
+          color: valueColor,
+        }}
       >
         {value}
       </div>

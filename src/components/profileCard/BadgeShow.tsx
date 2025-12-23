@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 export default function BadgeShow() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const startX = useRef(0)
+  const endX = useRef(0)
 
   const filters = [
     { label: 'All', active: false },
@@ -79,6 +81,9 @@ export default function BadgeShow() {
       ? allBadges
       : allBadges.filter(badge => badge.type === activeFilter)
 
+  // 获取总页数
+  const totalPages = Math.ceil(filteredBadges.length / 2)
+
   // 获取当前页的徽章
   const getCurrentBadges = () => {
     const startIndex = currentIndex * 2
@@ -93,7 +98,69 @@ export default function BadgeShow() {
 
   // 处理指示器点击
   const handleIndicatorClick = (index: number) => {
-    setCurrentIndex(index)
+    if (index >= 0 && index < totalPages) {
+      setCurrentIndex(index)
+    }
+  }
+
+  // 处理触摸开始事件
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientX =
+      'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX
+    startX.current = clientX
+  }
+
+  // 处理触摸结束事件
+  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientX =
+      'changedTouches' in e
+        ? e.changedTouches[0].clientX
+        : (e as React.MouseEvent).clientX
+    endX.current = clientX
+
+    const minSwipeDistance = 50
+    const swipeDistance = startX.current - endX.current
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // 向左滑动，下一页
+        if (currentIndex < totalPages - 1) {
+          setCurrentIndex(prev => prev + 1)
+        }
+      } else {
+        // 向右滑动，上一页
+        if (currentIndex > 0) {
+          setCurrentIndex(prev => prev - 1)
+        }
+      }
+    }
+  }
+
+  // 处理鼠标按下事件
+  const handleMouseDown = (e: React.MouseEvent) => {
+    startX.current = e.clientX
+  }
+
+  // 处理鼠标抬起事件
+  const handleMouseUp = (e: React.MouseEvent) => {
+    endX.current = e.clientX
+
+    const minSwipeDistance = 50
+    const swipeDistance = startX.current - endX.current
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // 向左滑动，下一页
+        if (currentIndex < totalPages - 1) {
+          setCurrentIndex(prev => prev + 1)
+        }
+      } else {
+        // 向右滑动，上一页
+        if (currentIndex > 0) {
+          setCurrentIndex(prev => prev - 1)
+        }
+      }
+    }
   }
 
   return (
@@ -145,7 +212,14 @@ export default function BadgeShow() {
         </div>
       </div>
 
-      <div className="absolute w-[280px] h-[120px] left-[70px] top-[55px] right-[16px]">
+      <div
+        className="absolute w-[280px] h-[120px] left-[70px] top-[55px] right-[16px]"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
         <div className="flex items-center justify-center">
           {getCurrentBadges().map(badge => (
             <div
