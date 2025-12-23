@@ -3,7 +3,7 @@ import MotionDiv from '@/components/motion/MotionDiv'
 import AssetsOverview from '@/components/profileCard/AssetsOverView'
 import WalletConnect from '@/components/profileCard/WalletConnect'
 import BadgeShow from '@/components/profileCard/BadgeShow'
-import Ranking from '@/components/profileCard/Ranking'
+import InviteLink from '@/components/profileCard/InviteLink'
 
 export default function ProfilePage() {
   return (
@@ -25,7 +25,7 @@ export default function ProfilePage() {
           <AssetsOverview />
           <WalletConnect />
           <BadgeShow />
-          <Ranking />
+          <InviteLink />
         </MotionDiv>
       </div>
     </div>
