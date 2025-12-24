@@ -21,8 +21,7 @@ const NAV_PRELOAD_IMAGES = [
   '/layout/NavCion/store.png',
   '/layout/NavCion/base.png',
   '/layout/NavCion/backpack.png',
-  '/layout/NavCion/home.png',
-  '/components/layout/NavIcon/HomeIcon.png',
+  '/layout/NavCion/profile.png',
   '/currency/power.png',
   '/currency/nova.png',
 ]
@@ -180,13 +179,14 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
       <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto px-6 mt-[412px]">
         {/* NovaExplorer 标题 */}
         <h1
-          className="mb-4 font-jersey-10"
+          className="mb-4 font-orbitron uppercase"
           style={
             {
-              fontSize: '54px',
-              lineHeight: '32px',
-              fontWeight: 400,
+              fontSize: '32px',
+              lineHeight: '100%',
+              fontWeight: 900,
               textAlign: 'center',
+              letterSpacing: '6%',
               background:
                 'linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%)',
               WebkitBackgroundClip: 'text',
@@ -213,12 +213,12 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
 
         {/* 加载状态文本 */}
         <p
-          className="font-jersey-10"
+          className="font-ibm-plex-mono"
           style={
             {
-              fontSize: '18px',
-              lineHeight: '22px',
-              fontWeight: 400,
+              fontSize: '16px',
+              lineHeight: '100%',
+              fontWeight: 700,
               textAlign: 'center',
               color: '#00F0FF',
             } as React.CSSProperties

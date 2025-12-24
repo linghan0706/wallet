@@ -28,6 +28,7 @@ interface StyleConfig {
   border?: string
   borderImageSource?: string
   marginTop?: string
+  letterSpacing?: string
 }
 
 // 引导页面数据接口
@@ -45,9 +46,9 @@ interface GuidancePageData {
 }
 
 const baseDescriptionStyle: StyleConfig = {
-  className: 'font-jersey-10',
-  fontSize: '18px',
-  lineHeight: '22px',
+  className: 'font-ibm-plex-mono',
+  fontSize: '14px',
+  lineHeight: '100%',
   color: '#D3D3D3',
   textAlign: 'center',
 }
@@ -63,20 +64,24 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       mainTitle: {
         className:
-          'font-jersey-10  text-6xl font-bold  bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent  ',
-        fontSize: '54px',
-        lineHeight: '58px',
+          'font-orbitron text-6xl font-black bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent uppercase',
+        fontSize: '32px',
+        lineHeight: '100%',
         height: '58px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         border: '1px solid',
         borderImageSource:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-bold text-7xl',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-7xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -92,10 +97,12 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-8xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -111,10 +118,12 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-8xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -130,10 +139,12 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-8xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -149,10 +160,12 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-8xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -168,20 +181,24 @@ const guidancePages: GuidancePageData[] = [
     styles: {
       mainTitle: {
         className:
-          'font-jersey-10  text-6xl font-bold  bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent  ',
-        fontSize: '54px',
-        lineHeight: '58px',
+          'font-orbitron text-6xl font-black bg-gradient-to-b from-[#a0f7ff] via-[#e0e5ff] to-[#a0f7ff] bg-clip-text text-transparent uppercase',
+        fontSize: '32px',
+        lineHeight: '100%',
         height: '58px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         border: '1px solid',
         borderImageSource:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
       subTitle: {
         className:
-          'font-jersey-10 bg-clip-text text-transparent font-black text-8xl tracking-tight',
-        fontSize: '54px',
-        lineHeight: '32px',
+          'font-orbitron bg-clip-text text-transparent font-black text-8xl uppercase',
+        fontSize: '24px',
+        lineHeight: '100%',
         height: '48px',
+        letterSpacing: '6%',
+        textAlign: 'center',
         background:
           'linear-gradient(270deg, rgba(0, 240, 255, 0.8) 1.39%, rgba(188, 19, 254, 0.8) 28.4%, rgba(0, 240, 255, 0.8) 45.48%, rgba(188, 19, 254, 0.8) 54.81%, rgba(0, 240, 255, 0.8) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1))',
       },
@@ -210,6 +227,7 @@ const getStyleForElement = (
     height: styleConfig.height,
     border: styleConfig.border,
     marginTop: styleConfig.marginTop,
+    letterSpacing: styleConfig.letterSpacing,
   }
 
   // 只有当width属性存在时才添加到样式中
