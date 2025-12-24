@@ -16,13 +16,62 @@ interface InitialLoadingProps {
   onLoadingComplete?: () => void
 }
 
+const NAV_PRELOAD_IMAGES = [
+  '/layout/NavCion/task.png',
+  '/layout/NavCion/store.png',
+  '/layout/NavCion/base.png',
+  '/layout/NavCion/backpack.png',
+  '/layout/NavCion/home.png',
+  '/components/layout/NavIcon/HomeIcon.png',
+  '/currency/power.png',
+  '/currency/nova.png',
+]
+
+const preloadImages = (sources: string[]) =>
+  Promise.all(
+    sources.map(
+      src =>
+        new Promise<void>(resolve => {
+          const img = new Image()
+          const done = () => resolve()
+          img.onload = done
+          img.onerror = done
+          img.src = src
+          if ('decode' in img) {
+            img.decode().then(done).catch(done)
+          }
+        })
+    )
+  ).then(() => undefined)
+
+const preloadLayoutAssets = () =>
+  Promise.allSettled([
+    import('@/components/layout/BottomNavigation'),
+    import('@/components/layout/UserHeader'),
+    preloadImages(NAV_PRELOAD_IMAGES),
+  ]).then(() => undefined)
+
 const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
   const [progress, setProgress] = useState(0)
   // 控制是否跳过加载动画的变量（但仍要完成登录）
   const [skipLoading, setSkipLoading] = useState(true)
 
   useEffect(() => {
-    // 执行登录逻辑
+    let isCancelled = false
+    let isReady = false
+    let isProgressDone = skipLoading
+    let didComplete = false
+    let completionTimer: ReturnType<typeof setTimeout> | null = null
+    let progressTimer: ReturnType<typeof setInterval> | null = null
+
+    const attemptComplete = () => {
+      if (isCancelled || didComplete || !isReady || !isProgressDone) {
+        return
+      }
+      didComplete = true
+      onLoadingComplete?.()
+    }
+
     const performLogin = async () => {
       try {
         const data = getInitData()
@@ -66,44 +115,48 @@ const InitialLoading = ({ onLoadingComplete }: InitialLoadingProps) => {
         }
       } catch (error) {
         console.error('Error during login process:', error)
-      } finally {
-        // 无论登录成功与否，都进入主页面
-        // 如果设置了跳过加载，则直接完成，否则等待进度条完成
-        if (skipLoading) {
-          onLoadingComplete?.()
-        }
       }
     }
 
-    // 启动登录过程
-    performLogin()
+    const warmup = async () => {
+      await Promise.allSettled([performLogin(), preloadLayoutAssets()])
+      if (isCancelled) return
+      if (skipLoading) {
+        completionTimer = setTimeout(() => {
+          isReady = true
+          attemptComplete()
+        }, 100)
+        return
+      }
+      isReady = true
+      attemptComplete()
+    }
 
-    // 如果不跳过加载，正常执行进度条动画
+    warmup()
+
     if (!skipLoading) {
-      // 模拟进度条动画
-      const progressTimer = setInterval(() => {
+      progressTimer = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
-            // 进度条完成后调用完成回调
-            clearInterval(progressTimer)
-            onLoadingComplete?.()
+            if (progressTimer) {
+              clearInterval(progressTimer)
+            }
+            isProgressDone = true
+            attemptComplete()
             return 100
           }
           return prev + 2
         })
       }, 6)
+    }
 
-      return () => {
-        clearInterval(progressTimer)
+    return () => {
+      isCancelled = true
+      if (completionTimer) {
+        clearTimeout(completionTimer)
       }
-    } else {
-      // 如果跳过加载，设置一个很短的延迟后直接完成
-      const timer = setTimeout(() => {
-        onLoadingComplete?.()
-      }, 100)
-
-      return () => {
-        clearTimeout(timer)
+      if (progressTimer) {
+        clearInterval(progressTimer)
       }
     }
   }, [onLoadingComplete, skipLoading])

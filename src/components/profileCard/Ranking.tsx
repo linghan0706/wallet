@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
-// 渲染数据
+// Mock data
 const topThreeData = [
   {
     rank: 2,
@@ -124,7 +124,7 @@ const historyListData = [
   },
 ]
 
-// 前三名卡片组件
+// Top rank card component
 interface TopRankCardProps {
   rank: number
   name: string
@@ -137,7 +137,7 @@ const TopRankCard = ({ rank, name, power, nova, avatar }: TopRankCardProps) => {
   const borderColor =
     rank === 1 ? '#00F0FF' : rank === 2 ? '#3B82F6' : '#BC13FE'
 
-  // 根据排名设置不同的样式
+  // Set different styles based on rank
   const cardStyles: Record<
     number,
     { bgImage: string; size: string; avatarSize: string; marginTop: string }
@@ -165,7 +165,7 @@ const TopRankCard = ({ rank, name, power, nova, avatar }: TopRankCardProps) => {
 
   return (
     <div className={`flex flex-col items-center ${cardStyle.marginTop}`}>
-      {/* 包含头像、用户名和数值的完整卡片 */}
+      {/* Complete card containing avatar, username and value */}
       <div
         className={`relative ${cardStyle.size} flex flex-col items-center justify-center`}
         style={{
@@ -175,7 +175,7 @@ const TopRankCard = ({ rank, name, power, nova, avatar }: TopRankCardProps) => {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        {/* 头像 */}
+        {/* Avatar */}
         <div
           className={`relative ${cardStyle.avatarSize} rounded-full overflow-hidden z-10 mb-1 flex items-center justify-center `}
           style={{
@@ -196,12 +196,12 @@ const TopRankCard = ({ rank, name, power, nova, avatar }: TopRankCardProps) => {
           />
         </div>
 
-        {/* 用户名 */}
+        {/* Username */}
         <div className="font-oxanium font-bold text-[12px] text-white z-10">
           {name}
         </div>
 
-        {/* 数值 */}
+        {/* Value */}
         <div
           className="font-oxanium font-bold text-[12px] z-10"
           style={{ color: borderColor }}
@@ -217,7 +217,7 @@ const TopRankCard = ({ rank, name, power, nova, avatar }: TopRankCardProps) => {
   )
 }
 
-// 排行榜列表项组件
+// Ranking list item component
 interface RankingItemProps {
   rank: number
   name: string
@@ -249,7 +249,7 @@ const RankingItem = ({
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* 排名 */}
+      {/* Rank */}
       <div className="flex items-center gap-3 flex-1">
         <span
           className="font-oxanium font-bold text-[14px] w-[40px] ml-[-15px] mt-[2px]"
@@ -258,7 +258,7 @@ const RankingItem = ({
           #{rank}
         </span>
 
-        {/* 头像 */}
+        {/* Avatar */}
         <div className="w-[20px] h-[20px] rounded-full overflow-hidden border border-[#00F0FF] flex items-center justify-center">
           <Image
             src={avatar}
@@ -271,13 +271,13 @@ const RankingItem = ({
           />
         </div>
 
-        {/* 用户名 */}
+        {/* Username */}
         <span className="font-oxanium font-bold text-[14px] text-white ">
           {name}
         </span>
       </div>
 
-      {/* 数值 */}
+      {/* Value */}
       <span
         className="font-oxanium font-bold text-[14px]"
         style={{ color: '#00F0FF' }}
@@ -288,7 +288,7 @@ const RankingItem = ({
   )
 }
 
-// 当前用户项组件
+// Current user item component
 interface CurrentUserItemProps {
   rank: number
   name: string
@@ -306,7 +306,7 @@ const CurrentUserItem = ({
 }: CurrentUserItemProps) => {
   return (
     <div className="flex items-center justify-center px-4 py-2 w-[300px] mx-auto border-2 border-dashed border-[#0066FF] bg-[#00F0FF10]">
-      {/* 排名 */}
+      {/* Rank */}
       <div className="flex items-center flex-1" style={{ paddingLeft: '5px' }}>
         <span
           className="font-oxanium font-bold text-[14px] w-[40px]"
@@ -315,7 +315,7 @@ const CurrentUserItem = ({
           #{rank}
         </span>
 
-        {/* 头像 */}
+        {/* Avatar */}
         <div
           className="w-[20px] h-[20px] rounded-full overflow-hidden border border-[#00F0FF] flex items-center justify-center"
           style={{ marginLeft: '9px' }}
@@ -331,13 +331,13 @@ const CurrentUserItem = ({
           />
         </div>
 
-        {/* 用户名 */}
+        {/* Username */}
         <span className="font-oxanium font-bold text-[14px] text-white  ml-3">
           {name}
         </span>
       </div>
 
-      {/* 数值 */}
+      {/* Value */}
       <span
         className="font-oxanium font-bold text-[14px]"
         style={{ color: '#00F0FF' }}
@@ -348,7 +348,7 @@ const CurrentUserItem = ({
   )
 }
 
-// 历史记录卡片组件
+// History record card component
 interface HistoryCardProps {
   type: string
   time: string
@@ -367,7 +367,7 @@ const HistoryCard = ({
   return (
     <div className="bg-[url(/profile/ranking/history_border.png)] bg-cover bg-no-repeat w-[363px] h-[83px] flex items-center px-4">
       <div className="flex items-center justify-between w-full">
-        {/* 左侧信息 */}
+        {/* Left info */}
         <div className="flex flex-col">
           <div className="w-[55px] h-[20px] bg-[url('/profile/ranking/asset_border.svg')] bg-cover bg-no-repeat flex items-center justify-center">
             <span className="font-oxanium font-bold uppercase text-[14px] text-[#B0B0C0]">
@@ -383,7 +383,7 @@ const HistoryCard = ({
             {action}
           </span>
         </div>
-        {/* 右侧数值 */}
+        {/* Right value */}
         <div className="flex items-center gap-1">
           <span
             className="font-oxanium font-bold text-[24px]"
@@ -391,7 +391,13 @@ const HistoryCard = ({
           >
             {amount.toLocaleString()}
           </span>
-          <img src={iconPath} alt="Asset Icon" className="w-[50px] h-[50px]" />
+          <Image
+            src={iconPath}
+            alt="Asset Icon"
+            width={50}
+            height={50}
+            className="w-[50px] h-[50px]"
+          />
         </div>
       </div>
     </div>
@@ -408,70 +414,78 @@ export default function Ranking() {
   const [activeTab, setActiveTab] = useState<'history' | 'power' | 'nova'>(
     'history'
   )
-  const activeIndex = tabs.findIndex(tab => tab.key === activeTab)
-  const activeLeft = `${activeIndex * 121}px`
   const borderSrc = '/GlobalBorder/profile/RankingBorder.svg'
+  const tabWidth = 121
+  const tabHeight = 30
+  const tabTop = 5
+  const tabLeft = 1 // Add left margin for spacing
 
   return (
     <div className="flex flex-col items-center mt-4">
-      {/* 标签页容器 */}
-      <div className="w-[363px] h-[30px] relative">
-        {/* SVG 边框 */}
+      {/* Tab container */}
+      <div className="w-[363px] h-[40px] relative">
+        {/* SVG border */}
         <div className="absolute inset-0">
-          <img
+          <Image
             src={borderSrc}
             alt="Ranking Border"
+            width={363}
+            height={40}
             className="w-full h-full object-fill"
           />
         </div>
 
-        {/* 激活指示器 */}
-        <div
-          className="absolute top-[1px] h-[26px] w-[115px] transition-all duration-300 ease-in-out"
-          style={{
-            left: activeLeft,
-            background:
-              activeTab === 'nova'
-                ? 'linear-gradient(90deg, rgba(188, 19, 254, 0.35) 0%, rgba(188, 19, 254, 0.35) 100%)'
-                : 'linear-gradient(90deg, rgba(0, 240, 255, 0.35) 0%, rgba(0, 240, 255, 0.35) 100%)',
-          }}
-        />
-
-        {/* 标签文本 */}
+        {/* Tab text */}
         {tabs.map((tab, index) => {
           const isActive = tab.key === activeTab
-          const left = `${index * 121}px`
+          const left = `${index * tabWidth}px`
 
           return (
             <div
               key={tab.key}
-              className="absolute top-0 h-[30px] w-[121px] flex items-center justify-center cursor-pointer"
-              style={{ left }}
+              className="absolute flex items-center justify-center cursor-pointer"
+              style={{
+                left,
+                top: `${tabTop}px`,
+                width: `${tabWidth}px`,
+                height: `${tabHeight}px`,
+                background: isActive
+                  ? 'linear-gradient(90deg, rgba(0, 240, 255, 0.35) 0%, rgba(0, 240, 255, 0.2) 100%)'
+                  : 'transparent',
+                boxShadow: isActive
+                  ? '0 0 10px rgba(0, 240, 255, 0.35)'
+                  : 'none',
+              }}
               onClick={() => setActiveTab(tab.key)}
             >
               <span
                 className="font-oxanium font-bold text-[14px] leading-[18px] text-center tracking-[0.04em] uppercase"
                 style={{
-                  color: isActive
-                    ? tab.key === 'nova'
-                      ? '#BC13FE'
-                      : '#00F0FF'
-                    : '#B0B0C0',
+                  color: isActive ? '#00F0FF' : '#9B8FB3',
                   textShadow: isActive
-                    ? tab.key === 'nova'
-                      ? '0 0 6px rgba(188, 19, 254, 0.55)'
-                      : '0 0 6px rgba(0, 240, 255, 0.5)'
+                    ? '0 0 6px rgba(0, 240, 255, 0.55)'
                     : 'none',
                 }}
               >
                 {tab.label}
               </span>
+              {index < tabs.length - 1 &&
+                tab.key !== 'power' &&
+                tabs[index + 1].key !== 'power' && (
+                  <span
+                    className="absolute top-0 right-[-1px] h-full w-[2px] pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(0, 240, 255, 0.6) 0%, rgba(188, 19, 254, 0.6) 100%)',
+                    }}
+                  />
+                )}
             </div>
           )
         })}
       </div>
 
-      {/* History 卡片 - 仅在 history tab 显示 */}
+      {/* History card - only show in history tab */}
       {activeTab === 'history' && (
         <div className="mt-4 space-y-2">
           {historyListData.map(history => (
@@ -487,7 +501,7 @@ export default function Ranking() {
         </div>
       )}
 
-      {/* Power 排行榜 - 仅在 power tab 显示 */}
+      {/* Power ranking - only show in power tab */}
       {activeTab === 'power' && (
         <div className="flex justify-center mt-4 overflow-hidden">
           <div
@@ -497,7 +511,7 @@ export default function Ranking() {
             }}
           >
             <div className="relative z-10 pt-8 px-4 space-y-3 h-full flex flex-col">
-              {/* 顶部标签 */}
+              {/* Top label */}
               <div className="flex justify-center">
                 <div
                   className="font-orbitron font-[900] text-[15px] leading-[19px] flex items-center text-center tracking-[0.06em] uppercase"
@@ -507,13 +521,12 @@ export default function Ranking() {
                 </div>
               </div>
 
-              {/* 前三名 - 按照从左到右：2、1、3的顺序 */}
+              {/* Top 3 - ordered as 2, 1, 3 from left to right */}
               <div className="flex justify-center gap-6 mb-2">
                 {topThreeData
                   .slice(0, 3)
                   .sort((a, b) => {
-                    // 自定义排序：第2名、第1名、第3名
-                    if (a.rank === 2) return -1
+                    // Custom order: 2nd, 1st, 3rd                    if (a.rank === 2) return -1
                     if (b.rank === 2) return 1
                     if (a.rank === 1) return -1
                     if (b.rank === 1) return 1
@@ -533,7 +546,7 @@ export default function Ranking() {
                 <div className="h-[24px] w-[260px] bg-[url('/profile/ranking/top3/ranking_header.png')] bg-cover bg-no-repeat"></div>
               </div>
 
-              {/* 可滚动的排行榜列表区域 */}
+              {/* Scrollable ranking list area */}
               <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2 pb-2">
                 {powerRankingListData.map(user => (
                   <RankingItem
@@ -547,7 +560,7 @@ export default function Ranking() {
                 ))}
               </div>
 
-              {/* 当前用户 - 固定在底部 */}
+              {/* Current user - fixed at bottom */}
               <div className="flex-shrink-0">
                 <CurrentUserItem
                   rank={currentUserData.rank}
@@ -561,7 +574,7 @@ export default function Ranking() {
         </div>
       )}
 
-      {/* Nova 排行榜 - 仅在 nova tab 显示 */}
+      {/* Nova ranking - only show in nova tab */}
       {activeTab === 'nova' && (
         <div className="flex justify-center mt-4 overflow-hidden">
           <div
@@ -571,7 +584,7 @@ export default function Ranking() {
             }}
           >
             <div className="relative z-10 pt-8 px-4 space-y-3 h-full flex flex-col">
-              {/* 顶部标签 */}
+              {/* Top label */}
               <div className="flex justify-center">
                 <div
                   className="font-orbitron font-[900] text-[15px] leading-[19px] flex items-center text-center tracking-[0.06em] uppercase"
@@ -581,30 +594,29 @@ export default function Ranking() {
                 </div>
               </div>
 
-              {/* 前三名 - 按照从左到右：2、1、3的顺序 */}
+              {/* Top 3 - ordered as 2, 1, 3 from left to right */}
               <div className="flex justify-center gap-6 mb-2">
                 {topThreeData
                   .slice(0, 3)
                   .sort((a, b) => {
-                    // 自定义排序：第2名、第1名、第3名
-                    if (a.rank === 2) return -1
+                    // Custom order: 2nd, 1st, 3rd                    if (a.rank === 2) return -1
                     if (b.rank === 2) return 1
                     if (a.rank === 1) return -1
                     if (b.rank === 1) return 1
                     return 0
                   })
                   .map(user => {
-                    // 为Nova排行榜创建模拟数据
+                    // Create mock data for Nova ranking
                     const novaUser = {
                       ...user,
-                      nova: user.power / 10, // 简单转换，实际应从真实数据获取
+                      nova: user.power / 10, // Simple conversion, should get real data
                     }
                     return (
                       <TopRankCard
                         key={novaUser.rank}
                         rank={novaUser.rank}
                         name={novaUser.name}
-                        nova={novaUser.nova} // 使用nova值
+                        nova={novaUser.nova} // Use nova value
                         avatar={novaUser.avatar}
                       />
                     )
@@ -614,7 +626,7 @@ export default function Ranking() {
                 <div className="h-[24px] w-[260px] bg-[url('/profile/ranking/top3/ranking_header.png')] bg-cover bg-no-repeat"></div>
               </div>
 
-              {/* 可滚动的排行榜列表区域 */}
+              {/* Scrollable ranking list area */}
               <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2 pb-2">
                 {novaRankingListData.map(user => (
                   <RankingItem
@@ -628,12 +640,12 @@ export default function Ranking() {
                 ))}
               </div>
 
-              {/* 当前用户 - 固定在底部 */}
+              {/* Current user - fixed at bottom */}
               <div className="flex-shrink-0">
                 <CurrentUserItem
                   rank={currentUserData.rank}
                   name={currentUserData.name}
-                  nova={Math.floor(currentUserData.power / 10)} // 简单转换
+                  nova={Math.floor(currentUserData.power / 10)} // Simple conversion
                   avatar={currentUserData.avatar}
                 />
               </div>

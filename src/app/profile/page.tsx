@@ -2,6 +2,7 @@
 import MotionDiv from '@/components/motion/MotionDiv'
 import AssetsOverview from '@/components/profileCard/AssetsOverView'
 import WalletConnect from '@/components/profileCard/WalletConnect'
+import WalletConnectModal from '@/components/profileCard/WalletConnectModal'
 import BadgeShow from '@/components/profileCard/BadgeShow'
 import InviteLink from '@/components/profileCard/InviteLink'
 import Ranking from '@/components/profileCard/Ranking'
@@ -29,6 +30,7 @@ export default function ProfilePage() {
           <InviteLink />
           <Ranking />
         </MotionDiv>
+        <WalletConnectModal />
       </div>
     </div>
   )
