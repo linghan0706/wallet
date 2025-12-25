@@ -1,4 +1,5 @@
 ﻿import React from 'react'
+import Image from 'next/image'
 
 type PartId =
   | 'propulsionSystem'
@@ -244,9 +245,11 @@ const BlueStarStage: React.FC<BlueStarStageProps> = ({
               : 'drop-shadow(1px 0px 5px #B0B0C0) drop-shadow(0px 1px 1px #B0B0C0)',
           }}
         >
-          <img
+          <Image
             src={SUBJECT_ICON}
             alt="Blue Star spaceship"
+            width={SUBJECT_SIZE}
+            height={SUBJECT_SIZE}
             className="w-full h-full object-contain select-none"
             loading="lazy"
             style={{

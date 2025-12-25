@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 
 type Point = { x: number; y: number }
 
@@ -452,9 +453,11 @@ const SolarSystemStage: React.FC<SolarSystemStageProps> = ({
               : 'drop-shadow(1px 1px 4px #181A1F)',
           }}
         >
-          <img
+          <Image
             src={SUBJECT_ICON}
             alt="Solar system subject"
+            width={160}
+            height={160}
             className="w-full h-full object-contain"
             loading="lazy"
             style={{
@@ -527,13 +530,15 @@ const SolarSystemStage: React.FC<SolarSystemStageProps> = ({
           }}
           aria-label="Continue journey"
         >
-          <img
+          <Image
             src={
               allActive
                 ? '/backpack/part/solar_system/button/active.png'
                 : '/backpack/part/solar_system/button/inactive.png'
             }
             alt="Continue journey"
+            width={140}
+            height={32}
             className="w-full h-full object-contain select-none"
             draggable={false}
             loading="lazy"

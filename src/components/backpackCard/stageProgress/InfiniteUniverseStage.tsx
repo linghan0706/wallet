@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 
 type InfiniteUniversePartId =
   | 'cosmicEdgeExpedition'
@@ -178,9 +179,11 @@ const InfiniteUniverseStage: React.FC<InfiniteUniverseStageProps> = ({
       style={{ width: '363px', height: '270px' }}
     >
       <div className="absolute inset-0" aria-hidden>
-        <img
+        <Image
           src={STAGE_BG}
           alt=""
+          width={363}
+          height={270}
           className="w-full h-full object-contain select-none"
           draggable={false}
           loading="lazy"

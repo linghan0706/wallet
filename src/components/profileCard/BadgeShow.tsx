@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function BadgeShow() {
   const [activeFilter, setActiveFilter] = useState('All')
@@ -266,15 +267,19 @@ export default function BadgeShow() {
                   </>
                 )}
                 {!badge.active ? (
-                  <img
+                  <Image
                     src="/profile/badge/badge_locked.png"
                     alt="Locked"
+                    width={48}
+                    height={48}
                     className="absolute z-20 w-[48px] h-[48px] opacity-80"
                   />
                 ) : (
-                  <img
+                  <Image
                     src={badge.image}
                     alt={badge.label.join(' ')}
+                    width={badge.active ? 60 : 48}
+                    height={badge.active ? 60 : 48}
                     className={`relative z-10 ${badge.active ? 'w-[60px] h-[60px]' : 'w-[48px] h-[48px] opacity-70 grayscale'}`}
                     style={
                       badge.active

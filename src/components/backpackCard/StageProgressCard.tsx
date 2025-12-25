@@ -1,4 +1,5 @@
 ﻿import React, { useMemo, useState } from 'react'
+import Image from 'next/image'
 import {
   BlueStarStage,
   GalaxyStage,
@@ -162,9 +163,11 @@ const StageProgressCard: React.FC<StageProgressCardProps> = ({
                 <React.Fragment key={stage.label}>
                   <div className="w-10 inline-flex flex-col justify-center items-center">
                     <div className="w-[30px] h-[30px]">
-                      <img
+                      <Image
                         src={stage.icon}
                         alt={stage.label}
+                        width={30}
+                        height={30}
                         className="w-full h-full object-contain select-none"
                         loading="lazy"
                       />

@@ -235,13 +235,7 @@ export default function TelegramStarPay() {
       setUsdcBalance(null)
       setUsdcJettonWallet(null)
     }
-  }, [
-    selectedMethod,
-    wallet.isConnected,
-    wallet.address,
-    fetchUsdcBalance,
-    paymentConfig.usdcJettonMaster,
-  ])
+  }, [selectedMethod, wallet.isConnected, wallet.address, fetchUsdcBalance])
 
   const handleStarPayment = async (item: FormattedStoreItem) => {
     setActiveId(item.id)

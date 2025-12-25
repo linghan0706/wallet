@@ -1,4 +1,5 @@
 ﻿import React from 'react'
+import Image from 'next/image'
 
 type GalaxyPartId =
   | 'voidSovereignsCrown'
@@ -185,9 +186,11 @@ const GalaxyStage: React.FC<GalaxyStageProps> = ({
         style={{ width: '363px', height: '258px', zIndex: 0 }}
         aria-hidden
       >
-        <img
+        <Image
           src={GALAXY_BG}
           alt=""
+          width={363}
+          height={258}
           className="w-full h-full object-contain select-none"
           draggable={false}
           loading="lazy"
@@ -206,9 +209,11 @@ const GalaxyStage: React.FC<GalaxyStageProps> = ({
         }}
         aria-hidden
       >
-        <img
+        <Image
           src={allActive ? GALAXY_PORTAL_ACTIVE : GALAXY_PORTAL_INACTIVE}
           alt=""
+          width={127}
+          height={127}
           className="w-full h-full object-contain select-none"
           draggable={false}
           loading="lazy"

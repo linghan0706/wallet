@@ -1,4 +1,5 @@
 import React from 'react'
+import NextImage from 'next/image'
 import { useBackpackModalStore } from '@/stores/backpackModalStore'
 
 // 背包分类类型定义
@@ -137,9 +138,11 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, selected, onToggle }) => {
           {status === 'error' ? (
             <div className="w-[48px] h-[48px] bg-[#0B122C]" />
           ) : (
-            <img
+            <NextImage
               src={srcPath}
               alt={item.name}
+              width={48}
+              height={48}
               className="w-[48px] h-[48px] object-contain "
               loading="lazy"
             />
