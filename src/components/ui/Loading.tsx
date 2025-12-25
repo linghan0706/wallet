@@ -342,7 +342,26 @@ export default function Loading({ onComplete }: LoadingProps) {
       {/* 跳过 Skip */}
       <button
         onClick={handleSkip}
-        className="absolute top-8 right-6 z-50 bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded-full transition-colors font-jersey-10"
+        className="absolute top-8 right-6 z-50 font-oxanium"
+        style={{
+          width: '82px',
+          height: '22px',
+          backgroundImage: 'url(/GlobalBorder/Small_Button.svg)',
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#00F0FF',
+          fontSize: '14px',
+          fontWeight: 700,
+          lineHeight: '100%',
+          letterSpacing: '4%',
+          textTransform: 'capitalize',
+        }}
       >
         skip
       </button>
