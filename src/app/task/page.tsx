@@ -166,21 +166,18 @@ export default function TaskPage() {
           return (
             <MotionDiv
               key={task.taskId}
-              className="relative w-full h-[80px] backdrop-blur-[8.4px] rounded-[15px] border border-transparent overflow-hidden"
+              className="relative w-[363px] h-[80px] overflow-hidden"
               style={{
-                borderRadius: '15px',
-                border: '1px solid transparent',
-                backgroundImage:
-                  'linear-gradient(rgba(5,8,25,0.75), rgba(5,8,25,0.75)), linear-gradient(90deg, #00F0FF 0%, #FFFFFF 33%, #FFFFFF 66%, #BC13FE 100%)',
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'padding-box, border-box',
+                backgroundImage: 'url(/GlobalBorder/task/basic_border.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
               }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.08 }}
             >
               {/* 内容容器 */}
-              <div className="relative w-full h-full rounded-[12px] border border-white/15 flex items-center px-3 sm:px-4 bg-transparent">
+              <div className="relative w-[363px] h-full rounded-[12px] border border-white/15 flex items-center px-3 sm:px-4 bg-transparent">
                 {/* 左侧图标和文本区域 */}
                 <div className="flex items-center flex-1 min-w-0">
                   {/* 图标容器  */}

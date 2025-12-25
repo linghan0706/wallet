@@ -8,7 +8,7 @@ export default function BasePage() {
       {/* 背景容器 */}
       <div
         className="fixed inset-0 bg-gradient-to-b from-purple-900 via-blue-900 to-black bg-cover bg-contain"
-        style={{ backgroundImage: `url(/layout/background.png)` }}
+        style={{ backgroundImage: `url(/base/background/bg_blue_star.png)` }}
       ></div>
 
       {/* 主要内容 */}

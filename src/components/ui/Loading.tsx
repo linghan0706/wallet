@@ -514,7 +514,7 @@ export default function Loading({ onComplete }: LoadingProps) {
 
           {/*回退箭头 Button*/}
           <div
-            className="w-full sm:w-80 md:w-96 lg:min-w-96 px-3 sm:px-0"
+            className="w-full sm:w-80 md:w-96 lg:min-w-96"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -553,16 +553,17 @@ export default function Loading({ onComplete }: LoadingProps) {
 
             {/* Next Step Button */}
             <motion.button
-              className="flex items-center justify-center relative transition-all flex-1 sm:flex-initial"
+              className="flex items-center justify-center relative transition-all flex-1 sm:flex-initial bg-cover bg-center"
               onClick={handleNext}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               style={{
-                width: currentPage > 1 ? 'calc(100% - 40px)' : '100%',
-                minHeight: '22px',
-                background:
-                  'linear-gradient(90deg, rgba(0, 240, 255, 0.8) 0%, rgba(0, 102, 255, 0.8) 100%)',
-                borderRadius: '5px',
+                width: '296px',
+                height: '36px',
+                backgroundImage: 'url(/GlobalBorder/Global_Button.svg)',
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -572,7 +573,7 @@ export default function Loading({ onComplete }: LoadingProps) {
                 style={{
                   fontSize: '14px',
                   lineHeight: '22px',
-                  color: '#FFFFFF',
+                  color: '#00F0FF',
                   textAlign: 'center',
                 }}
               >
