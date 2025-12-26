@@ -275,6 +275,7 @@ export default function Loading({ onComplete }: LoadingProps) {
   // 初始化为1，这样第二个进度条（index=1）会在进入时点亮
   const [currentPage, setCurrentPage] = useState(6)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
 
   // 布局管理器的ref引用
   const containerRef = useRef<HTMLDivElement>(null)
@@ -330,14 +331,44 @@ export default function Loading({ onComplete }: LoadingProps) {
     }
   }
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!touchStartRef.current || isTransitioning) {
+      touchStartRef.current = null
+      return
+    }
+
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - touchStartRef.current.x
+    const deltaY = touch.clientY - touchStartRef.current.y
+
+    touchStartRef.current = null
+
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY)) {
+      return
+    }
+
+    if (deltaX < 0) {
+      handleNext()
+    } else if (deltaX > 0) {
+      handlePrev()
+    }
+  }
+
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden"
+      className="min-h-screen min-h-[100svh] flex flex-col lg:flex-row relative overflow-hidden"
       data-layout-key="main-container"
       style={{
         background: 'linear-gradient(to top, #0F1226, #0C2957)',
       }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* 跳过 Skip */}
       <button
@@ -398,98 +429,103 @@ export default function Loading({ onComplete }: LoadingProps) {
       {/* 下层内容 Section: Content */}
       <div
         ref={titleAreaRef}
-        className="flex flex-col items-center justify-center w-full sm:w-[360px] md:w-[420px] lg:w-1/2 h-auto sm:h-auto md:h-auto lg:h-screen p-4 sm:p-6 md:p-7 lg:p-[80px_60px] gap-3 sm:gap-4 md:gap-5 lg:gap-5 mx-auto lg:mx-0 relative z-10 border-t lg:border-none border-[#CED4DD] rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-none lg:justify-center"
+        className="flex flex-col items-center w-full sm:w-[360px] md:w-[420px] lg:w-1/2 h-auto sm:h-auto md:h-auto lg:h-screen p-4 sm:p-6 md:p-7 lg:p-[80px_60px] mx-auto lg:mx-0 relative z-10 border-t lg:border-none border-[#CED4DD] rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-none"
         style={{
           background: 'linear-gradient(to top, #0F1226, #0C2957)',
         }}
       >
         {/* 主要内容  */}
-        <div
-          className="flex flex-col items-center w-full"
-          style={{ height: 'auto', minHeight: 'fit-content' }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`content-${currentPage}`}
-              className={`flex flex-col items-center w-full ${
-                hasDescription ? 'gap-1.5' : 'gap-3'
-              }`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              style={{ minHeight: '106px' }} // 主标题(58px) + 副标题(48px)
-            >
-              {/* 主标题容器  */}
-              <div
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  minHeight: '48px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 'none',
-                  order: 0,
-                }}
-              >
-                <h1
-                  style={getStyleForElement(currentData, 'mainTitle').style}
-                  className={
-                    getStyleForElement(currentData, 'mainTitle').className
-                  }
-                >
-                  {currentData.title}
-                </h1>
-              </div>
-
-              {/* 副标题容器 */}
-              <div
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  minHeight: '48px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 'none',
-                  order: 1,
-                }}
-              >
-                <h2
-                  style={getStyleForElement(currentData, 'subTitle').style}
-                  className={
-                    getStyleForElement(currentData, 'subTitle').className
-                  }
-                >
-                  {currentData.subtitle || ''}
-                </h2>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* 描述文本 */}
-        <div
-          className="w-full lg:max-w-xs flex items-center justify-center"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 'none',
-            order: 2,
-            minHeight: '44px',
-          }}
-        >
-          <p
-            style={getStyleForElement(currentData, 'description').style}
-            className={getStyleForElement(currentData, 'description').className}
+        <div className="flex flex-col items-center w-full flex-1 justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-5">
+          <div
+            className="flex flex-col items-center w-full"
+            style={{ height: 'auto', minHeight: 'fit-content' }}
           >
-            {currentData.description}
-          </p>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`content-${currentPage}`}
+                className={`flex flex-col items-center w-full ${
+                  hasDescription ? 'gap-1.5' : 'gap-3'
+                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                style={{ minHeight: '106px' }} // 主标题(58px) + 副标题(48px)
+              >
+                {/* 主标题容器  */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    minHeight: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 'none',
+                    order: 0,
+                  }}
+                >
+                  <h1
+                    style={getStyleForElement(currentData, 'mainTitle').style}
+                    className={
+                      getStyleForElement(currentData, 'mainTitle').className
+                    }
+                  >
+                    {currentData.title}
+                  </h1>
+                </div>
+
+                {/* 副标题容器 */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    minHeight: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 'none',
+                    order: 1,
+                  }}
+                >
+                  <h2
+                    style={getStyleForElement(currentData, 'subTitle').style}
+                    className={
+                      getStyleForElement(currentData, 'subTitle').className
+                    }
+                  >
+                    {currentData.subtitle || ''}
+                  </h2>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* 描述文本 */}
+          <div
+            className="w-full lg:max-w-xs flex items-center justify-center"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 'none',
+              order: 2,
+              minHeight: '44px',
+            }}
+          >
+            <p
+              style={getStyleForElement(currentData, 'description').style}
+              className={
+                getStyleForElement(currentData, 'description').className
+              }
+            >
+              {currentData.description}
+            </p>
+          </div>
+
+          {/* 分页器 */}
         </div>
 
-        {/* 分页器 */}
         <div
           className="flex flex-col gap-[15px] w-full items-center"
           style={{
@@ -511,18 +547,21 @@ export default function Loading({ onComplete }: LoadingProps) {
             {Array.from({ length: 6 }, (_, i) => {
               const index = i + 1
               const isActive = index === currentPage
+              const isVisited = index < currentPage
               return (
                 <motion.div
                   key={index}
                   onClick={() => handleDotClick(index)}
                   className="cursor-pointer transition-all"
                   style={{
-                    width: isActive ? '26px' : '6px',
-                    height: '6px',
+                    width: isActive ? '30px' : '24px',
+                    height: isActive ? '6px' : '2px',
                     background: isActive
-                      ? 'linear-gradient(172.02deg, #00F0FF -21.97%, #0066FF 99.02%)'
-                      : '#FFFFFF',
-                    borderRadius: isActive ? '20px' : '50%',
+                      ? '#00F0FF'
+                      : isVisited
+                        ? '#BC13FE'
+                        : '#B0B0C0',
+                    borderRadius: isActive ? '0px' : '0px',
                     flex: 'none',
                   }}
                   layout
@@ -531,75 +570,33 @@ export default function Loading({ onComplete }: LoadingProps) {
             })}
           </div>
 
-          {/*回退箭头 Button*/}
-          <div
-            className="w-full sm:w-80 md:w-96 lg:min-w-96"
+          {/* Next Step Button */}
+          <motion.button
+            className="flex items-center justify-center relative transition-all bg-cover bg-center"
+            onClick={handleNext}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px',
-              flex: 'none',
+              width: '296px',
+              height: '36px',
+              backgroundImage: 'url(/GlobalBorder/Global_Button.svg)',
+              backgroundRepeat: 'no-repeat',
+              border: 'none',
+              cursor: 'pointer',
             }}
           >
-            {currentPage > 1 && (
-              <motion.button
-                onClick={handlePrev}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="transition-transform active:scale-95"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '24px',
-                  minHeight: '24px',
-                }}
-              >
-                <Image
-                  src="/button/left.svg"
-                  alt="Back"
-                  width={22}
-                  height={22}
-                  style={{ width: 'auto', height: '22px' }}
-                />
-              </motion.button>
-            )}
-
-            {/* Next Step Button */}
-            <motion.button
-              className="flex items-center justify-center relative transition-all flex-1 sm:flex-initial bg-cover bg-center"
-              onClick={handleNext}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <span
+              className="font-jersey-10 text-xs sm:text-sm md:text-base lg:text-base whitespace-nowrap"
               style={{
-                width: '296px',
-                height: '36px',
-                backgroundImage: 'url(/GlobalBorder/Global_Button.svg)',
-                backgroundSize: 'contain',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                border: 'none',
-                cursor: 'pointer',
+                fontSize: '14px',
+                lineHeight: '22px',
+                color: '#00F0FF',
+                textAlign: 'center',
               }}
             >
-              <span
-                className="font-jersey-10 text-xs sm:text-sm md:text-base lg:text-base whitespace-nowrap"
-                style={{
-                  fontSize: '14px',
-                  lineHeight: '22px',
-                  color: '#00F0FF',
-                  textAlign: 'center',
-                }}
-              >
-                {currentPage === guidancePages.length ? 'Launch' : 'Next Step'}
-              </span>
-            </motion.button>
-          </div>
+              {currentPage === guidancePages.length ? 'Launch' : 'Next Step'}
+            </span>
+          </motion.button>
         </div>
       </div>
     </div>
