@@ -1,127 +1,142 @@
-'use client'
-
-import { motion } from 'framer-motion'
 import Image from 'next/image'
 
 export default function AssetRedemption() {
   return (
-    <div className="flex w-full items-center justify-center px-4 py-6">
-      <div className="relative h-[220px] w-[363px]  overflow-hidden rounded-[8px] border border-cyan-500/20 bg-[rgba(26,26,64,0.45)] px-6 pb-5 pt-4 shadow-[0_0_38px_rgba(0,0,0,0.45)]">
-        <div className="absolute" />
-        <div className="relative flex h-full flex-col items-center">
-          <p className="font-jersey-15 text-[16px] sm:text-[16px] leading-[22px] sm:leading-[20px] text-center text-[#B2B2B2] font-normal">
-            redeem props and resources
-          </p>
-          <p className="mt-2 font-jersey-10 text-[24px] leading-[22px] text-white/80 [text-shadow:0_0_1px_#BC13FE]">
-            asset redemption
-          </p>
-          <div className="relative mt-4 grid w-[288px] grid-cols-[112px_60px_112px] items-start gap-2">
-            {/* 连接线 */}
-            <div className="pointer-events-none absolute left-[149px] top-[33px] h-[32px] w-[130px] -translate-x-1/2">
-              <Image
-                src="/stores/connection.svg"
-                alt="connection"
-                width={130}
-                height={32}
-                className="absolute left-0 top-0 h-[32px] w-[288px]"
-              />
-            </div>
+    <div className="relative h-[221px] w-[363px] overflow-hidden bg-[url('/GlobalBorder/store/exchange_border.png')] bg-cover bg-no-repeat font-oxanium text-white">
+      <div className="absolute inset-[6px] rounded-[4px] bg-[radial-gradient(ellipse_at_center,_rgba(26,32,72,0.85)_0%,_rgba(13,16,38,0.95)_55%,_rgba(10,12,30,1)_100%)]" />
+      <div className="absolute inset-[6px] rounded-[4px] bg-[radial-gradient(circle_at_18%_28%,_rgba(255,255,255,0.15)_0%,_rgba(255,255,255,0)_40%),radial-gradient(circle_at_72%_20%,_rgba(130,170,255,0.2)_0%,_rgba(130,170,255,0)_45%),radial-gradient(circle_at_48%_72%,_rgba(120,90,255,0.25)_0%,_rgba(120,90,255,0)_50%)] opacity-60" />
+      <div className="absolute inset-0 pointer-events-none">
+        <svg
+          width="120"
+          height="18"
+          viewBox="0 0 120 18"
+          className="absolute right-[18px] top-[16px]"
+          fill="none"
+        >
+          <path
+            d="M2 9H50L60 3H78L88 9H118"
+            stroke="#BC13FE"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          <circle cx="60" cy="3" r="2.5" fill="#00F0FF" />
+          <circle cx="78" cy="3" r="2.5" fill="#00F0FF" />
+          <circle cx="88" cy="9" r="2.5" fill="#00F0FF" />
+        </svg>
+        <Image
+          src="/GlobalBorder/store/line.svg"
+          alt=""
+          width={66}
+          height={74}
+          unoptimized
+          aria-hidden="true"
+          className="absolute left-1/2 top-[64px] -translate-x-1/2 opacity-70"
+        />
+      </div>
 
-            {/* 左侧Power */}
+      <div className="relative z-10 flex h-full flex-col px-[16px] pb-[12px] pt-[12px]">
+        <div className="flex items-center justify-between">
+          <div className="font-orbitron text-[13px] font-bold tracking-[0.2em] text-[#C9D6FF] [text-shadow:0_0_6px_rgba(188,19,254,0.7)]">
+            ASSET REDEMPTION
+          </div>
+        </div>
+
+        <div className="mt-[10px] flex flex-1 items-start justify-between">
+          <div className="relative h-[130px] w-[130px]">
             <div
-              className="relative h-[120px] w-full rounded-[8px] overflow-hidden "
+              className="absolute inset-0 bg-[#171B3B]/65"
               style={{
-                borderRadius: '8px',
-                border: '1px solid transparent',
-                backgroundImage:
-                  'linear-gradient(#0d0f24, #0d0f24), linear-gradient(136.39deg, #00F0FF 8.54%, rgba(255, 255, 255, 0) 30.01%, rgba(255, 255, 255, 0) 72.95%, #BC13FE 94.42%)',
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'padding-box, border-box',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderImageSlice: 1,
+                borderImageSource:
+                  'linear-gradient(136.39deg, #00F0FF 8.54%, #00F0FF 17.12%, #606070 17.12%, #606070 85.83%, #BC13FE 85.83%, #BC13FE 94.42%)',
               }}
-            >
-              <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-[7px] bg-[#1A1A40CC] text-white">
-                <div className="relative flex h-[89px] w-[80px] flex-col items-center justify-start gap-2 px-3 ">
-                  <div className="relative h-[60px] w-[60px]">
-                    <div className="flex mt-1" />
-                    <Image
-                      src="/currency/power.svg"
-                      alt="power"
-                      width={60}
-                      height={60}
-                      className="relative h-[60px] w-[60px]"
-                    />
+            />
+            <div className="absolute left-0 top-0 h-[12px] w-[40px] " />
+            <div className="absolute bottom-0 right-0 h-[12px] w-[40px]" />
+            <div className="relative z-10 flex h-full flex-col items-center justify-between pb-[10px] pt-[10px]">
+              <div className="relative flex h-[42px] w-[42px] items-center justify-center">
+                <Image
+                  src="/currency/power.png"
+                  alt="Power"
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="[filter:drop-shadow(0_0_8px_rgba(0,240,255,0.6))_drop-shadow(0_0_10px_rgba(188,19,254,0.6))]"
+                />
+                <div className="absolute -bottom-[6px] left-1/2 h-[10px] w-[54px] -translate-x-1/2  bg-[radial-gradient(ellipse_at_center,_rgba(0,240,255,0.5)_0%,_rgba(188,19,254,0.35)_45%,_rgba(0,0,0,0)_70%)]" />
+              </div>
+              <div className="font-oxanium font-bold text-[14px] text-white [text-shadow:0px_0px_1px_#BC13FE] tracking-[0.04em] uppercase flex items-center">
+                POWER
+              </div>
+              <div className="flex items-center gap-[6px]">
+                <span className="font-oxanium font-bold text-[10px] text-[#00F0FF] underline uppercase flex items-center">
+                  MIN
+                </span>
+                <div className="h-[22px] w-[78px]">
+                  <div className="h-full w-full border-l-[1px] border-l-[#00F0FF] border-r-[1px] border-r-[#BC13FE] p-[1px] bg-[#3F3F56]">
+                    <div className="flex h-full w-full items-center justify-center rounded-[1px] bg-[#B0B0C0] text-[14px] font-bold tracking-[0.08em] text-white [text-shadow:0_0_4px_rgba(255,255,255,0.8)]">
+                      1,000
+                    </div>
                   </div>
-                  <span className="font-jersey-10 text-[18px] leading-[22px] text-white [text-shadow:0_0_1px_#BC13FE]">
-                    Power
-                  </span>
                 </div>
-                <div className="flex h-[22px] w-[100px] items-center justify-between rounded-xl mb-2 border border-cyan-400/60 bg-[linear-gradient(0deg,rgba(188,19,254,0.2),rgba(188,19,254,0.2)),rgba(0,240,255,0.2)] px-[5px]">
-                  <span className="flex h-[22px] w-[16px] items-center justify-center ">
-                    <Image
-                      src="/currency/leftButton.svg"
-                      alt="decrease amount"
-                      width={12}
-                      height={12}
-                    />
-                  </span>
-                  <span className="font-jersey-10 text-[16px] leading-[22px] text-white fontjersey-10">
-                    1,000
-                  </span>
-                  <span className="flex h-[22px] w-[16px] items-center justify-center">
-                    <Image
-                      src="/currency/rightButton.svg"
-                      alt="increase amount"
-                      width={12}
-                      height={12}
-                    />
-                  </span>
-                </div>
+                <span className="font-oxanium font-bold text-[10px] text-[#BC13FE] underline uppercase flex items-center tracking-[0.04em]">
+                  ALL
+                </span>
               </div>
             </div>
-            {/* 兑换按钮 */}
-            <div className="flex h-full w-full items-start justify-center ">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="mt-24 flex  w-[60px] h-[20px] items-center justify-center rounded-[5px] bg-[linear-gradient(98.64deg,rgba(0,240,255,0.8)_0%,rgba(188,19,254,0.8)_99.34%)] font-jersey-10 text-[12px] leading-[22px] text-white shadow-[0px_1px_1px_#BC13FE,0px_-1px_1px_#00F0FF,inset_0px_1px_1px_#BC13FE,inset_0px_-1px_1px_#00F0FF]"
-              >
-                exchange
-              </motion.button>
-            </div>
-            {/* 右侧 Stars */}
+          </div>
+
+          <div className="relative h-[130px] w-[130px]">
             <div
-              className="relative h-[120px] w-full rounded-[8px] overflow-hidden ml-[-3px]"
+              className="absolute inset-0 bg-[#171B3B]/65"
               style={{
-                borderRadius: '8px',
-                border: '1px solid transparent',
-                backgroundImage:
-                  'linear-gradient(#0d0f24, #0d0f24), linear-gradient(136.39deg, #00F0FF 8.54%, rgba(255, 255, 255, 0) 30.01%, rgba(255, 255, 255, 0) 72.95%, #BC13FE 94.42%)',
-                backgroundOrigin: 'border-box',
-                backgroundClip: 'padding-box, border-box',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderImageSlice: 1,
+                borderImageSource:
+                  'linear-gradient(136.39deg, #00F0FF 8.54%, #00F0FF 17.12%, #606070 17.12%, #606070 85.83%, #BC13FE 85.83%, #BC13FE 94.42%)',
               }}
-            >
-              <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-[7px] bg-[#1A1A40CC] text-white">
-                <div className="relative flex h-[89px] w-[80px] flex-col items-center justify-start  px-3 ">
-                  <div className="relative h-[60px] w-[60px]">
-                    <div className="flex mt-1" />
-                    <Image
-                      src="/currency/stars.svg"
-                      alt="star"
-                      width={60}
-                      height={60}
-                      className="relative h-[60px] w-[60px]"
-                    />
+            />
+            <div className="absolute left-0 top-0 h-[12px] w-[40px]" />
+            <div className="absolute bottom-0 right-0 h-[12px] w-[40px]  " />
+            <div className="relative z-10 flex h-full flex-col items-center justify-between pb-[12px] pt-[10px]">
+              <div className="relative flex h-[42px] w-[42px] items-center justify-center">
+                <svg
+                  width="42"
+                  height="42"
+                  viewBox="0 0 64 64"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M32 6l7.6 15.5 17.1 2.5-12.3 12 2.9 17-15.3-8.1-15.3 8.1 2.9-17-12.3-12 17.1-2.5L32 6z"
+                    fill="#F6C24A"
+                  />
+                </svg>
+                <div className="absolute -bottom-[6px] left-1/2 h-[10px] w-[54px] -translate-x-1/2  bg-[radial-gradient(ellipse_at_center,_rgba(255,214,102,0.45)_0%,_rgba(255,165,0,0.25)_45%,_rgba(0,0,0,0)_70%)]" />
+              </div>
+              <div className="font-oxanium font-bold text-[14px] text-white [text-shadow:0px_0px_1px_#BC13FE] tracking-[0.04em] uppercase">
+                STAR
+              </div>
+              <div className="h-[22px] w-[98px]">
+                <div className="h-full w-full rounded-[2px] bg-[#606174] p-[1px]">
+                  <div className="flex h-full w-full items-center justify-center rounded-[1px] bg-[#6E6F83] text-[14px] font-bold tracking-[0.08em] text-[#E6E7F2]">
+                    1,000
                   </div>
-                  <span className="font-jersey-10 mt-2 text-[18px] leading-[22px] text-white [text-shadow:0_0_1px_#BC13FE]">
-                    Star
-                  </span>
-                </div>
-                <div className="flex h-[22px] w-[100px] items-center justify-center font-jersey-10 rounded-xl border border-cyan-400/60 font-jersey-10 text-[16px] leading-[22px] mb-2 text-[#B0B0C0]">
-                  100
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-[6px] flex justify-center">
+          <button
+            type="button"
+            className="h-[30px] w-[160px] bg-[url('/GlobalBorder/store/button.png')] bg-cover bg-center font-oxanium font-bold text-[14px] text-white tracking-[0.04em] uppercase"
+          >
+            EXCHANGE
+          </button>
         </div>
       </div>
     </div>

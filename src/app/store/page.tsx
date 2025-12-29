@@ -284,12 +284,7 @@ export default function StorePage() {
         style={{ backgroundImage: `url(/layout/background.png)` }}
       ></div>
 
-      <div className="relative z-10 px-4">
-        <div className="flex flex-col items-center pt-3 sm:pt-6 space-y-2 sm:space-y-3">
-          <h1 className="font-jersey-10 text-[48px]  leading-[22px] text-white font-normal tracking-wide text-center text-shadow:0px_0px_10px_rgba(0,240,255,0.6)">
-            Store
-          </h1>
-        </div>
+      <div className="relative z-10 px-4 py-5">
         {/* 资产兑换 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

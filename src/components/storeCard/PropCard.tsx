@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -27,33 +27,64 @@ const splitTextSegments = (text: string): TextSegments => {
   if (!match) return { prefix: text.trim() }
 
   const [, prefix, value, suffix] = match
-  // 格式化标签内容
+
   return {
-    prefix: prefix.trim().replace(/:$/, ''),
+    prefix: prefix.trim(),
     value: value.trim(),
     suffix: suffix.trim(),
   }
 }
 
-const InfoBadge = ({ text }: { text: string }) => {
+const InfoBadge = ({
+  text,
+  emphasizeValue = false,
+}: {
+  text: string
+  emphasizeValue?: boolean
+}) => {
   const { prefix, value, suffix } = splitTextSegments(text)
 
+  if (!emphasizeValue || !value) {
+    return (
+      <div className="flex items-center justify-center text-center whitespace-nowrap font-ibm-plex-mono font-bold text-[8px]  leading-[12px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] ">
+        {prefix && (
+          //validity
+          <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] mt-3">
+            {prefix}
+          </span>
+        )}
+
+        {value && (
+          <span className="inline-flex items-center font-ibm-plex-mono font-bold text-[14px] leading-[14px] text-white [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] mt-2 ">
+            {value}
+          </span>
+        )}
+
+        {suffix && (
+          <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#B0B0C0] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] ml-1 mt-3 ">
+            {suffix}
+          </span>
+        )}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex h-[14px] items-center justify-center px-[4px] whitespace-nowrap no-underline gap-[1px] text-center">
+    <div className="flex items-center justify-center gap-[2px] whitespace-nowrap text-center">
       {prefix && (
-        <span className="inline-flex h-full items-center font-jersey-10 text-[10px] leading-[14px] text-[#00F0FF] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+        <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)]">
           {prefix}
         </span>
       )}
 
       {value && (
-        <span className="inline-flex h-full items-center font-jersey-10 text-[15px] leading-[14px] text-[#BC13FE] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff,0px_0px_3px_#FFFFFF]">
+        <span className="inline-flex items-center font-ibm-plex-mono font-bold text-[14px] leading-[14px] text-white [text-shadow:0_4px_4px_rgba(0,0,0,0.25)]">
           {value}
         </span>
       )}
 
       {suffix && (
-        <span className="inline-flex h-full items-center font-jersey-10 text-[10px] leading-[14px] text-[#B7B7B7] [text-shadow:1px_0_0_#fff,-1px_0_0_#fff,0_1px_0_#fff,0_-1px_0_#fff,1px_1px_0_#fff,-1px_1px_0_#fff,1px_-1px_0_#fff,-1px_-1px_0_#fff]">
+        <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#B0B0C0] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)]">
           {suffix}
         </span>
       )}
@@ -81,7 +112,7 @@ export function PropCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative w-[157.53px] h-[166px] rounded-[12px] overflow-hidden cursor-pointer select-none"
+      className="relative w-[157.53px] h-[166px] overflow-hidden cursor-pointer select-none"
       role="button"
       tabIndex={0}
       onClick={handleClick}
@@ -92,31 +123,25 @@ export function PropCard({
         }
       }}
     >
-      {/* 渐变边框容器 */}
-      <div
-        className="absolute inset-0 rounded-[12px]"
-        style={{
-          borderRadius: '12px',
-          border: '1px solid transparent',
-          backgroundImage:
-            'linear-gradient(#1A1A40, #1A1A40), linear-gradient(136.39deg, #00F0FF 8.54%, rgba(255, 255, 255, 0) 30.01%, rgba(255, 255, 255, 0) 72.95%, #00F0FF 94.42%)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
-        }}
-      />
+      <div className="absolute inset-0 overflow-hidden">
+        <Image
+          src="/GlobalBorder/store/prop_store_border.png"
+          alt="Prop Card Border"
+          fill
+          className="object-cover"
+        />
+      </div>
 
       <div className="relative z-10 flex flex-col items-center justify-between h-full p-0 w-full">
-        {/* 顶部：道具标题 */}
-        <div className="flex flex-row justify-center items-center pt-[5px] w-[105.59px] h-[22px]">
+        <div className="flex items-center justify-center pt-[5px] w-full h-[22px]">
           <div
-            className="font-jersey-10 text-white text-[24px] leading-[22px] text-center whitespace-nowrap mt-0.5 overflow-hidden"
+            className="flex items-center justify-center font-oxanium font-bold text-[14px] leading-[18px] tracking-[0.04em] capitalize text-white text-center whitespace-nowrap [text-shadow:0_0_1px_#BC13FE]"
             style={{}}
           >
             {title}
           </div>
         </div>
 
-        {/* 中间：道具图片 */}
         <div
           className="absolute w-[158px] h-[100px] flex items-center justify-center"
           style={{
@@ -124,22 +149,20 @@ export function PropCard({
             top: 'calc(50% - 100px/2 - 2px)',
           }}
         >
-          {/* 背景图层 */}
           <div
-            className="absolute inset-0 w-[158px] h-[100px]"
+            className="relative z-10 w-[100px] h-[100px]"
             style={{
               boxSizing: 'border-box',
               background:
                 'linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 240, 255, 0.15) 75%, rgba(255, 255, 255, 0.176) 87.5%, rgba(255, 255, 255, 0.2) 100%), linear-gradient(180deg, rgba(188, 19, 254, 0.08) 0%, rgba(0, 102, 255, 0.32) 25%, rgba(0, 240, 255, 0.64) 50%, rgba(0, 102, 255, 0.32) 75%, rgba(188, 19, 254, 0.08) 100%)',
-              backgroundImage: 'url(/stores/payiconbackground.png)',
+              backgroundImage:
+                'url(/GlobalBorder/store/item_background_icon.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
             }}
-          ></div>
-
-          {icon ? (
-            <div className="relative z-10">
+          >
+            {icon ? (
               <Image
                 src={icon}
                 alt={title}
@@ -147,25 +170,20 @@ export function PropCard({
                 height={100}
                 className="w-[100px] h-[100px] object-contain"
               />
-            </div>
-          ) : (
-            <div className="relative z-10">
-              <span role="img" aria-label="gift" className="text-4xl">
-                🎁
+            ) : (
+              <span
+                aria-hidden
+                className="absolute inset-0 flex items-center justify-center text-sm text-white/70"
+              >
+                gift
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* 底部：道具信息 */}
-        <div
-          className="absolute bottom-0 w-full flex flex-col items-center pb-[10px] mt-0.5"
-          style={{ height: '14px', top: '140px' }}
-        >
-          <div className="flex flex-row justify-center items-center  w-full">
-            <InfoBadge text={validity} />
-            <InfoBadge text={dailyCap} />
-          </div>
+        <div className="absolute bottom-[10px] left-0 w-full flex flex-col items-center gap-[2px]">
+          <InfoBadge text={validity} />
+          <InfoBadge text={dailyCap} emphasizeValue />
         </div>
       </div>
     </motion.div>

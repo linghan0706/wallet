@@ -5,7 +5,7 @@ import ItemUsage from '@/components/baseCard/Item_UsageList'
 import CentralCollector from '@/components/baseCard/Central_Collector'
 export default function BasePage() {
   return (
-    <div className="min-h-screen relative overflow-hidden pb-20 pt-10">
+    <div className="min-h-screen relative overflow-hidden pb-20 pt-10 flex flex-col items-center justify-center">
       {/* 背景容器 */}
       <div
         className="fixed inset-0 bg-gradient-to-b from-purple-900 via-blue-900 to-black bg-cover bg-contain"
