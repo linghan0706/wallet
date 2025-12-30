@@ -260,7 +260,7 @@ export default function TaskPage() {
                       {!task.buttonEnabled ? (
                         <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
-                            src="/currency/InCompleted.png"
+                            src="/currency/task_status/InCompleted.png"
                             alt="Completed"
                             width={48}
                             height={48}
@@ -270,7 +270,7 @@ export default function TaskPage() {
                       ) : (
                         <div className="relative w-[48px] h-[48px] flex items-center justify-center">
                           <Image
-                            src="/currency/InStatus.png"
+                            src="/currency/task_status/InStatus.png"
                             alt="Incomplete"
                             width={48}
                             height={48}

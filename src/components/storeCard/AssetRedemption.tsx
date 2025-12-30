@@ -103,17 +103,13 @@ export default function AssetRedemption() {
             <div className="absolute bottom-0 right-0 h-[12px] w-[40px]  " />
             <div className="relative z-10 flex h-full flex-col items-center justify-between pb-[12px] pt-[10px]">
               <div className="relative flex h-[42px] w-[42px] items-center justify-center">
-                <svg
-                  width="42"
-                  height="42"
-                  viewBox="0 0 64 64"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M32 6l7.6 15.5 17.1 2.5-12.3 12 2.9 17-15.3-8.1-15.3 8.1 2.9-17-12.3-12 17.1-2.5L32 6z"
-                    fill="#F6C24A"
-                  />
-                </svg>
+                <Image
+                  src="/currency/stars.svg"
+                  alt="Star"
+                  width={42}
+                  height={42}
+                  className="object-contain"
+                />
                 <div className="absolute -bottom-[6px] left-1/2 h-[10px] w-[54px] -translate-x-1/2  bg-[radial-gradient(ellipse_at_center,_rgba(255,214,102,0.45)_0%,_rgba(255,165,0,0.25)_45%,_rgba(0,0,0,0)_70%)]" />
               </div>
               <div className="font-oxanium font-bold text-[14px] text-white [text-shadow:0px_0px_1px_#BC13FE] tracking-[0.04em] uppercase">
