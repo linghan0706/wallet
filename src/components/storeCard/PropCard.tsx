@@ -46,7 +46,7 @@ const InfoBadge = ({
 
   if (!emphasizeValue || !value) {
     return (
-      <div className="flex items-center justify-center text-center whitespace-nowrap font-ibm-plex-mono font-bold text-[8px]  leading-[12px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] ">
+      <div className="flex items-center  justify-center text-center whitespace-nowrap font-ibm-plex-mono font-bold text-[8px]  leading-[12px] text-[#00F0FF]  [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] translate-y-2">
         {prefix && (
           //validity
           <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)] mt-3">
@@ -70,7 +70,7 @@ const InfoBadge = ({
   }
 
   return (
-    <div className="flex items-center justify-center gap-[2px] whitespace-nowrap text-center">
+    <div className="flex items-center justify-center gap-[2px] whitespace-nowrap text-center translate-y-2">
       {prefix && (
         <span className="inline-flex items-center justify-center font-ibm-plex-mono font-bold text-[8px] leading-[10px] text-[#00F0FF] [text-shadow:0_4px_4px_rgba(0,0,0,0.25)]">
           {prefix}
