@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function Entrance() {
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col justify-center items-center mt-10">
       <div className="w-[363px] h-[100px] bg-[url('/base/TopDisplay_border.png')] bg-contain bg-no-repeat bg-center   ">
         <div className="flex items-center px-4 h-full">
           {/* 左侧阶段图标区域 */}
@@ -56,7 +56,10 @@ export default function Entrance() {
       </div>
       <div className="flex items-center justify-center w-[363px] h-[50px] gap-8 mt-3">
         <div className="RankingLink relative w-30 h-12.5">
-          <a href="/ranking" className="block w-full h-full relative">
+          <a
+            href="/profile?tab=power#ranking"
+            className="block w-full h-full relative"
+          >
             <div className="w-full h-full bg-[url('/base/ranking.png')] bg-contain bg-no-repeat bg-center"></div>
             <div
               className="absolute right-8 transform translate-x-1/2 top-1/2 -translate-y-1/2 text-white text-2xl font-bold font-oxanium tracking-[0.04em] text-center uppercase flex items-center justify-center w-auto max-w-[100px]"

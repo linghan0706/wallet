@@ -25,7 +25,7 @@ export default function StoresTransactionCard({
     { name: 'Ton', icon: '/currency/ton.svg' },
     { name: 'USDC', icon: '/currency/usdc.svg' },
   ],
-  initialIndex = 2,
+  initialIndex = 0,
   initialQuantity = 56,
   onConfirm,
   initialIconSrc,
@@ -44,21 +44,41 @@ export default function StoresTransactionCard({
     USDC: 0.45,
   }
 
+  const labelMap: Record<CurrencyName, string> = {
+    Stars: 'STARS',
+    Ton: 'TON',
+    USDC: 'USDT',
+  }
+
+  const accentMap: Record<CurrencyName, string> = {
+    Stars: '#FFC506',
+    Ton: '#48BFF9',
+    USDC: '#92D233',
+  }
+
+  const glowMap: Record<CurrencyName, string> = {
+    Stars: '0px 0px 6px rgba(255, 197, 6, 0.9)',
+    Ton: '0px 0px 6px rgba(72, 191, 249, 0.9)',
+    USDC: '0px 0px 6px rgba(146, 210, 51, 0.9)',
+  }
+
   const [activeIndex, setActiveIndex] = useState<number>(initialIndex)
   const [quantity, setQuantity] = useState<number>(initialQuantity)
   const iconSrc = initialIconSrc || '/stores/AutomaticCollector/super.svg'
 
-  const active = useMemo(
-    () => items[Math.min(Math.max(activeIndex, 0), items.length - 1)],
-    [activeIndex, items]
+  const safeActiveIndex = Math.min(
+    Math.max(activeIndex, 0),
+    Math.max(items.length - 1, 0)
   )
+
+  const active = useMemo(() => items[safeActiveIndex], [items, safeActiveIndex])
 
   const handleDec = () => setQuantity(q => Math.max(1, q - 1))
   const handleInc = () => setQuantity(q => Math.min(9999, q + 1))
   const handleConfirm = () => onConfirm?.(active.name, quantity)
 
   return (
-    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[317px] h-[456.19px] text-white rounded-[12px] border border-white/10 bg-[url('/stores/storeupbackground.png')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+    <div className="relative flex flex-col items-center gap-4 p-4 sm:p-6 w-[317px] h-[456.19px] text-white bg-[url('/stores/storeupbackground.png')] bg-cover bg-center shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
       {/* 关闭按钮 */}
       <button
         aria-label="Close"
@@ -69,55 +89,49 @@ export default function StoresTransactionCard({
       </button>
 
       {/* 支付标题 */}
-      <h3 className="font-jersey-10 font-['Jersey_10'] font-normal text-xl leading-[22px] text-center text-white">
-        Please select a payment method
+      <h3 className="font-orbitron font-bold text-[15px] leading-[19px] text-center text-white tracking-[0.06em] uppercase [text-shadow:0px_0px_1px_#BC13FE]">
+        PAYMENT
       </h3>
-
       {/* 道具支付图标容器*/}
-      <div className="flex flex-col justify-center items-center p-0 w-[128px] h-[150px] box-border bg-[url('/stores/payiconbackground.png')] bg-cover rounded-[12px] mt-[52px]">
-        <div className="w-[126px] h-[148px] box-border rounded-[12px]">
-          <Image src={iconSrc} alt="item" width={126} height={148} priority />
+      <div className="flex flex-col justify-center items-center p-0 w-[200px] h-[200px] box-border bg-[url('/GlobalBorder/store/item_background_icon.png')] bg-cover  mt-[5px]">
+        <div className="w-full h-full box-border">
+          <Image
+            src={iconSrc}
+            alt="item"
+            width={200}
+            height={200}
+            className="w-full h-full object-contain"
+            priority
+          />
         </div>
-        <div
-          className="w-[100px] h-[6px] rounded-[12px]"
-          style={{
-            background:
-              'radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 0%, rgba(0, 240, 255, 0.25) 20%, rgba(26, 26, 64, 0.25) 75%, rgba(0, 102, 255, 0.25) 100%)',
-          }}
-        />
       </div>
-
       {/* 数量选择器*/}
-      <div
-        className="flex items-center gap-3 mt-1 w-[100px] h-[22px] border-[#00F0FFCC] border-[1px] rounded-[8px]"
-        style={{
-          background:
-            'linear-gradient(0deg, rgba(188, 19, 254, 0.2), rgba(188, 19, 254, 0.2)), rgba(0, 240, 255, 0.2)',
-        }}
-      >
+      <div className="flex items-center justify-center gap-3 mt-1 w-[200px] h-[23px]">
         <button
           onClick={handleDec}
           aria-label="Decrease"
-          className="w-7 h-7 flex items-center justify-center bg-transparent"
+          className="w-[23px] h-[23px] flex items-center justify-center bg-transparent"
         >
           <Image
             src="/currency/leftButton.svg"
             alt="Decrease"
-            width={6}
-            height={22}
+            width={23}
+            height={23}
           />
         </button>
-        <span className="font-jersey-10 font-bold text-[16px]">{quantity}</span>
+        <span className="w-[112px] h-[23px] bg-[#B0B0C0] border-l-[1px] border-l-[#00F0FF] border-r-[1px] border-r-[#BC13FE] rounded-[1px] font-oxanium font-bold text-[18px] leading-[22px] text-center tracking-[0.04em] uppercase text-white">
+          {quantity}
+        </span>
         <button
           onClick={handleInc}
           aria-label="Increase"
-          className="w-7 h-7 flex items-center justify-center bg-transparent"
+          className="w-[23px] h-[23px] flex items-center justify-center bg-transparent"
         >
           <Image
             src="/currency/rightButton.svg"
             alt="Increase"
-            width={6}
-            height={22}
+            width={23}
+            height={23}
           />
         </button>
       </div>
@@ -125,51 +139,122 @@ export default function StoresTransactionCard({
       {/* 支付方式 */}
       <div className="flex flex-row items-stretch justify-center gap-4 w-full px-2">
         {items.map((c, idx) => {
-          const isActive = idx === activeIndex
+          const isActive = idx === safeActiveIndex
           const amount = amountMap[c.name]
-          const activeBg =
-            c.name === 'Stars'
-              ? 'bg-[#FFC506]'
-              : c.name === 'Ton'
-                ? 'bg-[#48BFF9]'
-                : 'bg-[#92D233]'
-          const activeTextColor =
-            c.name === 'Stars'
-              ? 'text-[#FFC506]'
-              : c.name === 'Ton'
-                ? 'text-[#48BFF9]'
-                : 'text-[#92D233]'
-          const displayLabel = c.name === 'USDC' ? 'USDC' : c.name.toLowerCase()
+          const accent = accentMap[c.name]
+          const displayLabel = labelMap[c.name]
+
+          // 映射支付方式到对应的背景图片
+          const getBackgroundImage = (name: CurrencyName) => {
+            switch (name) {
+              case 'Stars':
+                return 'bg-[url("/stores/payment/star.png")]'
+              case 'Ton':
+                return 'bg-[url("/stores/payment/ton.png")]'
+              case 'USDC':
+                return 'bg-[url("/stores/payment/usdt.png")]'
+              default:
+                return 'bg-[url("/stores/payment/star.png")]'
+            }
+          }
+
           return (
             <button
               key={c.name}
               onClick={() => setActiveIndex(idx)}
-              className={`group w-[91px] h-[64px] rounded-lg border border-white/10 flex flex-col justify-between items-start p-2 ${
-                isActive
-                  ? `${activeBg} text-[#1A1A1A]`
-                  : 'bg-black/40 text-white'
-              } transform-gpu transition-colors duration-200 ease-out motion-reduce:transition-none focus-visible:outline-none disabled:opacity-50 disabled:pointer-events-none`}
+              type="button"
+              aria-pressed={isActive}
+              className="group relative w-[91px] h-[80px] bg-[#0B0B17] transform-gpu transition-all duration-200 ease-out motion-reduce:transition-none focus-visible:outline-none disabled:opacity-50 disabled:pointer-events-none"
             >
-              <div
-                className={`text-[18px] font-jersey-10  leading-[14px] font-bold text-center w-full ${isActive ? 'text-[#141F23]' : 'text-[#606060]'}`}
-              >
-                {displayLabel}
-              </div>
-              <div
-                className={`w-[75px] h-[34px] flex items-center justify-center gap-[4px] whitespace-nowrap select-none mt-[2px] rounded-[8px] border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.35)] transform-gpu transition-colors duration-200 ease-out motion-reduce:transition-none ${isActive ? 'bg-[#141F23] hover:bg-[#1A2429] group-focus-visible:ring-2 group-focus-visible:ring-white/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#141F23]' : 'bg-[#0B171B] hover:bg-[#102027] group-focus-visible:ring-2 group-focus-visible:ring-white/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#0B171B]'} group-disabled:opacity-50 group-disabled:grayscale`}
-              >
-                <Image
-                  className="shrink-0"
-                  src={c.icon}
-                  alt={c.name}
-                  width={16}
-                  height={16}
-                />
+              <Image
+                src={(() => {
+                  switch (c.name) {
+                    case 'Stars':
+                      return '/stores/payment/star.png'
+                    case 'Ton':
+                      return '/stores/payment/ton.png'
+                    case 'USDC':
+                      return '/stores/payment/usdt.png'
+                    default:
+                      return '/stores/payment/star.png'
+                  }
+                })()}
+                alt=""
+                width={91}
+                height={80}
+                className="absolute inset-0 z-0 object-cover pointer-events-none"
+              />
+              {isActive && (
                 <span
-                  className={`font-exo2 font-bold tabular-nums text-[14px] leading-[14px] align-middle text-center ${isActive ? activeTextColor : 'text-[#606060]'} transition-colors duration-150`}
-                >
-                  {amount}
-                </span>
+                  aria-hidden
+                  className="absolute inset-0 z-10 pointer-events-none"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(0,0,0,0) 45%, ${accent}B3 46%, ${accent}B3 100%)`,
+                  }}
+                />
+              )}
+              {!isActive && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#05050F]/65 pointer-events-none">
+                  <span
+                    className="font-oxanium font-bold text-[14px] leading-[18px] tracking-[0.04em] text-center uppercase"
+                    style={{ color: '#B0B0C0' }}
+                  >
+                    {displayLabel}
+                  </span>
+                </div>
+              )}
+              <div
+                className={`relative z-10 w-[91px] h-[80px] ${
+                  isActive
+                    ? 'flex flex-col justify-between items-start px-2 pt-2 pb-1'
+                    : 'flex items-center justify-center'
+                }`}
+              >
+                {isActive ? (
+                  <>
+                    <div
+                      className="font-oxanium font-bold text-[14px] leading-[100%] tracking-[0.08em] text-center uppercase w-full"
+                      style={{
+                        color: accent,
+                        textShadow: glowMap[c.name],
+                      }}
+                    >
+                      {displayLabel}
+                    </div>
+                    <div className="w-[75px] h-[40px] flex items-center justify-start gap-2 whitespace-nowrap select-none mt-[2px] bg-[#1A1A4099]">
+                      <div className="w-[25px] h-[25px] flex items-center justify-center">
+                        <Image
+                          src={c.icon}
+                          alt={c.name}
+                          width={25}
+                          height={25}
+                        />
+                      </div>
+                      <span
+                        className="font-oxanium font-bold text-[16px] leading-[100%] text-center uppercase tracking-[0.04em]"
+                        style={{
+                          color: '#FFFFFF',
+                          textShadow: glowMap[c.name],
+                        }}
+                      >
+                        {amount}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-[75px] h-[40px] flex items-center justify-center mt-[10px] bg-[#1A1A4099]">
+                      <div className="w-[25px] h-[25px] flex items-center justify-center">
+                        <Image
+                          src={c.icon}
+                          alt={c.name}
+                          width={25}
+                          height={25}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </button>
           )
@@ -178,16 +263,10 @@ export default function StoresTransactionCard({
 
       {/* 支付 */}
       <button
-        className="mt-auto w-[285px] h-[42px] rounded-[8px] text-white font-jersey-10 font-normal text-[18px] leading-[22px]"
+        className="mt-auto w-[230px] h-[26px] text-white font-oxanium font-bold text-[14px] leading-[18px] bg-[url('/GlobalBorder/Global_Button.svg')] bg-cover bg-center uppercase"
         onClick={handleConfirm}
-        style={{
-          background:
-            'linear-gradient(98.64deg, rgba(0, 240, 255, 0.8) 0%, rgba(188, 19, 254, 0.8) 99.34%)',
-          boxShadow:
-            '0px 1px 1px #BC13FE, 0px -1px 1px #00F0FF, inset 0px 1px 1px #BC13FE, inset 0px -1px 1px #00F0FF',
-        }}
       >
-        Confirm the transaction
+        Confirm
       </button>
     </div>
   )

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 export default function CentralCollector() {
   return (
-    <div className="relative w-[363px] h-[400px]">
+    <div className="relative w-[363px] h-[400px] flex items-center justify-center mt-10">
       <div className="absolute inset-0 w-full h-full">
         <Image
           src="/base/central_collector/background.png"

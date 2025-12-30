@@ -1,4 +1,6 @@
 'use client'
+import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import MotionDiv from '@/components/motion/MotionDiv'
 import AssetsOverview from '@/components/profileCard/AssetsOverView'
 import WalletConnect from '@/components/profileCard/WalletConnect'
@@ -8,6 +10,24 @@ import InviteLink from '@/components/profileCard/InviteLink'
 import Ranking from '@/components/profileCard/Ranking'
 
 export default function ProfilePage() {
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    // 检查是否有hash值
+    if (window.location.hash === '#ranking') {
+      const rankingElement = document.getElementById('ranking')
+      if (rankingElement) {
+        // 等待页面渲染完成后滚动到锚点
+        setTimeout(() => {
+          rankingElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          })
+        }, 100)
+      }
+    }
+  }, [])
+
   return (
     <div className="min-h-screen relative overflow-hidden pb-20 pt-10">
       {/* 背景容器 */}
@@ -28,7 +48,14 @@ export default function ProfilePage() {
           <WalletConnect />
           <BadgeShow />
           <InviteLink />
-          <Ranking />
+          <div id="ranking">
+            <Ranking
+              defaultTab={
+                (searchParams.get('tab') as 'history' | 'power' | 'nova') ||
+                'power'
+              }
+            />
+          </div>
         </MotionDiv>
         <WalletConnectModal />
       </div>

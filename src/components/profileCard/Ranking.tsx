@@ -404,7 +404,11 @@ const HistoryCard = ({
   )
 }
 
-export default function Ranking() {
+interface RankingProps {
+  defaultTab?: 'history' | 'power' | 'nova'
+}
+
+export default function Ranking({ defaultTab = 'history' }: RankingProps = {}) {
   const tabs = [
     { key: 'history', label: 'HISTORY' },
     { key: 'power', label: 'POWER' },
@@ -412,7 +416,7 @@ export default function Ranking() {
   ] as const
 
   const [activeTab, setActiveTab] = useState<'history' | 'power' | 'nova'>(
-    'history'
+    defaultTab
   )
   const borderSrc = '/GlobalBorder/profile/RankingBorder.svg'
   const tabWidth = 121

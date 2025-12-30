@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function AssetRedemption() {
   return (
-    <div className="relative h-[221px] w-[363px] overflow-hidden bg-[url('/GlobalBorder/store/exchange_border.png')] bg-cover bg-no-repeat font-oxanium text-white">
+    <div className="relative h-[221px] w-[363px] m-auto overflow-hidden bg-[url('/GlobalBorder/store/exchange_border.png')] bg-cover bg-no-repeat font-oxanium text-white">
       <div className="absolute inset-[6px] rounded-[4px] bg-[radial-gradient(ellipse_at_center,_rgba(26,32,72,0.85)_0%,_rgba(13,16,38,0.95)_55%,_rgba(10,12,30,1)_100%)]" />
       <div className="absolute inset-[6px] rounded-[4px] bg-[radial-gradient(circle_at_18%_28%,_rgba(255,255,255,0.15)_0%,_rgba(255,255,255,0)_40%),radial-gradient(circle_at_72%_20%,_rgba(130,170,255,0.2)_0%,_rgba(130,170,255,0)_45%),radial-gradient(circle_at_48%_72%,_rgba(120,90,255,0.25)_0%,_rgba(120,90,255,0)_50%)] opacity-60" />
       <div className="absolute inset-0 pointer-events-none">
@@ -75,13 +75,13 @@ export default function AssetRedemption() {
                   MIN
                 </span>
                 <div className="h-[22px] w-[78px]">
-                  <div className="h-full w-full border-l-[1px] border-l-[#00F0FF] border-r-[1px] border-r-[#BC13FE] p-[1px] bg-[#3F3F56]">
-                    <div className="flex h-full w-full items-center justify-center rounded-[1px] bg-[#B0B0C0] text-[14px] font-bold tracking-[0.08em] text-white [text-shadow:0_0_4px_rgba(255,255,255,0.8)]">
+                  <div className="h-full w-full border-l-[1px] border-l-[#00F0FF] border-r-[1px] border-r-[#BC13FE]  bg-[#3F3F56]">
+                    <div className="flex h-full w-full items-center justify-center rounded-[1px] bg-[#B0B0C0] text-[14px] font-bold tracking-[0.08em] text-white">
                       1,000
                     </div>
                   </div>
                 </div>
-                <span className="font-oxanium font-bold text-[10px] text-[#BC13FE] underline uppercase flex items-center tracking-[0.04em]">
+                <span className="font-oxanium font-bold text-[10px] text-[#BC13FE] underline uppercase flex items-center tracking-[0.02em]">
                   ALL
                 </span>
               </div>

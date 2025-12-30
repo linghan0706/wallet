@@ -139,7 +139,7 @@ export default function StoreTabs() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between select-none w-full -mt-[3px]">
+      <div className="flex items-center justify-between select-none w-full mt-[2px]">
         <div
           onClick={() => setTab('raffle')}
           className={`font-jersey-10 transition-opacity duration-200 ease-in-out font-[24px] leading-[22px] tracking-wide text-[#DEF5FF] ${
@@ -147,7 +147,7 @@ export default function StoreTabs() {
           }`}
           style={{ textShadow: '0 0 4px #6B0AE9' }}
         >
-          <span className="ml-[23px] text-[22px] font-jersey-10 leading-[22px] whitespace-nowrap">
+          <span className="ml-[23px] text-[13px] font-ibm-plex-mono leading-[22px] whitespace-nowrap">
             Raffle Ticket
           </span>
         </div>
@@ -160,7 +160,7 @@ export default function StoreTabs() {
           }`}
           style={{ textShadow: '0 0 4px #6B0AE9' }}
         >
-          <span className="ml-[40px] text-[22px] font-jersey-10 leading-[22px] whitespace-nowrap">
+          <span className="ml-[40px] text-[13px] font-ibm-plex-mono leading-[22px] whitespace-nowrap">
             Automatic Collector
           </span>
         </div>
